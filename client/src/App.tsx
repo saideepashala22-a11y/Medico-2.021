@@ -8,6 +8,10 @@ import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import Lab from "@/pages/lab";
+import PatientRegistration from "@/pages/lab/patient-registration";
+import TestSelection from "@/pages/lab/test-selection";
+import EnterResults from "@/pages/lab/enter-results";
+import LabReport from "@/pages/lab/report";
 import Pharmacy from "@/pages/pharmacy";
 import Discharge from "@/pages/discharge";
 import { Loader2 } from "lucide-react";
@@ -66,6 +70,30 @@ function Router() {
       <Route path="/lab">
         <ProtectedRoute>
           <Lab />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/lab/patient-registration">
+        <ProtectedRoute>
+          <PatientRegistration />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/lab/test-selection/:patientId">
+        <ProtectedRoute>
+          <TestSelection />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/lab/enter-results/:patientId">
+        <ProtectedRoute>
+          <EnterResults />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/lab/report/:labTestId">
+        <ProtectedRoute>
+          <LabReport />
         </ProtectedRoute>
       </Route>
       
