@@ -2,7 +2,17 @@
 
 ## Overview
 
-This is a comprehensive Hospital Management System built as a full-stack web application for managing hospital operations including patient records, laboratory tests, pharmacy prescriptions, and discharge summaries. The system provides role-based access for doctors and staff members, with features for patient registration, test management, prescription creation, and PDF report generation.
+This is a comprehensive Hospital Management System built as a full-stack web application for managing hospital operations including patient records, laboratory tests, pharmacy prescriptions, and discharge summaries. The system provides role-based access for doctors and staff members, with features for enhanced patient registration, multi-step lab test workflow, prescription creation, and PDF report generation.
+
+## Recent Changes (Latest)
+
+**Enhanced Lab Testing Workflow (August 2025)**
+- Redesigned lab testing into a comprehensive 4-step process: Patient Registration → Test Selection → Results Entry → Report Generation
+- Enhanced patient registration form with professional fields: salutation, age units, blood group, emergency contacts, email, address, and referring doctor information
+- Added smart auto-fill functionality (salutation automatically suggests gender)
+- Implemented comprehensive form validation with phone number (10-digit) and email format validation
+- Created professional progress indicators and step-by-step navigation
+- Fixed authentication issues with JWT token handling in API requests
 
 ## User Preferences
 

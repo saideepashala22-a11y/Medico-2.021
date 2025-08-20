@@ -17,10 +17,17 @@ export default function PatientRegistration() {
   const [, setLocation] = useLocation();
   
   const [patientData, setPatientData] = useState({
+    salutation: '',
     name: '',
-    age: '',
+    ageValue: '',
+    ageUnit: 'years',
     gender: '',
-    contact: '',
+    phone: '',
+    email: '',
+    address: '',
+    referringDoctor: '',
+    bloodGroup: '',
+    emergencyContact: '',
   });
 
   const createPatientMutation = useMutation({
@@ -45,19 +52,74 @@ export default function PatientRegistration() {
     },
   });
 
+  // Smart autofill for gender based on salutation
+  const handleSalutationChange = (value: string) => {
+    setPatientData(prev => {
+      let autoGender = prev.gender;
+      if (['mr', 'master'].includes(value.toLowerCase())) {
+        autoGender = 'male';
+      } else if (['mrs', 'ms', 'miss'].includes(value.toLowerCase())) {
+        autoGender = 'female';
+      }
+      return { ...prev, salutation: value, gender: autoGender };
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!patientData.name || !patientData.age || !patientData.gender) {
+    
+    // Basic validation
+    if (!patientData.name || !patientData.ageValue || !patientData.gender) {
       toast({
         title: 'Error',
-        description: 'Please fill in required fields',
+        description: 'Please fill in all required fields (Name, Age, Gender)',
         variant: 'destructive',
       });
       return;
     }
+
+    // Phone number validation (if provided)
+    if (patientData.phone && !/^\d{10}$/.test(patientData.phone)) {
+      toast({
+        title: 'Error',
+        description: 'Please enter a valid 10-digit phone number',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Email validation (if provided)
+    if (patientData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(patientData.email)) {
+      toast({
+        title: 'Error',
+        description: 'Please enter a valid email address',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Convert age to number and prepare full name
+    const fullName = patientData.salutation ? `${patientData.salutation} ${patientData.name}` : patientData.name;
+    const ageInYears = patientData.ageUnit === 'months' ? Math.floor(parseInt(patientData.ageValue) / 12) 
+                      : patientData.ageUnit === 'days' ? Math.floor(parseInt(patientData.ageValue) / 365) 
+                      : parseInt(patientData.ageValue);
+    
     createPatientMutation.mutate({
-      ...patientData,
-      age: parseInt(patientData.age),
+      name: fullName,
+      age: ageInYears,
+      gender: patientData.gender,
+      contact: patientData.phone || patientData.emergencyContact,
+      // Store additional data in a format that can be extended later
+      additionalInfo: {
+        salutation: patientData.salutation,
+        ageValue: patientData.ageValue,
+        ageUnit: patientData.ageUnit,
+        email: patientData.email,
+        address: patientData.address,
+        referringDoctor: patientData.referringDoctor,
+        bloodGroup: patientData.bloodGroup,
+        emergencyContact: patientData.emergencyContact,
+      }
     });
   };
 
@@ -117,7 +179,7 @@ export default function PatientRegistration() {
         </div>
 
         {/* Registration Form */}
-        <Card className="max-w-2xl mx-auto">
+        <Card className="max-w-4xl mx-auto">
           <CardHeader>
             <CardTitle className="text-center">Register New Patient</CardTitle>
             <p className="text-center text-gray-600">Enter patient information to begin lab testing</p>
@@ -133,29 +195,68 @@ export default function PatientRegistration() {
                 />
                 <p className="text-xs text-gray-500 mt-1">Format: HMS-YYYY-001</p>
               </div>
-              
-              <div>
-                <Label>Full Name *</Label>
-                <Input
-                  value={patientData.name}
-                  onChange={(e) => setPatientData({ ...patientData, name: e.target.value })}
-                  placeholder="Enter patient's full name"
-                  required
-                />
+
+              {/* Basic Information */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <Label>Salutation</Label>
+                  <Select 
+                    value={patientData.salutation}
+                    onValueChange={handleSalutationChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Salutation" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="mr">Mr.</SelectItem>
+                      <SelectItem value="mrs">Mrs.</SelectItem>
+                      <SelectItem value="ms">Ms.</SelectItem>
+                      <SelectItem value="miss">Miss</SelectItem>
+                      <SelectItem value="master">Master</SelectItem>
+                      <SelectItem value="baby">Baby</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="md:col-span-2">
+                  <Label>Full Name *</Label>
+                  <Input
+                    value={patientData.name}
+                    onChange={(e) => setPatientData({ ...patientData, name: e.target.value })}
+                    placeholder="Enter patient's full name"
+                    required
+                  />
+                </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-6">
+              {/* Age and Gender */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <Label>Age *</Label>
+                  <Label>Age Value *</Label>
                   <Input
                     type="number"
                     min="1"
-                    max="120"
-                    value={patientData.age}
-                    onChange={(e) => setPatientData({ ...patientData, age: e.target.value })}
+                    value={patientData.ageValue}
+                    onChange={(e) => setPatientData({ ...patientData, ageValue: e.target.value })}
                     placeholder="Age"
                     required
                   />
+                </div>
+                <div>
+                  <Label>Age Unit *</Label>
+                  <Select 
+                    value={patientData.ageUnit}
+                    onValueChange={(value) => setPatientData({ ...patientData, ageUnit: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="years">Years</SelectItem>
+                      <SelectItem value="months">Months</SelectItem>
+                      <SelectItem value="days">Days</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label>Gender *</Label>
@@ -174,15 +275,81 @@ export default function PatientRegistration() {
                   </Select>
                 </div>
               </div>
-              
-              <div>
-                <Label>Contact Number</Label>
-                <Input
-                  type="tel"
-                  value={patientData.contact}
-                  onChange={(e) => setPatientData({ ...patientData, contact: e.target.value })}
-                  placeholder="Phone number (optional)"
-                />
+
+              {/* Contact Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label>Phone Number</Label>
+                  <Input
+                    type="tel"
+                    value={patientData.phone}
+                    onChange={(e) => setPatientData({ ...patientData, phone: e.target.value })}
+                    placeholder="10-digit phone number"
+                    maxLength={10}
+                  />
+                </div>
+                <div>
+                  <Label>Email Address</Label>
+                  <Input
+                    type="email"
+                    value={patientData.email}
+                    onChange={(e) => setPatientData({ ...patientData, email: e.target.value })}
+                    placeholder="email@example.com"
+                  />
+                </div>
+              </div>
+
+              {/* Medical Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label>Blood Group</Label>
+                  <Select 
+                    value={patientData.bloodGroup}
+                    onValueChange={(value) => setPatientData({ ...patientData, bloodGroup: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Blood Group" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="A+">A+</SelectItem>
+                      <SelectItem value="A-">A-</SelectItem>
+                      <SelectItem value="B+">B+</SelectItem>
+                      <SelectItem value="B-">B-</SelectItem>
+                      <SelectItem value="AB+">AB+</SelectItem>
+                      <SelectItem value="AB-">AB-</SelectItem>
+                      <SelectItem value="O+">O+</SelectItem>
+                      <SelectItem value="O-">O-</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Referring Doctor</Label>
+                  <Input
+                    value={patientData.referringDoctor}
+                    onChange={(e) => setPatientData({ ...patientData, referringDoctor: e.target.value })}
+                    placeholder="Doctor name or 'Self'"
+                  />
+                </div>
+              </div>
+
+              {/* Emergency Contact and Address */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label>Emergency Contact</Label>
+                  <Input
+                    value={patientData.emergencyContact}
+                    onChange={(e) => setPatientData({ ...patientData, emergencyContact: e.target.value })}
+                    placeholder="Emergency contact number"
+                  />
+                </div>
+                <div>
+                  <Label>Address</Label>
+                  <Input
+                    value={patientData.address}
+                    onChange={(e) => setPatientData({ ...patientData, address: e.target.value })}
+                    placeholder="Patient address"
+                  />
+                </div>
               </div>
 
               <Button 

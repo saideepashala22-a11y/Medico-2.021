@@ -1,0 +1,151 @@
+Nice 👌 the new **Patient Registration form** you showed looks much more detailed and professional than the first one. Let’s **improvise and finalize** it so that it covers all essential patient details while keeping the UI clean.
+
+---
+
+## 🏥 Improved **Patient Registration Form**
+
+### **Mandatory Fields**
+
+* **Salutation** (Mr., Mrs., Ms., Master, Baby, etc.)
+* **Full Name**
+* **Age Value + Age Unit** (e.g., 22 Years, 6 Months, 12 Days → store both value + unit)
+* **Gender** *(auto-select from salutation, but allow manual override)*
+
+### **Optional but Useful Fields**
+
+* **Phone Number** (10-digit validation)
+* **Email Address** (for sending reports)
+* **Referring Doctor** (dropdown with doctor list or "Self")
+* **Address** (useful for discharge summary or billing)
+
+### **Extra Recommended Fields (Improvements)**
+
+* **Patient ID** (auto-generate, e.g., `HMS-2025-003`)
+* **Blood Group** (Dropdown: A+, A-, B+, O+, etc.)
+* **Insurance Details** (if hospital supports)
+* **Emergency Contact** (name + number)
+* **Occupation** (helps in epidemiology reports)
+
+---
+
+## 🎨 UI/UX Improvements
+
+* **Smart Autofill:**
+  If salutation = "Mr." → Default gender = Male
+  If salutation = "Mrs." / "Ms." → Default gender = Female
+
+* **Validation:**
+
+  * Age should be a number + unit selected
+  * Phone number = 10 digits
+  * Email = regex validation
+
+* **Patient ID Auto-generation:**
+  Format: `HMS-YYYY-XXX` (increment counter for each new patient)
+
+* **Navigation Flow:**
+  Once registered → **Save to DB + Redirect to Test Selection**
+
+---
+
+## ⚡ Example React Component (Patient Registration Page)
+
+```jsx
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+function PatientRegistration() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    salutation: "",
+    fullName: "",
+    ageValue: "",
+    ageUnit: "Years",
+    gender: "",
+    phone: "",
+    email: "",
+    address: "",
+    referringDoctor: "",
+    bloodGroup: "",
+    emergencyContact: "",
+  });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+    if (e.target.name === "salutation") {
+      if (["Mr.", "Master"].includes(e.target.value)) {
+        setForm((prev) => ({ ...prev, gender: "Male" }));
+      } else if (["Mrs.", "Ms.", "Baby"].includes(e.target.value)) {
+        setForm((prev) => ({ ...prev, gender: "Female" }));
+      }
+    }
+  };
+
+  const handleSubmit = () => {
+    // Auto-generate patient ID
+    const patientId = `HMS-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`;
+    const patientData = { ...form, patientId };
+    localStorage.setItem("patientData", JSON.stringify(patientData));
+    navigate("/tests");
+  };
+
+  return (
+    <div className="p-6 max-w-2xl mx-auto bg-gray-800 rounded-xl text-white">
+      <h2 className="text-xl mb-4">🧑‍⚕️ Patient Information</h2>
+
+      <div className="grid grid-cols-2 gap-4">
+        <select name="salutation" value={form.salutation} onChange={handleChange}>
+          <option>Select salutation</option>
+          <option>Mr.</option>
+          <option>Mrs.</option>
+          <option>Ms.</option>
+          <option>Master</option>
+          <option>Baby</option>
+        </select>
+
+        <input type="text" name="fullName" placeholder="Full Name" value={form.fullName} onChange={handleChange} required />
+
+        <input type="number" name="ageValue" placeholder="Age Value" value={form.ageValue} onChange={handleChange} required />
+
+        <select name="ageUnit" value={form.ageUnit} onChange={handleChange}>
+          <option>Years</option>
+          <option>Months</option>
+          <option>Days</option>
+        </select>
+
+        <select name="gender" value={form.gender} onChange={handleChange} required>
+          <option>Select gender</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+
+        <input type="text" name="phone" placeholder="Phone Number (Optional)" value={form.phone} onChange={handleChange} />
+
+        <input type="email" name="email" placeholder="Email (Optional)" value={form.email} onChange={handleChange} />
+
+        <input type="text" name="referringDoctor" placeholder="Referring Doctor (Optional)" value={form.referringDoctor} onChange={handleChange} />
+
+        <input type="text" name="bloodGroup" placeholder="Blood Group (Optional)" value={form.bloodGroup} onChange={handleChange} />
+
+        <input type="text" name="emergencyContact" placeholder="Emergency Contact (Optional)" value={form.emergencyContact} onChange={handleChange} />
+
+        <textarea name="address" placeholder="Address (Optional)" value={form.address} onChange={handleChange}></textarea>
+      </div>
+
+      <button onClick={handleSubmit} className="mt-4 w-full bg-blue-500 text-white p-2 rounded">
+        Continue to Test Selection →
+      </button>
+    </div>
+  );
+}
+
+export default PatientRegistration;
+```
+
+---
+
+✅ This way you’ll have a **comprehensive registration page** → then redirect into your **Test Selection Page**.
+
+👉 Do you want me to now design the **Test Selection Page** in the same **multi-page flow** (like this registration page) with **multi-select tests + cost calculation**?
