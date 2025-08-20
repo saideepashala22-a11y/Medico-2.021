@@ -1,8 +1,9 @@
 import { 
-  users, patients, labTests, prescriptions, dischargeSummaries,
+  users, patients, labTests, prescriptions, dischargeSummaries, medicalHistory, patientProfiles,
   type User, type InsertUser, type Patient, type InsertPatient,
   type LabTest, type InsertLabTest, type Prescription, type InsertPrescription,
-  type DischargeSummary, type InsertDischargeSummary
+  type DischargeSummary, type InsertDischargeSummary, type MedicalHistory, type InsertMedicalHistory,
+  type PatientProfile, type InsertPatientProfile
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, ilike, or, sql } from "drizzle-orm";
@@ -37,6 +38,17 @@ export interface IStorage {
   getDischargeSummariesByPatient(patientId: string): Promise<DischargeSummary[]>;
   createDischargeSummary(summary: InsertDischargeSummary): Promise<DischargeSummary>;
   getRecentDischargeSummaries(): Promise<(DischargeSummary & { patient: Patient })[]>;
+  
+  // Medical History
+  getMedicalHistoryEntry(id: string): Promise<MedicalHistory | undefined>;
+  getMedicalHistoryByPatient(patientId: string): Promise<MedicalHistory[]>;
+  createMedicalHistoryEntry(entry: InsertMedicalHistory): Promise<MedicalHistory>;
+  updateMedicalHistoryEntry(id: string, updates: Partial<MedicalHistory>): Promise<MedicalHistory>;
+  deleteMedicalHistoryEntry(id: string): Promise<void>;
+  
+  // Patient Profiles  
+  getPatientProfile(patientId: string): Promise<PatientProfile | undefined>;
+  createOrUpdatePatientProfile(profile: InsertPatientProfile): Promise<PatientProfile>;
   
   // Stats
   getStats(): Promise<{
@@ -237,6 +249,57 @@ export class DatabaseStorage implements IStorage {
       prescriptionsToday: Number(prescriptionsToday.count),
       dischargesToday: Number(dischargesToday.count),
     };
+  }
+
+  // Medical History Methods
+  async getMedicalHistoryEntry(id: string): Promise<MedicalHistory | undefined> {
+    const [entry] = await db.select().from(medicalHistory).where(eq(medicalHistory.id, id));
+    return entry || undefined;
+  }
+
+  async getMedicalHistoryByPatient(patientId: string): Promise<MedicalHistory[]> {
+    return await db.select().from(medicalHistory)
+      .where(eq(medicalHistory.patientId, patientId))
+      .orderBy(desc(medicalHistory.createdAt));
+  }
+
+  async createMedicalHistoryEntry(entry: InsertMedicalHistory): Promise<MedicalHistory> {
+    const [newEntry] = await db.insert(medicalHistory).values(entry).returning();
+    return newEntry;
+  }
+
+  async updateMedicalHistoryEntry(id: string, updates: Partial<MedicalHistory>): Promise<MedicalHistory> {
+    const [updatedEntry] = await db.update(medicalHistory)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(medicalHistory.id, id))
+      .returning();
+    return updatedEntry;
+  }
+
+  async deleteMedicalHistoryEntry(id: string): Promise<void> {
+    await db.delete(medicalHistory).where(eq(medicalHistory.id, id));
+  }
+
+  // Patient Profile Methods
+  async getPatientProfile(patientId: string): Promise<PatientProfile | undefined> {
+    const [profile] = await db.select().from(patientProfiles)
+      .where(eq(patientProfiles.patientId, patientId));
+    return profile || undefined;
+  }
+
+  async createOrUpdatePatientProfile(profile: InsertPatientProfile): Promise<PatientProfile> {
+    const existingProfile = await this.getPatientProfile(profile.patientId);
+    
+    if (existingProfile) {
+      const [updatedProfile] = await db.update(patientProfiles)
+        .set({ ...profile, updatedAt: new Date() })
+        .where(eq(patientProfiles.patientId, profile.patientId))
+        .returning();
+      return updatedProfile;
+    } else {
+      const [newProfile] = await db.insert(patientProfiles).values(profile).returning();
+      return newProfile;
+    }
   }
 }
 

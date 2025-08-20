@@ -94,7 +94,7 @@ export default function EnterResults() {
       });
     });
     setResults(initialResults);
-  }, [selectedTests]);
+  }, [selectedTests.join(',')]); // Fix infinite loop by converting array to string
 
   const createLabTestMutation = useMutation({
     mutationFn: async (data: any) => {

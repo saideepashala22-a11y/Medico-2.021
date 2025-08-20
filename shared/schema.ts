@@ -61,17 +61,78 @@ export const dischargeSummaries = pgTable("discharge_summaries", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Patient Medical History Table
+export const medicalHistory = pgTable("medical_history", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  patientId: varchar("patient_id").notNull().references(() => patients.id),
+  entryType: text("entry_type").notNull(), // 'diagnosis', 'allergy', 'medication', 'procedure', 'note'
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  category: text("category"), // 'chronic', 'acute', 'surgical', 'medication', etc.
+  severity: text("severity"), // 'mild', 'moderate', 'severe', 'critical'
+  status: text("status").notNull().default("active"), // 'active', 'resolved', 'inactive'
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  providerName: text("provider_name"),
+  notes: text("notes"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Extended Patient Information
+export const patientProfiles = pgTable("patient_profiles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  patientId: varchar("patient_id").notNull().references(() => patients.id).unique(),
+  dateOfBirth: timestamp("date_of_birth"),
+  bloodType: text("blood_type"),
+  height: decimal("height", { precision: 5, scale: 2 }), // in cm
+  weight: decimal("weight", { precision: 5, scale: 2 }), // in kg
+  emergencyContactName: text("emergency_contact_name"),
+  emergencyContactPhone: text("emergency_contact_phone"),
+  emergencyContactRelation: text("emergency_contact_relation"),
+  address: text("address"),
+  insurance: text("insurance"),
+  primaryPhysician: text("primary_physician"),
+  knownAllergies: jsonb("known_allergies"), // array of allergy objects
+  currentMedications: jsonb("current_medications"), // array of medication objects
+  chronicConditions: jsonb("chronic_conditions"), // array of condition objects
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   labTests: many(labTests),
   prescriptions: many(prescriptions),
   dischargeSummaries: many(dischargeSummaries),
+  medicalHistoryEntries: many(medicalHistory),
 }));
 
-export const patientsRelations = relations(patients, ({ many }) => ({
+export const patientsRelations = relations(patients, ({ many, one }) => ({
   labTests: many(labTests),
   prescriptions: many(prescriptions),
   dischargeSummaries: many(dischargeSummaries),
+  medicalHistoryEntries: many(medicalHistory),
+  profile: one(patientProfiles),
+}));
+
+export const patientProfilesRelations = relations(patientProfiles, ({ one }) => ({
+  patient: one(patients, {
+    fields: [patientProfiles.patientId],
+    references: [patients.id],
+  }),
+}));
+
+export const medicalHistoryRelations = relations(medicalHistory, ({ one }) => ({
+  patient: one(patients, {
+    fields: [medicalHistory.patientId],
+    references: [patients.id],
+  }),
+  createdBy: one(users, {
+    fields: [medicalHistory.createdBy],
+    references: [users.id],
+  }),
 }));
 
 export const labTestsRelations = relations(labTests, ({ one }) => ({
@@ -134,6 +195,18 @@ export const insertDischargeSummarySchema = createInsertSchema(dischargeSummarie
   createdAt: true,
 });
 
+export const insertMedicalHistorySchema = createInsertSchema(medicalHistory).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPatientProfileSchema = createInsertSchema(patientProfiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -143,5 +216,9 @@ export type InsertLabTest = z.infer<typeof insertLabTestSchema>;
 export type LabTest = typeof labTests.$inferSelect;
 export type InsertPrescription = z.infer<typeof insertPrescriptionSchema>;
 export type Prescription = typeof prescriptions.$inferSelect;
+export type InsertMedicalHistory = z.infer<typeof insertMedicalHistorySchema>;
+export type MedicalHistory = typeof medicalHistory.$inferSelect;
+export type InsertPatientProfile = z.infer<typeof insertPatientProfileSchema>;
+export type PatientProfile = typeof patientProfiles.$inferSelect;
 export type InsertDischargeSummary = z.infer<typeof insertDischargeSummarySchema>;
 export type DischargeSummary = typeof dischargeSummaries.$inferSelect;

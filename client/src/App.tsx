@@ -14,6 +14,7 @@ import EnterResults from "@/pages/lab/enter-results";
 import LabReport from "@/pages/lab/report";
 import Pharmacy from "@/pages/pharmacy";
 import Discharge from "@/pages/discharge";
+import MedicalHistory from "@/pages/medical-history";
 import { Loader2 } from "lucide-react";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -106,6 +107,12 @@ function Router() {
       <Route path="/discharge">
         <ProtectedRoute>
           <Discharge />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/medical-history">
+        <ProtectedRoute>
+          <MedicalHistory />
         </ProtectedRoute>
       </Route>
       

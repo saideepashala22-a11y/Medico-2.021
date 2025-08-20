@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema } from "@shared/schema";
+import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema } from "@shared/schema";
 import { z } from "zod";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
@@ -278,6 +278,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json(summary);
     } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Medical History Routes
+  app.get('/api/medical-history/:patientId', authenticateToken, async (req: any, res) => {
+    try {
+      const history = await storage.getMedicalHistoryByPatient(req.params.patientId);
+      res.json(history);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.post('/api/medical-history', authenticateToken, async (req: any, res) => {
+    try {
+      const entryData = insertMedicalHistorySchema.parse({
+        ...req.body,
+        createdBy: req.user.id
+      });
+      
+      const entry = await storage.createMedicalHistoryEntry(entryData);
+      res.status(201).json(entry);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Invalid input', errors: error.errors });
+      }
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.put('/api/medical-history/:id', authenticateToken, async (req: any, res) => {
+    try {
+      const updates = req.body;
+      const entry = await storage.updateMedicalHistoryEntry(req.params.id, updates);
+      res.json(entry);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.delete('/api/medical-history/:id', authenticateToken, async (req: any, res) => {
+    try {
+      await storage.deleteMedicalHistoryEntry(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Patient Profile Routes
+  app.get('/api/patient-profile/:patientId', authenticateToken, async (req: any, res) => {
+    try {
+      const profile = await storage.getPatientProfile(req.params.patientId);
+      res.json(profile || {});
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.post('/api/patient-profile', authenticateToken, async (req: any, res) => {
+    try {
+      const profileData = insertPatientProfileSchema.parse(req.body);
+      const profile = await storage.createOrUpdatePatientProfile(profileData);
+      res.json(profile);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Invalid input', errors: error.errors });
+      }
       res.status(500).json({ message: 'Server error' });
     }
   });
