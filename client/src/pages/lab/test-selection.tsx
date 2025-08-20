@@ -139,22 +139,22 @@ export default function TestSelection() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-medical-background">
       {/* Header Navigation */}
-      <nav className="bg-white shadow-sm border-b">
+      <nav className="bg-medical-primary shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link href="/lab/patient-registration">
-                <Button variant="ghost" size="sm" className="mr-4">
+                <Button variant="ghost" size="sm" className="mr-4 text-white hover:bg-medical-primary-dark">
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
               </Link>
-              <TestTube className="text-medical-blue text-xl mr-3" />
-              <span className="text-xl font-bold text-gray-900">Test Selection</span>
+              <TestTube className="text-white text-xl mr-3" />
+              <span className="text-xl font-bold text-white">Test Selection</span>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">{user?.name}</span>
+              <span className="text-sm text-medical-primary-light">{user?.name}</span>
             </div>
           </div>
         </div>
@@ -165,14 +165,14 @@ export default function TestSelection() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="flex items-center text-green-600">
-                <div className="flex items-center justify-center w-8 h-8 bg-green-600 text-white rounded-full text-sm font-bold">
+              <div className="flex items-center text-medical-success">
+                <div className="flex items-center justify-center w-8 h-8 bg-medical-success text-white rounded-full text-sm font-bold">
                   ✓
                 </div>
                 <span className="ml-2 text-sm font-medium">Patient Registration</span>
               </div>
-              <div className="flex items-center ml-4 text-medical-blue">
-                <div className="flex items-center justify-center w-8 h-8 bg-medical-blue text-white rounded-full text-sm font-bold">
+              <div className="flex items-center ml-4 text-medical-primary">
+                <div className="flex items-center justify-center w-8 h-8 bg-medical-primary text-white rounded-full text-sm font-bold">
                   2
                 </div>
                 <span className="ml-2 text-sm font-medium">Test Selection</span>
@@ -291,7 +291,7 @@ export default function TestSelection() {
                       })}
                       <div className="flex justify-between items-center pt-3 text-lg font-bold">
                         <span>Total Cost</span>
-                        <span className="text-medical-blue">₹{totalCost}</span>
+                        <span className="text-medical-primary">₹{totalCost}</span>
                       </div>
                     </>
                   ) : (
@@ -301,7 +301,7 @@ export default function TestSelection() {
                 
                 <Button 
                   onClick={handleProceed}
-                  className="w-full mt-6 bg-medical-blue hover:bg-blue-700"
+                  className="w-full mt-6 bg-medical-primary hover:bg-medical-primary-dark text-white shadow-lg"
                   size="lg"
                   disabled={selectedTests.length === 0}
                 >

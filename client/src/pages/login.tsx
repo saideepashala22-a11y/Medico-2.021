@@ -48,14 +48,14 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-medical-blue to-medical-indigo">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-medical-primary to-medical-info">
+      <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center">
-          <div className="mx-auto h-12 w-12 bg-medical-blue rounded-full flex items-center justify-center mb-4">
+          <div className="mx-auto h-12 w-12 bg-medical-primary rounded-full flex items-center justify-center mb-4">
             <Hospital className="text-white text-xl" />
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-900">Hospital Management</CardTitle>
-          <p className="text-gray-600 mt-2">Sign in to your account</p>
+          <CardTitle className="text-2xl font-bold text-medical-text">Hospital Management</CardTitle>
+          <p className="text-medical-text-muted mt-2">Sign in to your account</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -98,7 +98,7 @@ export default function Login() {
             
             <Button 
               type="submit" 
-              className="w-full bg-medical-blue hover:bg-blue-700"
+              className="w-full bg-medical-primary hover:bg-medical-primary-dark text-white shadow-lg"
               disabled={isLoading}
             >
               {isLoading ? (

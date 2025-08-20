@@ -64,6 +64,28 @@ export default {
         "medical-blue": "var(--medical-blue)",
         "medical-green": "var(--medical-green)",
         "medical-indigo": "var(--medical-indigo)",
+        // Professional Medical Theme Colors
+        "medical-primary": {
+          DEFAULT: "#2563EB", // Medical Blue
+          dark: "#1D4ED8",
+          light: "#E0F2FE",
+        },
+        "medical-secondary": {
+          DEFAULT: "#16A34A", // Medical Green
+          light: "#86EFAC",
+        },
+        "medical-background": {
+          DEFAULT: "#F9FAFB", // Light background
+          dark: "#F3F4F6",
+        },
+        "medical-text": {
+          DEFAULT: "#111827", // Dark gray for text
+          muted: "#4B5563",   // Subtle gray
+        },
+        "medical-error": "#DC2626",     // Red for critical alerts
+        "medical-warning": "#F59E0B",   // Amber for warnings
+        "medical-info": "#0891B2",      // Teal for info
+        "medical-success": "#059669",   // Green for success states
       },
       fontFamily: {
         sans: ["var(--font-sans)"],

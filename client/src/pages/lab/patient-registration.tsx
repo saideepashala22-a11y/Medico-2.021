@@ -124,22 +124,22 @@ export default function PatientRegistration() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-medical-background">
       {/* Header Navigation */}
-      <nav className="bg-white shadow-sm border-b">
+      <nav className="bg-medical-primary shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link href="/dashboard">
-                <Button variant="ghost" size="sm" className="mr-4">
+                <Button variant="ghost" size="sm" className="mr-4 text-white hover:bg-medical-primary-dark">
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
               </Link>
-              <User className="text-medical-blue text-xl mr-3" />
-              <span className="text-xl font-bold text-gray-900">Patient Registration</span>
+              <User className="text-white text-xl mr-3" />
+              <span className="text-xl font-bold text-white">Patient Registration</span>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">{user?.name}</span>
+              <span className="text-sm text-medical-primary-light">{user?.name}</span>
             </div>
           </div>
         </div>
@@ -150,8 +150,8 @@ export default function PatientRegistration() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="flex items-center text-medical-blue">
-                <div className="flex items-center justify-center w-8 h-8 bg-medical-blue text-white rounded-full text-sm font-bold">
+              <div className="flex items-center text-medical-primary">
+                <div className="flex items-center justify-center w-8 h-8 bg-medical-primary text-white rounded-full text-sm font-bold">
                   1
                 </div>
                 <span className="ml-2 text-sm font-medium">Patient Registration</span>
@@ -354,7 +354,7 @@ export default function PatientRegistration() {
 
               <Button 
                 type="submit" 
-                className="w-full bg-medical-blue hover:bg-blue-700"
+                className="w-full bg-medical-primary hover:bg-medical-primary-dark text-white shadow-lg"
                 disabled={createPatientMutation.isPending}
                 size="lg"
               >

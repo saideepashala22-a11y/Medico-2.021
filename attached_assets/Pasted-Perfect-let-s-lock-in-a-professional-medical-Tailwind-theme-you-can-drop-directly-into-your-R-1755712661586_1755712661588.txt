@@ -1,0 +1,113 @@
+Perfect 👍 let’s lock in a **professional medical Tailwind theme** you can drop directly into your Replit React project.
+
+---
+
+## 🎨 Tailwind Medical Theme Setup
+
+### 1. **Edit `tailwind.config.js`**
+
+Add custom colors for your hospital palette:
+
+```js
+// tailwind.config.js
+module.exports = {
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          DEFAULT: "#2563EB", // Blue
+          dark: "#1D4ED8",
+          light: "#E0F2FE",
+        },
+        secondary: {
+          DEFAULT: "#16A34A", // Green
+          light: "#86EFAC",
+        },
+        background: {
+          DEFAULT: "#F9FAFB", // Light background
+          dark: "#F3F4F6",
+        },
+        text: {
+          DEFAULT: "#111827", // Dark gray for text
+          muted: "#4B5563",   // Subtle gray
+        },
+        error: "#DC2626",     // Red for critical alerts
+        warning: "#F59E0B",   // Amber for warnings
+        info: "#0891B2",      // Teal for info
+      },
+    },
+  },
+  plugins: [],
+};
+```
+
+---
+
+### 2. **Usage Examples in Components**
+
+Now you can use these semantic classes across your app:
+
+```jsx
+// Example Patient Registration Button
+<button className="bg-primary text-white px-4 py-2 rounded-lg shadow hover:bg-primary-dark">
+  Continue to Test Selection →
+</button>
+
+// Input Fields
+<input
+  type="text"
+  placeholder="Enter patient name"
+  className="border border-gray-300 p-2 rounded-md w-full focus:ring-2 focus:ring-primary"
+/>
+
+// Success message
+<p className="text-secondary">Patient registered successfully!</p>
+
+// Error state
+<p className="text-error">Missing required fields</p>
+```
+
+---
+
+### 3. **Recommended Component Styling**
+
+* **Cards / Sections:** `bg-white shadow-md rounded-xl p-6`
+* **Navigation Bar:** `bg-primary text-white`
+* **Progress Steps (Registration → Tests → Results → Report):** Use `bg-primary` for active, `bg-gray-200` for inactive
+* **Tables (for lab results):** `border border-gray-200 text-text bg-white`
+
+---
+
+### 4. **Example Full Page Layout**
+
+```jsx
+<div className="min-h-screen bg-background text-text p-8">
+  <h1 className="text-2xl font-semibold text-primary mb-6">
+    🏥 Hospital Lab Management
+  </h1>
+
+  <div className="bg-white rounded-xl shadow-lg p-6">
+    <h2 className="text-lg font-bold text-secondary mb-4">Patient Information</h2>
+    
+    <input
+      type="text"
+      placeholder="Full Name"
+      className="border border-gray-300 p-2 rounded-md w-full mb-4 focus:ring-2 focus:ring-primary"
+    />
+
+    <button className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark">
+      Continue →
+    </button>
+  </div>
+</div>
+```
+
+---
+
+✅ With this setup, every page in your hospital app (Registration, Test Selection, Results, Report) will look **clean, modern, and medical-grade**.
+✅ Colors are **consistent across the app** so doctors, staff, and patients get a trustworthy experience.
+
+---
+
+👉 Do you want me to also **design the Test Selection Page UI** with this theme (multi-select tests + cost calculation) so you can connect it to your registration flow?
