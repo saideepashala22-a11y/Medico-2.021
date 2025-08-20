@@ -222,3 +222,54 @@ export type InsertPatientProfile = z.infer<typeof insertPatientProfileSchema>;
 export type PatientProfile = typeof patientProfiles.$inferSelect;
 export type InsertDischargeSummary = z.infer<typeof insertDischargeSummarySchema>;
 export type DischargeSummary = typeof dischargeSummaries.$inferSelect;
+
+// Consultations table
+export const consultations = pgTable('consultations', {
+  id: text('id').primaryKey().default(sql`gen_random_uuid()`),
+  patientId: text('patient_id').notNull().references(() => patients.id),
+  doctorName: text('doctor_name').notNull(),
+  consultationDate: timestamp('consultation_date').notNull(),
+  chiefComplaint: text('chief_complaint').notNull(),
+  presentIllnessHistory: text('present_illness_history'),
+  pastMedicalHistory: text('past_medical_history'),
+  examination: text('examination'),
+  diagnosis: text('diagnosis').notNull(),
+  treatment: text('treatment'),
+  prescription: jsonb('prescription').$type<Array<{
+    medicine: string;
+    dosage: string;
+    frequency: string;
+    duration: string;
+    instructions?: string;
+  }>>(),
+  followUpDate: timestamp('follow_up_date'),
+  notes: text('notes'),
+  consultationType: text('consultation_type').notNull().default('general'), // general, emergency, follow-up
+  status: text('status').notNull().default('completed'), // scheduled, in-progress, completed, cancelled
+  createdBy: text('created_by').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const consultationsRelations = relations(consultations, ({ one }) => ({
+  patient: one(patients, {
+    fields: [consultations.patientId],
+    references: [patients.id],
+  }),
+  createdBy: one(users, {
+    fields: [consultations.createdBy],
+    references: [users.id],
+  }),
+}));
+
+export const insertConsultationSchema = createInsertSchema(consultations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  consultationDate: z.coerce.date(),
+  followUpDate: z.coerce.date().optional(),
+});
+
+export type InsertConsultation = z.infer<typeof insertConsultationSchema>;
+export type Consultation = typeof consultations.$inferSelect;

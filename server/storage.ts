@@ -1,9 +1,9 @@
 import { 
-  users, patients, labTests, prescriptions, dischargeSummaries, medicalHistory, patientProfiles,
+  users, patients, labTests, prescriptions, dischargeSummaries, medicalHistory, patientProfiles, consultations,
   type User, type InsertUser, type Patient, type InsertPatient,
   type LabTest, type InsertLabTest, type Prescription, type InsertPrescription,
   type DischargeSummary, type InsertDischargeSummary, type MedicalHistory, type InsertMedicalHistory,
-  type PatientProfile, type InsertPatientProfile
+  type PatientProfile, type InsertPatientProfile, type Consultation, type InsertConsultation
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, ilike, or, sql } from "drizzle-orm";
@@ -50,12 +50,21 @@ export interface IStorage {
   getPatientProfile(patientId: string): Promise<PatientProfile | undefined>;
   createOrUpdatePatientProfile(profile: InsertPatientProfile): Promise<PatientProfile>;
   
+  // Consultations
+  getConsultation(id: string): Promise<Consultation | undefined>;
+  getConsultationsByPatient(patientId: string): Promise<Consultation[]>;
+  createConsultation(consultation: InsertConsultation): Promise<Consultation>;
+  updateConsultation(id: string, updates: Partial<Consultation>): Promise<Consultation>;
+  deleteConsultation(id: string): Promise<void>;
+  getRecentConsultations(): Promise<(Consultation & { patient: Patient })[]>;
+  
   // Stats
   getStats(): Promise<{
     totalPatients: number;
     labTestsToday: number;
     prescriptionsToday: number;
     dischargesToday: number;
+    consultationsToday: number;
   }>;
 }
 
@@ -229,6 +238,7 @@ export class DatabaseStorage implements IStorage {
     labTestsToday: number;
     prescriptionsToday: number;
     dischargesToday: number;
+    consultationsToday: number;
   }> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -242,12 +252,15 @@ export class DatabaseStorage implements IStorage {
       .where(sql`${prescriptions.createdAt} >= ${today} AND ${prescriptions.createdAt} < ${tomorrow}`);
     const [dischargesToday] = await db.select({ count: sql`count(*)` }).from(dischargeSummaries)
       .where(sql`${dischargeSummaries.createdAt} >= ${today} AND ${dischargeSummaries.createdAt} < ${tomorrow}`);
+    const [consultationsToday] = await db.select({ count: sql`count(*)` }).from(consultations)
+      .where(sql`${consultations.createdAt} >= ${today} AND ${consultations.createdAt} < ${tomorrow}`);
 
     return {
       totalPatients: Number(totalPatients.count),
       labTestsToday: Number(labTestsToday.count),
       prescriptionsToday: Number(prescriptionsToday.count),
       dischargesToday: Number(dischargesToday.count),
+      consultationsToday: Number(consultationsToday.count),
     };
   }
 
@@ -300,6 +313,70 @@ export class DatabaseStorage implements IStorage {
       const [newProfile] = await db.insert(patientProfiles).values(profile).returning();
       return newProfile;
     }
+  }
+
+  // Consultation Methods
+  async getConsultation(id: string): Promise<Consultation | undefined> {
+    const [consultation] = await db.select().from(consultations).where(eq(consultations.id, id));
+    return consultation || undefined;
+  }
+
+  async getConsultationsByPatient(patientId: string): Promise<Consultation[]> {
+    return await db.select().from(consultations)
+      .where(eq(consultations.patientId, patientId))
+      .orderBy(desc(consultations.consultationDate));
+  }
+
+  async createConsultation(consultation: InsertConsultation): Promise<Consultation> {
+    // Convert dates properly for database insertion
+    const consultationToInsert = {
+      ...consultation,
+      consultationDate: new Date(consultation.consultationDate),
+      followUpDate: consultation.followUpDate ? new Date(consultation.followUpDate) : null,
+    };
+    
+    const [newConsultation] = await db.insert(consultations).values(consultationToInsert).returning();
+    return newConsultation;
+  }
+
+  async updateConsultation(id: string, updates: Partial<Consultation>): Promise<Consultation> {
+    const [updatedConsultation] = await db.update(consultations)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(consultations.id, id))
+      .returning();
+    return updatedConsultation;
+  }
+
+  async deleteConsultation(id: string): Promise<void> {
+    await db.delete(consultations).where(eq(consultations.id, id));
+  }
+
+  async getRecentConsultations(): Promise<(Consultation & { patient: Patient })[]> {
+    return await db.select({
+      id: consultations.id,
+      patientId: consultations.patientId,
+      doctorName: consultations.doctorName,
+      consultationDate: consultations.consultationDate,
+      chiefComplaint: consultations.chiefComplaint,
+      presentIllnessHistory: consultations.presentIllnessHistory,
+      pastMedicalHistory: consultations.pastMedicalHistory,
+      examination: consultations.examination,
+      diagnosis: consultations.diagnosis,
+      treatment: consultations.treatment,
+      prescription: consultations.prescription,
+      followUpDate: consultations.followUpDate,
+      notes: consultations.notes,
+      consultationType: consultations.consultationType,
+      status: consultations.status,
+      createdBy: consultations.createdBy,
+      createdAt: consultations.createdAt,
+      updatedAt: consultations.updatedAt,
+      patient: patients,
+    })
+    .from(consultations)
+    .innerJoin(patients, eq(consultations.patientId, patients.id))
+    .orderBy(desc(consultations.consultationDate))
+    .limit(10);
   }
 }
 

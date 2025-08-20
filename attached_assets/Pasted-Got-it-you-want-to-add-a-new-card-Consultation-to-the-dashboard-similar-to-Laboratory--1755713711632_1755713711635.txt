@@ -1,0 +1,137 @@
+Got it 👍 — you want to **add a new card "Consultation"** to the dashboard (similar to Laboratory / Pharmacy / Discharge) and also ensure that when generating the **Consultation PDF**, it includes:
+
+* 🏥 Hospital Name (as header)
+* 👤 Patient Details (Name, Age, Blood Group, etc.)
+* 📄 Doctor’s Notes / Consultation Details
+* 📍 Hospital Address (as footer)
+
+Let me propose a **clean design + code** for both the dashboard card and the consultation report.
+
+---
+
+## 🖥 Dashboard – Add Consultation Card
+
+```jsx
+<div className="bg-cyan-600 text-white rounded-xl shadow-md p-6 cursor-pointer hover:shadow-lg transition">
+  <h3 className="text-lg font-semibold">Consultation</h3>
+  <p className="mt-2 text-sm">
+    Manage doctor consultations, patient notes, and generate reports.
+  </p>
+  <ul className="mt-3 text-sm space-y-1">
+    <li>• Patient Consultation</li>
+    <li>• Doctor’s Notes</li>
+  </ul>
+</div>
+```
+
+This card will appear alongside **Laboratory, Pharmacy, and Discharge Summary**.
+
+---
+
+## 📄 Consultation Report (PDF Layout)
+
+### **Header (Hospital Info)**
+
+* Hospital Name (bold, centered)
+* Optional: Logo
+
+### **Patient Details Section**
+
+* Name, Age, Gender, Blood Group
+* Patient ID (auto-generated)
+* Date of Consultation
+
+### **Consultation Notes Section**
+
+* Doctor’s Notes / Diagnosis
+* Prescription (if any)
+
+### **Footer**
+
+* Hospital Address
+* Contact Number / Email
+
+---
+
+## ⚡ Example PDF Generation with `pdfkit` (Node.js Backend)
+
+```js
+const PDFDocument = require("pdfkit");
+const fs = require("fs");
+
+function generateConsultationReport(patient, consultation, hospital) {
+  const doc = new PDFDocument();
+  const fileName = `${patient.name}_consultation.pdf`;
+  doc.pipe(fs.createWriteStream(fileName));
+
+  // Header - Hospital Name
+  doc.fontSize(20).text(hospital.name, { align: "center" });
+  doc.moveDown();
+
+  // Patient Details
+  doc.fontSize(12).text(`Patient Name: ${patient.name}`);
+  doc.text(`Age: ${patient.age}`);
+  doc.text(`Gender: ${patient.gender}`);
+  doc.text(`Blood Group: ${patient.bloodGroup}`);
+  doc.text(`Patient ID: ${patient.patientId}`);
+  doc.moveDown();
+
+  // Consultation Notes
+  doc.fontSize(14).text("Consultation Notes", { underline: true });
+  doc.fontSize(12).text(consultation.notes || "No notes provided.");
+  doc.moveDown();
+
+  // Prescription (optional)
+  if (consultation.prescription) {
+    doc.fontSize(14).text("Prescription", { underline: true });
+    doc.fontSize(12).text(consultation.prescription);
+    doc.moveDown();
+  }
+
+  // Footer - Hospital Address
+  doc.moveDown(2);
+  doc.fontSize(10).text(hospital.address, { align: "center" });
+  doc.text(`Contact: ${hospital.phone} | ${hospital.email}`, { align: "center" });
+
+  doc.end();
+  return fileName;
+}
+
+// Example Usage
+const hospital = {
+  name: "CityCare Hospital",
+  address: "123 Main Street, Hyderabad, India",
+  phone: "+91-9876543210",
+  email: "info@citycare.com"
+};
+
+const patient = {
+  patientId: "HMS-2025-010",
+  name: "John Doe",
+  age: 35,
+  gender: "Male",
+  bloodGroup: "O+"
+};
+
+const consultation = {
+  notes: "Patient reported mild fever and cough. Advised rest and hydration.",
+  prescription: "Paracetamol 500mg, 1 tablet every 6 hours for 3 days."
+};
+
+generateConsultationReport(patient, consultation, hospital);
+```
+
+---
+
+## 🌟 Improvements
+
+* Add **doctor’s signature placeholder** at the bottom of the PDF
+* Include **date & time of consultation**
+* Store consultation history per patient (like lab reports)
+
+---
+
+👉 Do you want me to also design a **Consultation Entry Page (form in React)** with:
+
+* Select Patient → Enter Notes → Prescription → Generate PDF,
+  so it integrates smoothly with the new **Consultation card**?

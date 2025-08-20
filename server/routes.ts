@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema } from "@shared/schema";
+import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema, insertConsultationSchema } from "@shared/schema";
 import { z } from "zod";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
@@ -347,6 +347,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: 'Invalid input', errors: error.errors });
       }
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Consultation Routes
+  app.get('/api/consultations/:patientId', authenticateToken, async (req: any, res) => {
+    try {
+      const consultations = await storage.getConsultationsByPatient(req.params.patientId);
+      res.json(consultations);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.post('/api/consultations', authenticateToken, async (req: any, res) => {
+    try {
+      const consultationData = insertConsultationSchema.parse({
+        ...req.body,
+        createdBy: req.user.id
+      });
+      
+      const consultation = await storage.createConsultation(consultationData);
+      res.status(201).json(consultation);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Invalid input', errors: error.errors });
+      }
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.get('/api/consultations/recent', authenticateToken, async (req: any, res) => {
+    try {
+      const consultations = await storage.getRecentConsultations();
+      res.json(consultations);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.get('/api/consultation/:id', authenticateToken, async (req: any, res) => {
+    try {
+      const consultation = await storage.getConsultation(req.params.id);
+      if (!consultation) {
+        return res.status(404).json({ message: 'Consultation not found' });
+      }
+      res.json(consultation);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.put('/api/consultations/:id', authenticateToken, async (req: any, res) => {
+    try {
+      const updates = req.body;
+      const consultation = await storage.updateConsultation(req.params.id, updates);
+      res.json(consultation);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.delete('/api/consultations/:id', authenticateToken, async (req: any, res) => {
+    try {
+      await storage.deleteConsultation(req.params.id);
+      res.status(204).send();
+    } catch (error) {
       res.status(500).json({ message: 'Server error' });
     }
   });
