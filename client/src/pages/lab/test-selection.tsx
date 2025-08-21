@@ -37,11 +37,40 @@ export default function TestSelection() {
   const filteredTests = useMemo(() => {
     if (!testDefinitions) return [];
     
-    return testDefinitions.filter(test => {
-      const matchesSearch = test.testName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           test.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    let filtered = testDefinitions.filter(test => {
       const matchesDepartment = selectedDepartment === 'all' || test.department === selectedDepartment;
+      
+      if (!searchTerm) {
+        return test.isActive && matchesDepartment;
+      }
+      
+      const searchLower = searchTerm.toLowerCase();
+      const testNameLower = test.testName.toLowerCase();
+      const descriptionLower = test.description?.toLowerCase() || '';
+      
+      // If search is a single letter, prioritize tests starting with that letter
+      if (searchTerm.length === 1) {
+        const startsWithLetter = testNameLower.startsWith(searchLower);
+        return test.isActive && matchesDepartment && startsWithLetter;
+      }
+      
+      // For longer searches, use contains logic
+      const matchesSearch = testNameLower.includes(searchLower) || descriptionLower.includes(searchLower);
       return test.isActive && matchesSearch && matchesDepartment;
+    });
+    
+    // Sort results: exact matches first, then alphabetical
+    return filtered.sort((a, b) => {
+      if (!searchTerm) return a.testName.localeCompare(b.testName);
+      
+      const searchLower = searchTerm.toLowerCase();
+      const aStartsWith = a.testName.toLowerCase().startsWith(searchLower);
+      const bStartsWith = b.testName.toLowerCase().startsWith(searchLower);
+      
+      if (aStartsWith && !bStartsWith) return -1;
+      if (!aStartsWith && bStartsWith) return 1;
+      
+      return a.testName.localeCompare(b.testName);
     });
   }, [testDefinitions, searchTerm, selectedDepartment]);
 
@@ -228,26 +257,53 @@ export default function TestSelection() {
               </CardHeader>
               <CardContent>
                 {/* Search and Filter */}
-                <div className="flex gap-4 mb-6">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      placeholder="Search tests..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
+                <div className="space-y-4 mb-6">
+                  <div className="flex gap-4">
+                    <div className="flex-1 relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <Input
+                        placeholder="Search tests (try typing 'a', 'b', 'c'...)"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                    <select
+                      value={selectedDepartment}
+                      onChange={(e) => setSelectedDepartment(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-medical-primary"
+                    >
+                      <option value="all">All Departments</option>
+                      {departments.map(dept => (
+                        <option key={dept} value={dept}>{dept}</option>
+                      ))}
+                    </select>
                   </div>
-                  <select
-                    value={selectedDepartment}
-                    onChange={(e) => setSelectedDepartment(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-medical-primary"
-                  >
-                    <option value="all">All Departments</option>
-                    {departments.map(dept => (
-                      <option key={dept} value={dept}>{dept}</option>
-                    ))}
-                  </select>
+                  
+                  {/* Search Results Info */}
+                  <div className="flex items-center justify-between text-sm text-gray-600">
+                    <span>
+                      {filteredTests.length} tests found
+                      {searchTerm && (
+                        <span className="ml-2">
+                          {searchTerm.length === 1 
+                            ? `starting with "${searchTerm.toUpperCase()}"`
+                            : `matching "${searchTerm}"`
+                          }
+                        </span>
+                      )}
+                    </span>
+                    {searchTerm && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSearchTerm('')}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        Clear search
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Test List */}
