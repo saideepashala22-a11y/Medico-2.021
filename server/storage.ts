@@ -516,7 +516,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(surgicalCaseSheets.createdAt));
   }
 
-  async createSurgicalCaseSheet(caseSheet: InsertSurgicalCaseSheet): Promise<SurgicalCaseSheet> {
+  async createSurgicalCaseSheet(caseSheet: InsertSurgicalCaseSheet & { createdBy?: string }): Promise<SurgicalCaseSheet> {
     // Generate case number
     const today = new Date();
     const year = today.getFullYear();
@@ -526,6 +526,7 @@ export class DatabaseStorage implements IStorage {
     const caseSheetData = {
       ...caseSheet,
       caseNumber,
+      createdBy: caseSheet.createdBy || 'system',
     };
 
     const [newCaseSheet] = await db.insert(surgicalCaseSheets).values([caseSheetData]).returning();
