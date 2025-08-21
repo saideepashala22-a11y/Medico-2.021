@@ -40,9 +40,14 @@ export default function SurgicalCaseSheets() {
   });
 
   // Fetch patients for the dropdown
-  const { data: patients } = useQuery({
+  const { data: patients, isLoading: patientsLoading, error: patientsError } = useQuery({
     queryKey: ['/api/patients'],
   });
+
+  // Debug patients data
+  console.log('Patients data:', patients);
+  console.log('Patients loading:', patientsLoading);
+  console.log('Patients error:', patientsError);
 
   const form = useForm<InsertSurgicalCaseSheet>({
     resolver: zodResolver(insertSurgicalCaseSheetSchema),
@@ -66,7 +71,7 @@ export default function SurgicalCaseSheets() {
 
   const createMutation = useMutation({
     mutationFn: (data: InsertSurgicalCaseSheet) => 
-      apiRequest('/api/surgical-case-sheets', 'POST', data),
+      apiRequest('POST', '/api/surgical-case-sheets', data),
     onSuccess: () => {
       toast({
         title: "Success",
@@ -97,6 +102,16 @@ export default function SurgicalCaseSheets() {
     };
     
     console.log('Submitting data:', submitData);
+    
+    // Generate and download PDF immediately
+    const mockCaseSheet = {
+      ...submitData,
+      caseNumber: `SCS-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
+      id: 'temp-id',
+    };
+    generatePDF(mockCaseSheet);
+    
+    // Then submit to database
     createMutation.mutate(submitData);
   };
 
@@ -287,20 +302,26 @@ export default function SurgicalCaseSheets() {
                             if (selectedPatient) {
                               form.setValue('patientName', selectedPatient.name);
                               form.setValue('age', selectedPatient.age);
-                              form.setValue('sex', selectedPatient.gender);
+                              form.setValue('sex', selectedPatient.gender || '');
                             }
-                          }}>
+                          }} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Select patient" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {Array.isArray(patients) && patients.map((patient: any) => (
-                                <SelectItem key={patient.id} value={patient.id}>
-                                  {patient.name} - {patient.patientId}
+                              {Array.isArray(patients) && patients.length > 0 ? (
+                                patients.map((patient: any) => (
+                                  <SelectItem key={patient.id} value={patient.id}>
+                                    {patient.name} - {patient.patientId}
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <SelectItem value="no-patients" disabled>
+                                  No patients found
                                 </SelectItem>
-                              ))}
+                              )}
                             </SelectContent>
                           </Select>
                           <FormMessage />
