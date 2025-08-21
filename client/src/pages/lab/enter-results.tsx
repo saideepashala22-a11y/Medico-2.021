@@ -48,13 +48,13 @@ export default function EnterResults() {
 
   // Initialize results based on selected tests
   useEffect(() => {
-    if (labTest && results.length === 0) {
-      const testTypes = labTest.testType.split(', ');
-      const initialResults = testTypes.map((testName: string) => ({
-        testName,
+    if (labTest && results.length === 0 && labTest.testTypes) {
+      const testTypes = Array.isArray(labTest.testTypes) ? labTest.testTypes : [];
+      const initialResults = testTypes.map((test: any) => ({
+        testName: test.testName,
         value: '',
-        unit: getDefaultUnit(testName),
-        normalRange: getNormalRange(testName),
+        unit: getDefaultUnit(test.testName),
+        normalRange: getNormalRange(test.testName),
         status: 'normal' as const
       }));
       setResults(initialResults);

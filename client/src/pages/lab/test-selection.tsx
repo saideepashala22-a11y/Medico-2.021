@@ -122,11 +122,13 @@ export default function TestSelection() {
     
     createLabTestMutation.mutate({
       patientId,
-      testType: selectedTestData.map(test => test.testName).join(', '),
+      testTypes: selectedTestData.map(test => ({
+        id: test.id,
+        testName: test.testName,
+        department: test.department,
+        cost: parseFloat(test.cost)
+      })), // Send as JSONB array matching schema
       status: 'pending',
-      orderedBy: user?.id,
-      requestedDate: new Date().toISOString(),
-      notes: `Selected tests: ${selectedTestData.length} tests`,
       totalCost
     });
   };
