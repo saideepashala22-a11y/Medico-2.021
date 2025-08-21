@@ -125,8 +125,22 @@ export class DatabaseStorage implements IStorage {
       .limit(10);
   }
 
-  async getLabTest(id: string): Promise<LabTest | undefined> {
-    const [labTest] = await db.select().from(labTests).where(eq(labTests.id, id));
+  async getLabTest(id: string): Promise<(LabTest & { patient: Patient }) | undefined> {
+    const [labTest] = await db.select({
+      id: labTests.id,
+      patientId: labTests.patientId,
+      testTypes: labTests.testTypes,
+      results: labTests.results,
+      doctorNotes: labTests.doctorNotes,
+      totalCost: labTests.totalCost,
+      status: labTests.status,
+      createdBy: labTests.createdBy,
+      createdAt: labTests.createdAt,
+      patient: patients,
+    })
+    .from(labTests)
+    .innerJoin(patients, eq(labTests.patientId, patients.id))
+    .where(eq(labTests.id, id));
     return labTest || undefined;
   }
 

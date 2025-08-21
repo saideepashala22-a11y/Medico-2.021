@@ -25,7 +25,12 @@ export default function LabReport() {
   // Fetch lab test details
   const { data: labTest, isLoading } = useQuery<{
     id: string;
-    testType: string;
+    testTypes: Array<{
+      id: string;
+      testName: string;
+      department: string;
+      cost: number;
+    }>;
     results: string;
     doctorNotes?: string;
     totalCost: string;
@@ -78,7 +83,7 @@ export default function LabReport() {
       
       doc.setFont('helvetica', 'normal');
       doc.text(`Test Date: ${new Date(labTest.createdAt).toLocaleDateString()}`, 20, 130);
-      doc.text(`Tests Performed: ${labTest.testType}`, 20, 140);
+      doc.text(`Tests Performed: ${labTest.testTypes?.map(t => t.testName).join(', ') || 'N/A'}`, 20, 140);
       doc.text(`Total Cost: ₹${labTest.totalCost}`, 20, 150);
       
       // Results
@@ -91,17 +96,16 @@ export default function LabReport() {
       
       try {
         const results = JSON.parse(labTest.results);
-        const testTypes = labTest.testType.split(', ');
+        const testTypeNames = labTest.testTypes?.map(t => t.testName) || [];
         
-        testTypes.forEach((testId: string) => {
-          const cleanTestId = testId.trim();
-          const testName = testNames[cleanTestId as keyof typeof testNames] || cleanTestId;
-          const testResults = results[cleanTestId];
+        testTypeNames.forEach((testName: string) => {
+          const cleanTestName = testName.trim();
+          const testResults = results[cleanTestName];
           
           if (testResults) {
             yPos += 10;
             doc.setFont('helvetica', 'bold');
-            doc.text(`${testName}:`, 20, yPos);
+            doc.text(`${cleanTestName}:`, 20, yPos);
             yPos += 8;
             
             doc.setFont('helvetica', 'normal');
@@ -188,12 +192,12 @@ export default function LabReport() {
 
   let parsedResults: any = {};
   try {
-    parsedResults = JSON.parse(labTest.results);
+    parsedResults = labTest.results ? JSON.parse(labTest.results) : {};
   } catch (e) {
-    console.error('Failed to parse results:', e);
+    console.error('Failed to parse results:', parsedResults);
   }
 
-  const testTypes = labTest.testType.split(', ');
+  const testTypes = Array.isArray(labTest.testTypes) ? labTest.testTypes : [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -310,7 +314,7 @@ export default function LabReport() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Tests Performed</p>
-                <p className="text-lg font-semibold">{labTest.testType}</p>
+                <p className="text-lg font-semibold">{labTest.testTypes?.map(t => t.testName).join(', ') || 'N/A'}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Total Cost</p>
@@ -322,15 +326,14 @@ export default function LabReport() {
 
         {/* Test Results */}
         <div className="space-y-4">
-          {testTypes.map((testId: string) => {
-            const cleanTestId = testId.trim();
-            const testName = testNames[cleanTestId as keyof typeof testNames] || cleanTestId;
-            const testResults = parsedResults[cleanTestId];
+          {testTypes.map((testType) => {
+            const testName = testType.testName;
+            const testResults = parsedResults[testName];
             
             if (!testResults) return null;
             
             return (
-              <Card key={cleanTestId}>
+              <Card key={testType.id}>
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <TestTube className="mr-2 h-5 w-5" />
