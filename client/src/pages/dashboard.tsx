@@ -139,7 +139,7 @@ export default function Dashboard() {
         </div>
 
         {/* Module Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Consultation Module - FIRST */}
           <Link href="/consultation">
             <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
@@ -289,37 +289,6 @@ export default function Dashboard() {
                   <li className="flex items-center">
                     <div className="w-2 h-2 bg-medical-secondary rounded-full mr-2"></div>
                     Treatment Records
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </Link>
-
-          {/* Discharge Module */}
-          <Link href="/discharge">
-            <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
-              <div className="bg-medical-info p-6">
-                <FileText className="text-white text-3xl mb-4" />
-                <h3 className="text-xl font-bold text-white">Discharge Summary</h3>
-              </div>
-              <CardContent className="p-6">
-                <p className="text-medical-text-muted mb-4">Generate discharge summaries and final reports</p>
-                <ul className="text-sm text-medical-text-muted space-y-2">
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-medical-secondary rounded-full mr-2"></div>
-                    Patient Summary
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-medical-secondary rounded-full mr-2"></div>
-                    Diagnosis Notes
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-medical-green rounded-full mr-2"></div>
-                    Treatment History
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-medical-green rounded-full mr-2"></div>
-                    PDF Export
                   </li>
                 </ul>
               </CardContent>
