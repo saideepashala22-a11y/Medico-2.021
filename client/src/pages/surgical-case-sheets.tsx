@@ -87,7 +87,17 @@ export default function SurgicalCaseSheets() {
   });
 
   const onSubmit = (data: InsertSurgicalCaseSheet) => {
-    createMutation.mutate(data);
+    console.log('Form submitted with data:', data);
+    console.log('Form errors:', form.formState.errors);
+    
+    // Add required fields
+    const submitData = {
+      ...data,
+      createdBy: user?.id || '',
+    };
+    
+    console.log('Submitting data:', submitData);
+    createMutation.mutate(submitData);
   };
 
   // Generate PDF function

@@ -370,6 +370,11 @@ export const insertSurgicalCaseSheetSchema = createInsertSchema(surgicalCaseShee
   caseNumber: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  dateOfAdmission: z.coerce.date().optional(),
+  dateOfOperation: z.coerce.date().optional(),
+  dateOfDischarge: z.coerce.date().optional(),
+  edd: z.coerce.date().optional(),
 });
 
 export type InsertSurgicalCaseSheet = z.infer<typeof insertSurgicalCaseSheetSchema>;
