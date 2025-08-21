@@ -368,6 +368,7 @@ export const surgicalCaseSheetsRelations = relations(surgicalCaseSheets, ({ one 
 export const insertSurgicalCaseSheetSchema = createInsertSchema(surgicalCaseSheets).omit({
   id: true,
   caseNumber: true,
+  createdBy: true,
   createdAt: true,
   updatedAt: true,
 }).extend({
