@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema, insertConsultationSchema } from "@shared/schema";
+import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema, insertConsultationSchema, insertLabTestDefinitionSchema } from "@shared/schema";
 import { z } from "zod";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
@@ -412,6 +412,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/consultations/:id', authenticateToken, async (req: any, res) => {
     try {
       await storage.deleteConsultation(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Lab Test Definitions routes
+  app.get('/api/lab-test-definitions', authenticateToken, async (req: any, res) => {
+    try {
+      const definitions = await storage.getAllLabTestDefinitions();
+      res.json(definitions);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.get('/api/lab-test-definitions/active', authenticateToken, async (req: any, res) => {
+    try {
+      const definitions = await storage.getActiveLabTestDefinitions();
+      res.json(definitions);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.post('/api/lab-test-definitions', authenticateToken, async (req: any, res) => {
+    try {
+      const definitionData = insertLabTestDefinitionSchema.parse({
+        ...req.body,
+        createdBy: req.user.id
+      });
+      
+      const definition = await storage.createLabTestDefinition(definitionData);
+      res.status(201).json(definition);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Invalid input', errors: error.errors });
+      }
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.put('/api/lab-test-definitions/:id', authenticateToken, async (req: any, res) => {
+    try {
+      const updates = req.body;
+      const definition = await storage.updateLabTestDefinition(req.params.id, updates);
+      res.json(definition);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.delete('/api/lab-test-definitions/:id', authenticateToken, async (req: any, res) => {
+    try {
+      await storage.deleteLabTestDefinition(req.params.id);
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: 'Server error' });

@@ -1,0 +1,69 @@
+Perfect 👍 Thanks for sharing this!
+What you are showing here is the **Lab Tests Management dashboard**, and you want to add a feature to **create new test types with their cost**.
+
+Here’s how we can extend the design and functionality:
+
+---
+
+## 🔹 New Feature: Add & Manage Lab Tests
+
+Inside **Lab Tests** section, we can have two tabs:
+
+1. **Available Tests**
+
+   * Show list of all tests (Test Name, Department, Cost, Active/Inactive).
+   * Example: "Blood Sugar", "CBC", "X-Ray", etc.
+
+2. **Add New Test**
+
+   * A form with:
+
+     * **Test Name** (text field)
+     * **Department** (dropdown – Pathology, Radiology, etc.)
+     * **Cost** (numeric input with currency symbol ₹/\$/€)
+     * **Description / Notes** (optional)
+     * **Save** button
+
+   ✅ When saved, the test will be available in the dropdown while registering a patient’s lab test.
+
+---
+
+## 🔹 Workflow Example
+
+1. Admin/Lab Manager goes to **Lab Tests → Add New Test**
+2. Adds "Vitamin D Test", Cost = ₹800
+3. Now when a receptionist/lab staff registers a patient → they see "Vitamin D Test" in the list of available tests.
+
+---
+
+## 🔹 UI Placement (in your design screenshot)
+
+* In **Lab Tests** card → Add a button: `➕ Add New Test`
+* Clicking it opens a **popup modal or new page** with the form.
+* Saved test appears in the **Available Tests Table**.
+
+---
+
+## 🔹 Technical Implementation (Replit App)
+
+* **Database Table: `lab_tests`**
+
+  ```sql
+  id (PK) | test_name | department | cost | description | created_at
+  ```
+
+* **API Endpoints**
+
+  * `POST /lab-tests` → Add new test
+  * `GET /lab-tests` → Fetch all tests
+  * `PUT /lab-tests/:id` → Update test
+  * `DELETE /lab-tests/:id` → Remove test
+
+* **Frontend (React/Next.js)**
+
+  * Table to display existing tests
+  * Modal form to add/update tests
+
+---
+
+👉 Do you want me to **add this “Add New Test with Cost” feature into the full app plan** I gave earlier and show you **exact UI layout** for this page (like the screenshot you uploaded)?

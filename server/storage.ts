@@ -1,9 +1,10 @@
 import { 
-  users, patients, labTests, prescriptions, dischargeSummaries, medicalHistory, patientProfiles, consultations,
+  users, patients, labTests, prescriptions, dischargeSummaries, medicalHistory, patientProfiles, consultations, labTestDefinitions,
   type User, type InsertUser, type Patient, type InsertPatient,
   type LabTest, type InsertLabTest, type Prescription, type InsertPrescription,
   type DischargeSummary, type InsertDischargeSummary, type MedicalHistory, type InsertMedicalHistory,
-  type PatientProfile, type InsertPatientProfile, type Consultation, type InsertConsultation
+  type PatientProfile, type InsertPatientProfile, type Consultation, type InsertConsultation,
+  insertLabTestDefinitionSchema
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, ilike, or, sql } from "drizzle-orm";
@@ -26,6 +27,13 @@ export interface IStorage {
   createLabTest(labTest: InsertLabTest): Promise<LabTest>;
   updateLabTest(id: string, updates: Partial<LabTest>): Promise<LabTest>;
   getRecentLabTests(): Promise<(LabTest & { patient: Patient })[]>;
+  
+  // Lab Test Definitions
+  getAllLabTestDefinitions(): Promise<any[]>;
+  getActiveLabTestDefinitions(): Promise<any[]>;
+  createLabTestDefinition(definition: any): Promise<any>;
+  updateLabTestDefinition(id: string, updates: Partial<any>): Promise<any>;
+  deleteLabTestDefinition(id: string): Promise<void>;
   
   // Prescriptions
   getPrescription(id: string): Promise<Prescription | undefined>;
@@ -335,7 +343,7 @@ export class DatabaseStorage implements IStorage {
       followUpDate: consultation.followUpDate ? new Date(consultation.followUpDate) : null,
     };
     
-    const [newConsultation] = await db.insert(consultations).values(consultationToInsert).returning();
+    const [newConsultation] = await db.insert(consultations).values([consultationToInsert]).returning();
     return newConsultation;
   }
 
@@ -377,6 +385,38 @@ export class DatabaseStorage implements IStorage {
     .innerJoin(patients, eq(consultations.patientId, patients.id))
     .orderBy(desc(consultations.consultationDate))
     .limit(10);
+  }
+
+  // Lab Test Definitions methods
+  async getAllLabTestDefinitions(): Promise<any[]> {
+    const testDefinitions = await db.select().from(labTestDefinitions).orderBy(desc(labTestDefinitions.createdAt));
+    return testDefinitions;
+  }
+
+  async getActiveLabTestDefinitions(): Promise<any[]> {
+    const testDefinitions = await db.select().from(labTestDefinitions)
+      .where(eq(labTestDefinitions.isActive, true))
+      .orderBy(labTestDefinitions.testName);
+    return testDefinitions;
+  }
+
+  async createLabTestDefinition(definition: any): Promise<any> {
+    const [testDefinition] = await db.insert(labTestDefinitions).values(definition).returning();
+    return testDefinition;
+  }
+
+  async updateLabTestDefinition(id: string, updates: Partial<any>): Promise<any> {
+    const [testDefinition] = await db.update(labTestDefinitions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(labTestDefinitions.id, id))
+      .returning();
+    return testDefinition;
+  }
+
+  async deleteLabTestDefinition(id: string): Promise<void> {
+    await db.update(labTestDefinitions)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(eq(labTestDefinitions.id, id));
   }
 }
 

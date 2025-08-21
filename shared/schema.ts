@@ -61,6 +61,20 @@ export const dischargeSummaries = pgTable("discharge_summaries", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Lab Test Definitions Table - for managing available test types
+export const labTestDefinitions = pgTable("lab_test_definitions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  testName: text("test_name").notNull(),
+  department: text("department").notNull(), // 'Pathology', 'Radiology', 'Biochemistry', etc.
+  cost: decimal("cost", { precision: 10, scale: 2 }).notNull(),
+  description: text("description"),
+  normalRanges: jsonb("normal_ranges"), // reference ranges for results
+  isActive: boolean("is_active").notNull().default(true),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Patient Medical History Table
 export const medicalHistory = pgTable("medical_history", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -107,6 +121,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   prescriptions: many(prescriptions),
   dischargeSummaries: many(dischargeSummaries),
   medicalHistoryEntries: many(medicalHistory),
+  labTestDefinitions: many(labTestDefinitions),
 }));
 
 export const patientsRelations = relations(patients, ({ many, one }) => ({
@@ -206,6 +221,20 @@ export const insertPatientProfileSchema = createInsertSchema(patientProfiles).om
   createdAt: true,
   updatedAt: true,
 });
+
+export const insertLabTestDefinitionSchema = createInsertSchema(labTestDefinitions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Add relations for lab test definitions
+export const labTestDefinitionsRelations = relations(labTestDefinitions, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [labTestDefinitions.createdBy],
+    references: [users.id],
+  }),
+}));
 
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;

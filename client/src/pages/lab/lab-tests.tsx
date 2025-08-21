@@ -4,20 +4,44 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useQuery } from '@tanstack/react-query';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 import { Link } from 'wouter';
-import { ArrowLeft, TestTube, Calendar, Search, Filter, Eye, Download, Edit } from 'lucide-react';
+import { ArrowLeft, TestTube, Calendar, Search, Filter, Eye, Download, Edit, Plus, Settings, DollarSign, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { format } from 'date-fns';
 
 export default function LabTests() {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // Test Results state
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  
+  // Test Definitions state
+  const [isAddTestOpen, setIsAddTestOpen] = useState(false);
+  const [editingTest, setEditingTest] = useState<any>(null);
+  const [newTestForm, setNewTestForm] = useState({
+    testName: '',
+    department: '',
+    cost: '',
+    description: ''
+  });
 
   const { data: labTests, isLoading: testsLoading } = useQuery<any[]>({
     queryKey: ['/api/lab-tests'],
+  });
+
+  const { data: testDefinitions, isLoading: definitionsLoading } = useQuery<any[]>({
+    queryKey: ['/api/lab-test-definitions'],
   });
 
   const filteredTests = labTests?.filter(test => {
@@ -39,6 +63,62 @@ export default function LabTests() {
       case 'cancelled': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  // Mutations for test definitions
+  const createTestMutation = useMutation({
+    mutationFn: (testData: any) => apiRequest('/api/lab-test-definitions', 'POST', testData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/lab-test-definitions'] });
+      setIsAddTestOpen(false);
+      setNewTestForm({ testName: '', department: '', cost: '', description: '' });
+      toast({ title: "Success", description: "Test definition created successfully" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to create test definition", variant: "destructive" });
+    }
+  });
+
+  const updateTestMutation = useMutation({
+    mutationFn: ({ id, ...data }: any) => apiRequest(`/api/lab-test-definitions/${id}`, 'PUT', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/lab-test-definitions'] });
+      setEditingTest(null);
+      toast({ title: "Success", description: "Test definition updated successfully" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to update test definition", variant: "destructive" });
+    }
+  });
+
+  const deleteTestMutation = useMutation({
+    mutationFn: (id: string) => apiRequest(`/api/lab-test-definitions/${id}`, 'DELETE'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/lab-test-definitions'] });
+      toast({ title: "Success", description: "Test definition deactivated successfully" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to deactivate test definition", variant: "destructive" });
+    }
+  });
+
+  const handleCreateTest = () => {
+    if (!newTestForm.testName || !newTestForm.department || !newTestForm.cost) {
+      toast({ title: "Error", description: "Please fill in all required fields", variant: "destructive" });
+      return;
+    }
+    
+    createTestMutation.mutate({
+      testName: newTestForm.testName,
+      department: newTestForm.department,
+      cost: parseFloat(newTestForm.cost),
+      description: newTestForm.description || null
+    });
+  };
+
+  const handleUpdateTest = () => {
+    if (!editingTest) return;
+    updateTestMutation.mutate(editingTest);
   };
 
   return (
@@ -66,9 +146,19 @@ export default function LabTests() {
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Laboratory Test Results</h1>
-          <p className="text-gray-600 mt-2">View and manage all laboratory test results</p>
+          <h1 className="text-3xl font-bold text-gray-900">Laboratory Test Management</h1>
+          <p className="text-gray-600 mt-2">Manage test results and configure available lab tests</p>
         </div>
+
+        {/* Main Content with Tabs */}
+        <Tabs defaultValue="results" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="results">Test Results</TabsTrigger>
+            <TabsTrigger value="definitions">Available Tests</TabsTrigger>
+          </TabsList>
+
+          {/* Test Results Tab */}
+          <TabsContent value="results" className="space-y-6">
 
         {/* Filters and Search */}
         <Card className="mb-6">
@@ -239,6 +329,190 @@ export default function LabTests() {
             )}
           </CardContent>
         </Card>
+          </TabsContent>
+
+          {/* Test Definitions Tab */}
+          <TabsContent value="definitions" className="space-y-6">
+            {/* Header with Add Button */}
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Available Lab Tests</h2>
+                <p className="text-gray-600">Configure test types and pricing</p>
+              </div>
+              <Dialog open={isAddTestOpen} onOpenChange={setIsAddTestOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-medical-primary hover:bg-medical-primary-dark text-white">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add New Test
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px]">
+                  <DialogHeader>
+                    <DialogTitle>Add New Lab Test</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="testName" className="text-right">Test Name *</Label>
+                      <Input
+                        id="testName"
+                        value={newTestForm.testName}
+                        onChange={(e) => setNewTestForm({...newTestForm, testName: e.target.value})}
+                        className="col-span-3"
+                        placeholder="e.g., Complete Blood Count"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="department" className="text-right">Department *</Label>
+                      <Select value={newTestForm.department} onValueChange={(value) => setNewTestForm({...newTestForm, department: value})}>
+                        <SelectTrigger className="col-span-3">
+                          <SelectValue placeholder="Select department" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Pathology">Pathology</SelectItem>
+                          <SelectItem value="Radiology">Radiology</SelectItem>
+                          <SelectItem value="Biochemistry">Biochemistry</SelectItem>
+                          <SelectItem value="Microbiology">Microbiology</SelectItem>
+                          <SelectItem value="Hematology">Hematology</SelectItem>
+                          <SelectItem value="Cardiology">Cardiology</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="cost" className="text-right">Cost ($) *</Label>
+                      <Input
+                        id="cost"
+                        type="number"
+                        step="0.01"
+                        value={newTestForm.cost}
+                        onChange={(e) => setNewTestForm({...newTestForm, cost: e.target.value})}
+                        className="col-span-3"
+                        placeholder="0.00"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="description" className="text-right">Description</Label>
+                      <Textarea
+                        id="description"
+                        value={newTestForm.description}
+                        onChange={(e) => setNewTestForm({...newTestForm, description: e.target.value})}
+                        className="col-span-3"
+                        placeholder="Optional description or notes"
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <Button variant="outline" onClick={() => setIsAddTestOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={handleCreateTest} 
+                      disabled={createTestMutation.isPending}
+                      className="bg-medical-primary hover:bg-medical-primary-dark text-white"
+                    >
+                      {createTestMutation.isPending ? 'Adding...' : 'Add Test'}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            {/* Test Definitions Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Test Catalog ({testDefinitions?.length || 0})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {definitionsLoading ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-medical-primary mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading test definitions...</p>
+                  </div>
+                ) : testDefinitions && testDefinitions.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Test Name</TableHead>
+                          <TableHead>Department</TableHead>
+                          <TableHead>Cost</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Created</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {testDefinitions.map((test: any) => (
+                          <TableRow key={test.id}>
+                            <TableCell>
+                              <div>
+                                <p className="font-semibold">{test.testName}</p>
+                                {test.description && (
+                                  <p className="text-sm text-gray-600">{test.description}</p>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                                {test.department}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center">
+                                <DollarSign className="h-4 w-4 text-gray-400 mr-1" />
+                                <span className="font-medium">{parseFloat(test.cost).toFixed(2)}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge className={test.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+                                {test.isActive ? 'Active' : 'Inactive'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <p className="text-sm">{format(new Date(test.createdAt), 'MMM dd, yyyy')}</p>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center space-x-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => setEditingTest(test)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => deleteTestMutation.mutate(test.id)}
+                                  disabled={deleteTestMutation.isPending}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <Settings className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No lab tests configured</h3>
+                    <p className="text-gray-600 mb-4">Start by adding your first lab test definition.</p>
+                    <Button 
+                      onClick={() => setIsAddTestOpen(true)}
+                      className="bg-medical-primary hover:bg-medical-primary-dark text-white"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add First Test
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
