@@ -8,6 +8,7 @@ import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import Lab from "@/pages/lab";
+import LabTests from "@/pages/lab/lab-tests";
 import PatientRegistration from "@/pages/lab/patient-registration";
 import TestSelection from "@/pages/lab/test-selection";
 import EnterResults from "@/pages/lab/enter-results";
@@ -72,6 +73,12 @@ function Router() {
       <Route path="/lab">
         <ProtectedRoute>
           <Lab />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/lab/lab-tests">
+        <ProtectedRoute>
+          <LabTests />
         </ProtectedRoute>
       </Route>
       

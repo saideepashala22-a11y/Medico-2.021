@@ -54,15 +54,17 @@ export default function Lab() {
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow cursor-pointer group">
-            <CardHeader className="text-center">
-              <div className="mx-auto w-12 h-12 bg-green-500 bg-opacity-10 rounded-full flex items-center justify-center mb-4 group-hover:bg-opacity-20 transition-colors">
-                <TestTube className="h-6 w-6 text-green-600" />
-              </div>
-              <CardTitle className="text-lg">Lab Tests</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 text-center">View and manage laboratory test results</p>
-            </CardContent>
+            <Link href="/lab/lab-tests">
+              <CardHeader className="text-center">
+                <div className="mx-auto w-12 h-12 bg-green-500 bg-opacity-10 rounded-full flex items-center justify-center mb-4 group-hover:bg-opacity-20 transition-colors">
+                  <TestTube className="h-6 w-6 text-green-600" />
+                </div>
+                <CardTitle className="text-lg">Lab Tests</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 text-center">View and manage laboratory test results</p>
+              </CardContent>
+            </Link>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow cursor-pointer group">
