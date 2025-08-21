@@ -99,8 +99,9 @@ export default function TestSelection() {
       // Navigate to results entry
       window.location.href = `/lab/enter-results/${result.id}`;
     },
-    onError: () => {
-      toast({ title: "Error", description: "Failed to create lab test order", variant: "destructive" });
+    onError: (error: any) => {
+      console.error('Lab test creation error:', error);
+      toast({ title: "Error", description: error.message || "Failed to create lab test order", variant: "destructive" });
     }
   });
 
@@ -120,7 +121,7 @@ export default function TestSelection() {
 
     const selectedTestData = testDefinitions?.filter(test => selectedTests.includes(test.id)) || [];
     
-    createLabTestMutation.mutate({
+    const labTestData = {
       patientId,
       testTypes: selectedTestData.map(test => ({
         id: test.id,
@@ -129,8 +130,11 @@ export default function TestSelection() {
         cost: parseFloat(test.cost)
       })), // Send as JSONB array matching schema
       status: 'pending',
-      totalCost
-    });
+      totalCost: totalCost.toString() // Convert to string for decimal field
+    };
+    
+    console.log('Sending lab test data:', labTestData);
+    createLabTestMutation.mutate(labTestData);
   };
 
   if (patientLoading || testsLoading) {
