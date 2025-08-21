@@ -140,69 +140,7 @@ export default function Dashboard() {
 
         {/* Module Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          {/* Lab Module */}
-          <Link href="/lab">
-            <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
-              <div className="bg-medical-primary p-6">
-                <FlaskConical className="text-white text-3xl mb-4" />
-                <h3 className="text-xl font-bold text-white">Laboratory</h3>
-              </div>
-              <CardContent className="p-6">
-                <p className="text-medical-text-muted mb-4">Manage lab tests, enter results, and generate reports</p>
-                <ul className="text-sm text-medical-text-muted space-y-2">
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-medical-secondary rounded-full mr-2"></div>
-                    Patient Registration
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-medical-secondary rounded-full mr-2"></div>
-                    Test Selection
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-medical-secondary rounded-full mr-2"></div>
-                    Results Entry
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-medical-secondary rounded-full mr-2"></div>
-                    PDF Reports
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </Link>
-
-          {/* Pharmacy Module */}
-          <Link href="/pharmacy">
-            <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
-              <div className="bg-medical-secondary p-6">
-                <Pill className="text-white text-3xl mb-4" />
-                <h3 className="text-xl font-bold text-white">Pharmacy</h3>
-              </div>
-              <CardContent className="p-6">
-                <p className="text-medical-text-muted mb-4">Handle prescriptions, inventory, and billing</p>
-                <ul className="text-sm text-medical-text-muted space-y-2">
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-medical-primary rounded-full mr-2"></div>
-                    Prescription Management
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-medical-primary rounded-full mr-2"></div>
-                    Medicine Inventory
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-medical-primary rounded-full mr-2"></div>
-                    Bill Generation
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-medical-primary rounded-full mr-2"></div>
-                    Stock Tracking
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </Link>
-
-          {/* Consultation Module */}
+          {/* Consultation Module - FIRST */}
           <Link href="/consultation">
             <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
               <div className="bg-cyan-600 p-6">
@@ -233,12 +171,105 @@ export default function Dashboard() {
             </Card>
           </Link>
 
-          {/* Medical History Module */}
+          {/* Laboratory Module - SECOND */}
+          <Link href="/lab">
+            <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
+              <div className="bg-medical-primary p-6">
+                <FlaskConical className="text-white text-3xl mb-4" />
+                <h3 className="text-xl font-bold text-white">Laboratory</h3>
+              </div>
+              <CardContent className="p-6">
+                <p className="text-medical-text-muted mb-4">Manage lab tests, enter results, and generate reports</p>
+                <ul className="text-sm text-medical-text-muted space-y-2">
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-medical-secondary rounded-full mr-2"></div>
+                    Patient Registration
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-medical-secondary rounded-full mr-2"></div>
+                    Test Selection
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-medical-secondary rounded-full mr-2"></div>
+                    Results Entry
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-medical-secondary rounded-full mr-2"></div>
+                    PDF Reports
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Pharmacy Module - THIRD */}
+          <Link href="/pharmacy">
+            <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
+              <div className="bg-medical-secondary p-6">
+                <Pill className="text-white text-3xl mb-4" />
+                <h3 className="text-xl font-bold text-white">Pharmacy</h3>
+              </div>
+              <CardContent className="p-6">
+                <p className="text-medical-text-muted mb-4">Handle prescriptions, inventory, and billing</p>
+                <ul className="text-sm text-medical-text-muted space-y-2">
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-medical-primary rounded-full mr-2"></div>
+                    Prescription Management
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-medical-primary rounded-full mr-2"></div>
+                    Medicine Inventory
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-medical-primary rounded-full mr-2"></div>
+                    Bill Generation
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-medical-primary rounded-full mr-2"></div>
+                    Stock Tracking
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Discharge Summary Module - FOURTH */}
+          <Link href="/discharge">
+            <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
+              <div className="bg-medical-warning p-6">
+                <FileText className="text-white text-3xl mb-4" />
+                <h3 className="text-xl font-bold text-white">Discharge Summary</h3>
+              </div>
+              <CardContent className="p-6">
+                <p className="text-medical-text-muted mb-4">Create and manage patient discharge summaries</p>
+                <ul className="text-sm text-medical-text-muted space-y-2">
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-medical-primary rounded-full mr-2"></div>
+                    Discharge Planning
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-medical-secondary rounded-full mr-2"></div>
+                    Summary Generation
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-medical-warning rounded-full mr-2"></div>
+                    Follow-up Instructions
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-medical-accent rounded-full mr-2"></div>
+                    PDF Reports
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Track Patient (Medical History) Module - FIFTH */}
           <Link href="/medical-history">
             <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
               <div className="bg-medical-accent p-6">
                 <Heart className="text-white text-3xl mb-4" />
-                <h3 className="text-xl font-bold text-white">Medical History</h3>
+                <h3 className="text-xl font-bold text-white">Track Patient</h3>
               </div>
               <CardContent className="p-6">
                 <p className="text-medical-text-muted mb-4">Track patient medical history, conditions, and profiles</p>
