@@ -166,7 +166,7 @@ export default function EnterResults() {
 
   // Update lab test mutation
   const updateLabTestMutation = useMutation({
-    mutationFn: (testData: any) => apiRequest(`/api/lab-tests/${testId}`, 'PUT', testData),
+    mutationFn: (testData: any) => apiRequest('PUT', `/api/lab-tests/${testId}`, testData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/lab-tests'] });
       toast({ title: "Success", description: "Lab test results saved successfully" });
