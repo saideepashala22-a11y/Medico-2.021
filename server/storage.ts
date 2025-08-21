@@ -528,7 +528,7 @@ export class DatabaseStorage implements IStorage {
       caseNumber,
     };
 
-    const [newCaseSheet] = await db.insert(surgicalCaseSheets).values(caseSheetData).returning();
+    const [newCaseSheet] = await db.insert(surgicalCaseSheets).values([caseSheetData]).returning();
     return newCaseSheet;
   }
 
