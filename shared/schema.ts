@@ -302,3 +302,75 @@ export const insertConsultationSchema = createInsertSchema(consultations).omit({
 
 export type InsertConsultation = z.infer<typeof insertConsultationSchema>;
 export type Consultation = typeof consultations.$inferSelect;
+
+// Surgical Case Sheets Table
+export const surgicalCaseSheets = pgTable("surgical_case_sheets", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  caseNumber: text("case_number").notNull().unique(), // SCS-2024-001 format
+  patientId: varchar("patient_id").notNull().references(() => patients.id),
+  patientName: text("patient_name").notNull(),
+  husbandFatherName: text("husband_father_name"),
+  religion: text("religion"),
+  nationality: text("nationality"),
+  age: integer("age").notNull(),
+  sex: text("sex").notNull(),
+  address: text("address"),
+  village: text("village"),
+  district: text("district"),
+  diagnosis: text("diagnosis"),
+  natureOfOperation: text("nature_of_operation"),
+  edd: timestamp("edd"), // Expected Date of Delivery
+  dateOfAdmission: timestamp("date_of_admission"),
+  dateOfOperation: timestamp("date_of_operation"),
+  dateOfDischarge: timestamp("date_of_discharge"),
+  lpNo: text("lp_no"),
+  complaintsAndDuration: text("complaints_and_duration"),
+  historyOfPresentIllness: text("history_of_present_illness"),
+  
+  // Investigation fields
+  hb: text("hb"),
+  bsa: text("bsa"),
+  ct: text("ct"),
+  bt: text("bt"),
+  bloodGrouping: text("blood_grouping"),
+  rhFactor: text("rh_factor"),
+  prl: text("prl"),
+  rbs: text("rbs"),
+  urineSugar: text("urine_sugar"),
+  xray: text("xray"),
+  ecg: text("ecg"),
+  bloodUrea: text("blood_urea"),
+  serumCreatinine: text("serum_creatinine"),
+  serumBilirubin: text("serum_bilirubin"),
+  hbsag: text("hbsag"),
+  
+  // On Examination fields
+  generalCondition: text("general_condition"),
+  temperature: text("temperature"),
+  pulse: text("pulse"),
+  bloodPressure: text("blood_pressure"),
+  respiratoryRate: text("respiratory_rate"),
+  heart: text("heart"),
+  lungs: text("lungs"),
+  abdomen: text("abdomen"),
+  cns: text("cns"),
+  
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const surgicalCaseSheetsRelations = relations(surgicalCaseSheets, ({ one }) => ({
+  patient: one(patients, { fields: [surgicalCaseSheets.patientId], references: [patients.id] }),
+  createdBy: one(users, { fields: [surgicalCaseSheets.createdBy], references: [users.id] }),
+}));
+
+export const insertSurgicalCaseSheetSchema = createInsertSchema(surgicalCaseSheets).omit({
+  id: true,
+  caseNumber: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertSurgicalCaseSheet = z.infer<typeof insertSurgicalCaseSheetSchema>;
+export type SurgicalCaseSheet = typeof surgicalCaseSheets.$inferSelect;

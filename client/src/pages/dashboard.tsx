@@ -13,7 +13,8 @@ import {
   TestTube,
   FileCheck,
   Heart,
-  Stethoscope
+  Stethoscope,
+  Scissors
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -131,6 +132,22 @@ export default function Dashboard() {
                   <p className="text-sm font-medium text-medical-text-muted">Discharges</p>
                   <p className="text-2xl font-bold text-medical-text">
                     {isLoading ? '...' : (stats as any)?.dischargesToday || 0}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Scissors className="h-8 w-8 text-red-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-medical-text-muted">Surgery Cases</p>
+                  <p className="text-2xl font-bold text-medical-text">
+                    {isLoading ? '...' : (stats as any)?.surgicalCasesToday || 0}
                   </p>
                 </div>
               </div>
@@ -264,7 +281,38 @@ export default function Dashboard() {
             </Card>
           </Link>
 
-          {/* Track Patient (Medical History) Module - FIFTH */}
+          {/* Surgical Case Sheet Module - FIFTH */}
+          <Link href="/surgical-case-sheets">
+            <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
+              <div className="bg-red-600 p-6">
+                <Scissors className="text-white text-3xl mb-4" />
+                <h3 className="text-xl font-bold text-white">Surgical Case Sheet</h3>
+              </div>
+              <CardContent className="p-6">
+                <p className="text-medical-text-muted mb-4">Create and manage surgical case sheets with downloadable forms</p>
+                <ul className="text-sm text-medical-text-muted space-y-2">
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-medical-primary rounded-full mr-2"></div>
+                    Patient Information
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-red-600 rounded-full mr-2"></div>
+                    Surgery Details
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-medical-secondary rounded-full mr-2"></div>
+                    Investigation Results
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-medical-accent rounded-full mr-2"></div>
+                    PDF Download
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Track Patient (Medical History) Module - SIXTH */}
           <Link href="/medical-history">
             <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
               <div className="bg-medical-accent p-6">

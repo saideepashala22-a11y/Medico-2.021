@@ -1,9 +1,10 @@
 import { 
-  users, patients, labTests, prescriptions, dischargeSummaries, medicalHistory, patientProfiles, consultations, labTestDefinitions,
+  users, patients, labTests, prescriptions, dischargeSummaries, medicalHistory, patientProfiles, consultations, labTestDefinitions, surgicalCaseSheets,
   type User, type InsertUser, type Patient, type InsertPatient,
   type LabTest, type InsertLabTest, type Prescription, type InsertPrescription,
   type DischargeSummary, type InsertDischargeSummary, type MedicalHistory, type InsertMedicalHistory,
   type PatientProfile, type InsertPatientProfile, type Consultation, type InsertConsultation,
+  type SurgicalCaseSheet, type InsertSurgicalCaseSheet,
   insertLabTestDefinitionSchema
 } from "@shared/schema";
 import { db } from "./db";
@@ -66,6 +67,13 @@ export interface IStorage {
   deleteConsultation(id: string): Promise<void>;
   getRecentConsultations(): Promise<(Consultation & { patient: Patient })[]>;
   
+  // Surgical Case Sheets
+  getSurgicalCaseSheet(id: string): Promise<(SurgicalCaseSheet & { patient: Patient }) | undefined>;
+  getSurgicalCaseSheetsByPatient(patientId: string): Promise<SurgicalCaseSheet[]>;
+  createSurgicalCaseSheet(caseSheet: InsertSurgicalCaseSheet): Promise<SurgicalCaseSheet>;
+  updateSurgicalCaseSheet(id: string, updates: Partial<SurgicalCaseSheet>): Promise<SurgicalCaseSheet>;
+  getRecentSurgicalCaseSheets(): Promise<(SurgicalCaseSheet & { patient: Patient })[]>;
+  
   // Stats
   getStats(): Promise<{
     totalPatients: number;
@@ -73,6 +81,7 @@ export interface IStorage {
     prescriptionsToday: number;
     dischargesToday: number;
     consultationsToday: number;
+    surgicalCasesToday: number;
   }>;
 }
 
@@ -261,6 +270,7 @@ export class DatabaseStorage implements IStorage {
     prescriptionsToday: number;
     dischargesToday: number;
     consultationsToday: number;
+    surgicalCasesToday: number;
   }> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -276,6 +286,8 @@ export class DatabaseStorage implements IStorage {
       .where(sql`${dischargeSummaries.createdAt} >= ${today} AND ${dischargeSummaries.createdAt} < ${tomorrow}`);
     const [consultationsToday] = await db.select({ count: sql`count(*)` }).from(consultations)
       .where(sql`${consultations.createdAt} >= ${today} AND ${consultations.createdAt} < ${tomorrow}`);
+    const [surgicalCasesToday] = await db.select({ count: sql`count(*)` }).from(surgicalCaseSheets)
+      .where(sql`${surgicalCaseSheets.createdAt} >= ${today} AND ${surgicalCaseSheets.createdAt} < ${tomorrow}`);
 
     return {
       totalPatients: Number(totalPatients.count),
@@ -283,6 +295,7 @@ export class DatabaseStorage implements IStorage {
       prescriptionsToday: Number(prescriptionsToday.count),
       dischargesToday: Number(dischargesToday.count),
       consultationsToday: Number(consultationsToday.count),
+      surgicalCasesToday: Number(surgicalCasesToday.count),
     };
   }
 
@@ -431,6 +444,153 @@ export class DatabaseStorage implements IStorage {
     await db.update(labTestDefinitions)
       .set({ isActive: false, updatedAt: new Date() })
       .where(eq(labTestDefinitions.id, id));
+  }
+
+  // Surgical Case Sheet Methods
+  async getSurgicalCaseSheet(id: string): Promise<(SurgicalCaseSheet & { patient: Patient }) | undefined> {
+    const [caseSheet] = await db.select({
+      id: surgicalCaseSheets.id,
+      caseNumber: surgicalCaseSheets.caseNumber,
+      patientId: surgicalCaseSheets.patientId,
+      patientName: surgicalCaseSheets.patientName,
+      husbandFatherName: surgicalCaseSheets.husbandFatherName,
+      religion: surgicalCaseSheets.religion,
+      nationality: surgicalCaseSheets.nationality,
+      age: surgicalCaseSheets.age,
+      sex: surgicalCaseSheets.sex,
+      address: surgicalCaseSheets.address,
+      village: surgicalCaseSheets.village,
+      district: surgicalCaseSheets.district,
+      diagnosis: surgicalCaseSheets.diagnosis,
+      natureOfOperation: surgicalCaseSheets.natureOfOperation,
+      edd: surgicalCaseSheets.edd,
+      dateOfAdmission: surgicalCaseSheets.dateOfAdmission,
+      dateOfOperation: surgicalCaseSheets.dateOfOperation,
+      dateOfDischarge: surgicalCaseSheets.dateOfDischarge,
+      lpNo: surgicalCaseSheets.lpNo,
+      complaintsAndDuration: surgicalCaseSheets.complaintsAndDuration,
+      historyOfPresentIllness: surgicalCaseSheets.historyOfPresentIllness,
+      hb: surgicalCaseSheets.hb,
+      bsa: surgicalCaseSheets.bsa,
+      ct: surgicalCaseSheets.ct,
+      bt: surgicalCaseSheets.bt,
+      bloodGrouping: surgicalCaseSheets.bloodGrouping,
+      rhFactor: surgicalCaseSheets.rhFactor,
+      prl: surgicalCaseSheets.prl,
+      rbs: surgicalCaseSheets.rbs,
+      urineSugar: surgicalCaseSheets.urineSugar,
+      xray: surgicalCaseSheets.xray,
+      ecg: surgicalCaseSheets.ecg,
+      bloodUrea: surgicalCaseSheets.bloodUrea,
+      serumCreatinine: surgicalCaseSheets.serumCreatinine,
+      serumBilirubin: surgicalCaseSheets.serumBilirubin,
+      hbsag: surgicalCaseSheets.hbsag,
+      generalCondition: surgicalCaseSheets.generalCondition,
+      temperature: surgicalCaseSheets.temperature,
+      pulse: surgicalCaseSheets.pulse,
+      bloodPressure: surgicalCaseSheets.bloodPressure,
+      respiratoryRate: surgicalCaseSheets.respiratoryRate,
+      heart: surgicalCaseSheets.heart,
+      lungs: surgicalCaseSheets.lungs,
+      abdomen: surgicalCaseSheets.abdomen,
+      cns: surgicalCaseSheets.cns,
+      createdBy: surgicalCaseSheets.createdBy,
+      createdAt: surgicalCaseSheets.createdAt,
+      updatedAt: surgicalCaseSheets.updatedAt,
+      patient: patients,
+    })
+    .from(surgicalCaseSheets)
+    .innerJoin(patients, eq(surgicalCaseSheets.patientId, patients.id))
+    .where(eq(surgicalCaseSheets.id, id));
+    return caseSheet || undefined;
+  }
+
+  async getSurgicalCaseSheetsByPatient(patientId: string): Promise<SurgicalCaseSheet[]> {
+    return await db.select().from(surgicalCaseSheets)
+      .where(eq(surgicalCaseSheets.patientId, patientId))
+      .orderBy(desc(surgicalCaseSheets.createdAt));
+  }
+
+  async createSurgicalCaseSheet(caseSheet: InsertSurgicalCaseSheet): Promise<SurgicalCaseSheet> {
+    // Generate case number
+    const today = new Date();
+    const year = today.getFullYear();
+    const existingSheets = await this.getRecentSurgicalCaseSheets();
+    const caseNumber = `SCS-${year}-${String(existingSheets.length + 1).padStart(3, '0')}`;
+
+    const caseSheetData = {
+      ...caseSheet,
+      caseNumber,
+    };
+
+    const [newCaseSheet] = await db.insert(surgicalCaseSheets).values(caseSheetData).returning();
+    return newCaseSheet;
+  }
+
+  async updateSurgicalCaseSheet(id: string, updates: Partial<SurgicalCaseSheet>): Promise<SurgicalCaseSheet> {
+    const [updatedCaseSheet] = await db.update(surgicalCaseSheets)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(surgicalCaseSheets.id, id))
+      .returning();
+    return updatedCaseSheet;
+  }
+
+  async getRecentSurgicalCaseSheets(): Promise<(SurgicalCaseSheet & { patient: Patient })[]> {
+    return await db.select({
+      id: surgicalCaseSheets.id,
+      caseNumber: surgicalCaseSheets.caseNumber,
+      patientId: surgicalCaseSheets.patientId,
+      patientName: surgicalCaseSheets.patientName,
+      husbandFatherName: surgicalCaseSheets.husbandFatherName,
+      religion: surgicalCaseSheets.religion,
+      nationality: surgicalCaseSheets.nationality,
+      age: surgicalCaseSheets.age,
+      sex: surgicalCaseSheets.sex,
+      address: surgicalCaseSheets.address,
+      village: surgicalCaseSheets.village,
+      district: surgicalCaseSheets.district,
+      diagnosis: surgicalCaseSheets.diagnosis,
+      natureOfOperation: surgicalCaseSheets.natureOfOperation,
+      edd: surgicalCaseSheets.edd,
+      dateOfAdmission: surgicalCaseSheets.dateOfAdmission,
+      dateOfOperation: surgicalCaseSheets.dateOfOperation,
+      dateOfDischarge: surgicalCaseSheets.dateOfDischarge,
+      lpNo: surgicalCaseSheets.lpNo,
+      complaintsAndDuration: surgicalCaseSheets.complaintsAndDuration,
+      historyOfPresentIllness: surgicalCaseSheets.historyOfPresentIllness,
+      hb: surgicalCaseSheets.hb,
+      bsa: surgicalCaseSheets.bsa,
+      ct: surgicalCaseSheets.ct,
+      bt: surgicalCaseSheets.bt,
+      bloodGrouping: surgicalCaseSheets.bloodGrouping,
+      rhFactor: surgicalCaseSheets.rhFactor,
+      prl: surgicalCaseSheets.prl,
+      rbs: surgicalCaseSheets.rbs,
+      urineSugar: surgicalCaseSheets.urineSugar,
+      xray: surgicalCaseSheets.xray,
+      ecg: surgicalCaseSheets.ecg,
+      bloodUrea: surgicalCaseSheets.bloodUrea,
+      serumCreatinine: surgicalCaseSheets.serumCreatinine,
+      serumBilirubin: surgicalCaseSheets.serumBilirubin,
+      hbsag: surgicalCaseSheets.hbsag,
+      generalCondition: surgicalCaseSheets.generalCondition,
+      temperature: surgicalCaseSheets.temperature,
+      pulse: surgicalCaseSheets.pulse,
+      bloodPressure: surgicalCaseSheets.bloodPressure,
+      respiratoryRate: surgicalCaseSheets.respiratoryRate,
+      heart: surgicalCaseSheets.heart,
+      lungs: surgicalCaseSheets.lungs,
+      abdomen: surgicalCaseSheets.abdomen,
+      cns: surgicalCaseSheets.cns,
+      createdBy: surgicalCaseSheets.createdBy,
+      createdAt: surgicalCaseSheets.createdAt,
+      updatedAt: surgicalCaseSheets.updatedAt,
+      patient: patients,
+    })
+    .from(surgicalCaseSheets)
+    .innerJoin(patients, eq(surgicalCaseSheets.patientId, patients.id))
+    .orderBy(desc(surgicalCaseSheets.createdAt))
+    .limit(10);
   }
 }
 

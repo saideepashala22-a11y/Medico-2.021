@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema, insertConsultationSchema, insertLabTestDefinitionSchema } from "@shared/schema";
+import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema, insertConsultationSchema, insertLabTestDefinitionSchema, insertSurgicalCaseSheetSchema } from "@shared/schema";
 import { z } from "zod";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
@@ -468,6 +468,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       await storage.deleteLabTestDefinition(req.params.id);
       res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Surgical case sheet routes
+  app.get('/api/surgical-case-sheets/:id', authenticateToken, async (req: any, res) => {
+    try {
+      const caseSheet = await storage.getSurgicalCaseSheet(req.params.id);
+      if (!caseSheet) {
+        return res.status(404).json({ message: 'Surgical case sheet not found' });
+      }
+      res.json(caseSheet);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.get('/api/patients/:patientId/surgical-case-sheets', authenticateToken, async (req: any, res) => {
+    try {
+      const caseSheets = await storage.getSurgicalCaseSheetsByPatient(req.params.patientId);
+      res.json(caseSheets);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.post('/api/surgical-case-sheets', authenticateToken, async (req: any, res) => {
+    try {
+      const caseSheetData = insertSurgicalCaseSheetSchema.parse({
+        ...req.body,
+        createdBy: req.user.id
+      });
+      
+      const caseSheet = await storage.createSurgicalCaseSheet(caseSheetData);
+      res.status(201).json(caseSheet);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Invalid input', errors: error.errors });
+      }
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.put('/api/surgical-case-sheets/:id', authenticateToken, async (req: any, res) => {
+    try {
+      const updates = req.body;
+      const caseSheet = await storage.updateSurgicalCaseSheet(req.params.id, updates);
+      res.json(caseSheet);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.get('/api/surgical-case-sheets', authenticateToken, async (req: any, res) => {
+    try {
+      const caseSheets = await storage.getRecentSurgicalCaseSheets();
+      res.json(caseSheets);
     } catch (error) {
       res.status(500).json({ message: 'Server error' });
     }
