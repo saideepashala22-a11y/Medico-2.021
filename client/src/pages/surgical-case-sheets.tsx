@@ -98,6 +98,16 @@ export default function SurgicalCaseSheets() {
     console.log('Form submitted with data:', data);
     console.log('Form errors:', form.formState.errors);
     
+    // Validate required fields
+    if (!data.patientId || !data.patientName || !data.age || !data.sex) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields (Patient, Patient Name, Age, Sex)",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Add required fields
     const submitData = {
       ...data,
@@ -107,12 +117,26 @@ export default function SurgicalCaseSheets() {
     console.log('Submitting data:', submitData);
     
     // Generate and download PDF immediately
-    const mockCaseSheet = {
-      ...submitData,
-      caseNumber: `SCS-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
-      id: 'temp-id',
-    };
-    generatePDF(mockCaseSheet);
+    try {
+      const mockCaseSheet = {
+        ...submitData,
+        caseNumber: `SCS-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
+        id: 'temp-id',
+      };
+      generatePDF(mockCaseSheet);
+      
+      toast({
+        title: "PDF Generated",
+        description: "Surgical case sheet PDF has been downloaded",
+      });
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast({
+        title: "PDF Error",
+        description: "Failed to generate PDF, but form will still be saved",
+        variant: "destructive",
+      });
+    }
     
     // Then submit to database
     createMutation.mutate(submitData);
@@ -625,6 +649,11 @@ export default function SurgicalCaseSheets() {
                       type="submit" 
                       disabled={createMutation.isPending}
                       className="bg-red-600 hover:bg-red-700"
+                      onClick={() => {
+                        console.log('Create Case Sheet button clicked!');
+                        console.log('Form valid:', form.formState.isValid);
+                        console.log('Form errors:', form.formState.errors);
+                      }}
                     >
                       {createMutation.isPending ? 'Creating...' : 'Create Case Sheet'}
                     </Button>
