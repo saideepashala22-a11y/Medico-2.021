@@ -254,8 +254,8 @@ export type DischargeSummary = typeof dischargeSummaries.$inferSelect;
 
 // Consultations table
 export const consultations = pgTable('consultations', {
-  id: text('id').primaryKey().default(sql`gen_random_uuid()`),
-  patientId: text('patient_id').notNull().references(() => patients.id),
+  id: varchar('id').primaryKey().default(sql`gen_random_uuid()`),
+  patientId: varchar('patient_id').notNull().references(() => patients.id),
   doctorName: text('doctor_name').notNull(),
   consultationDate: timestamp('consultation_date').notNull(),
   chiefComplaint: text('chief_complaint').notNull(),
@@ -275,7 +275,7 @@ export const consultations = pgTable('consultations', {
   notes: text('notes'),
   consultationType: text('consultation_type').notNull().default('general'), // general, emergency, follow-up
   status: text('status').notNull().default('completed'), // scheduled, in-progress, completed, cancelled
-  createdBy: text('created_by').notNull(),
+  createdBy: varchar('created_by').notNull().references(() => users.id),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

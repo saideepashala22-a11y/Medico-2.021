@@ -337,13 +337,13 @@ export class DatabaseStorage implements IStorage {
 
   async createConsultation(consultation: InsertConsultation): Promise<Consultation> {
     // Convert dates properly for database insertion
-    const consultationToInsert = {
+    const consultationToInsert: any = {
       ...consultation,
       consultationDate: new Date(consultation.consultationDate),
       followUpDate: consultation.followUpDate ? new Date(consultation.followUpDate) : null,
     };
     
-    const [newConsultation] = await db.insert(consultations).values([consultationToInsert]).returning();
+    const [newConsultation] = await db.insert(consultations).values(consultationToInsert).returning();
     return newConsultation;
   }
 
