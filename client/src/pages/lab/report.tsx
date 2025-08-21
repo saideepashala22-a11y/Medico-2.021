@@ -95,30 +95,37 @@ export default function LabReport() {
       doc.setFont('helvetica', 'normal');
       
       try {
-        const results = JSON.parse(labTest.results);
-        const testTypeNames = labTest.testTypes?.map(t => t.testName) || [];
-        
-        testTypeNames.forEach((testName: string) => {
-          const cleanTestName = testName.trim();
-          const testResults = results[cleanTestName];
+        if (labTest.results && labTest.results.trim() !== '') {
+          const results = JSON.parse(labTest.results);
+          const testTypeNames = labTest.testTypes?.map(t => t.testName) || [];
           
-          if (testResults) {
-            yPos += 10;
-            doc.setFont('helvetica', 'bold');
-            doc.text(`${cleanTestName}:`, 20, yPos);
-            yPos += 8;
+          testTypeNames.forEach((testName: string) => {
+            const cleanTestName = testName.trim();
+            const testResults = results[cleanTestName];
             
-            doc.setFont('helvetica', 'normal');
-            Object.entries(testResults).forEach(([key, value]) => {
-              if (value) {
-                doc.text(`  ${key}: ${value}`, 25, yPos);
-                yPos += 6;
-              }
-            });
-          }
-        });
+            if (testResults) {
+              yPos += 10;
+              doc.setFont('helvetica', 'bold');
+              doc.text(`${cleanTestName}:`, 20, yPos);
+              yPos += 8;
+              
+              doc.setFont('helvetica', 'normal');
+              Object.entries(testResults).forEach(([key, value]) => {
+                if (value) {
+                  doc.text(`  ${key}: ${value}`, 25, yPos);
+                  yPos += 6;
+                }
+              });
+            }
+          });
+        } else {
+          doc.setFont('helvetica', 'normal');
+          doc.text('Test results are pending entry.', 20, yPos);
+        }
       } catch (e) {
-        doc.text('Unable to parse test results', 20, yPos);
+        console.error('Failed to parse results:', e);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Test results are pending entry.', 20, yPos);
       }
       
       // Doctor's Notes
@@ -194,7 +201,8 @@ export default function LabReport() {
   try {
     parsedResults = labTest.results ? JSON.parse(labTest.results) : {};
   } catch (e) {
-    console.error('Failed to parse results:', parsedResults);
+    console.error('Failed to parse results:', e);
+    parsedResults = {};
   }
 
   const testTypes = Array.isArray(labTest.testTypes) ? labTest.testTypes : [];
@@ -326,36 +334,54 @@ export default function LabReport() {
 
         {/* Test Results */}
         <div className="space-y-4">
-          {testTypes.map((testType) => {
-            const testName = testType.testName;
-            const testResults = parsedResults[testName];
-            
-            if (!testResults) return null;
-            
-            return (
-              <Card key={testType.id}>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <TestTube className="mr-2 h-5 w-5" />
-                    {testName}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {Object.entries(testResults).map(([key, value]) => {
-                      if (!value) return null;
-                      return (
-                        <div key={key}>
-                          <p className="text-sm font-medium text-gray-500 capitalize">{key.replace(/([A-Z])/g, ' $1')}</p>
-                          <p className="text-lg font-semibold">{String(value)}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+          {Object.keys(parsedResults).length > 0 ? (
+            testTypes.map((testType) => {
+              const testName = testType.testName;
+              const testResults = parsedResults[testName];
+              
+              if (!testResults) return null;
+              
+              return (
+                <Card key={testType.id}>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <TestTube className="mr-2 h-5 w-5" />
+                      {testName}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {Object.entries(testResults).map(([key, value]) => {
+                        if (!value) return null;
+                        return (
+                          <div key={key}>
+                            <p className="text-sm font-medium text-gray-500 capitalize">{key.replace(/([A-Z])/g, ' $1')}</p>
+                            <p className="text-lg font-semibold">{String(value)}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <TestTube className="mr-2 h-5 w-5" />
+                  Test Results
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <TestTube className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  <p className="text-gray-500 text-lg">Test results are pending entry.</p>
+                  <p className="text-gray-400 text-sm mt-2">Results will be available once the lab analysis is complete.</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Doctor's Notes */}
