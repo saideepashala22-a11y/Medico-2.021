@@ -92,10 +92,14 @@ export default function TestSelection() {
 
   // Create lab test order mutation
   const createLabTestMutation = useMutation({
-    mutationFn: (testData: any) => apiRequest('POST', '/api/lab-tests', testData),
+    mutationFn: async (testData: any) => {
+      const response = await apiRequest('POST', '/api/lab-tests', testData);
+      return response.json();
+    },
     onSuccess: (result: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/lab-tests'] });
       toast({ title: "Success", description: "Lab tests ordered successfully" });
+      console.log('Lab test created successfully:', result);
       // Navigate to results entry
       window.location.href = `/lab/enter-results/${result.id}`;
     },
