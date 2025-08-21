@@ -86,6 +86,7 @@ export default {
         "medical-warning": "#F59E0B",   // Amber for warnings
         "medical-info": "#0891B2",      // Teal for info
         "medical-success": "#059669",   // Green for success states
+        "medical-accent": "#8B5CF6",    // Purple for accents
       },
       fontFamily: {
         sans: ["var(--font-sans)"],

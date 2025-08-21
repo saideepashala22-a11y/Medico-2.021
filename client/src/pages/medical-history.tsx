@@ -237,7 +237,7 @@ export default function MedicalHistory() {
                 </div>
               )}
 
-              {searchResults && searchResults.length > 0 && (
+              {searchResults && Array.isArray(searchResults) && searchResults.length > 0 && (
                 <div className="space-y-2">
                   <Label>Search Results</Label>
                   {searchResults.map((patient: Patient) => (
@@ -265,7 +265,7 @@ export default function MedicalHistory() {
                 </div>
               )}
 
-              {searchTerm.length > 2 && searchResults && searchResults.length === 0 && (
+              {searchTerm.length > 2 && searchResults && Array.isArray(searchResults) && searchResults.length === 0 && (
                 <div className="text-center py-4 text-medical-text-muted">
                   No patients found matching "{searchTerm}"
                 </div>
