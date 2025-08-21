@@ -108,6 +108,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Patient routes
+  app.get('/api/patients', authenticateToken, async (req: any, res) => {
+    try {
+      const patients = await storage.getAllPatients();
+      res.json(patients);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
   app.get('/api/patients/search', authenticateToken, async (req: any, res) => {
     try {
       const { q } = req.query;

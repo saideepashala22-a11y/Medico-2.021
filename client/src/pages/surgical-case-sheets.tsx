@@ -48,6 +48,9 @@ export default function SurgicalCaseSheets() {
   console.log('Patients data:', patients);
   console.log('Patients loading:', patientsLoading);
   console.log('Patients error:', patientsError);
+  
+  // Use the patients data directly now that the API is fixed
+  const displayPatients = Array.isArray(patients) ? patients : [];
 
   const form = useForm<InsertSurgicalCaseSheet>({
     resolver: zodResolver(insertSurgicalCaseSheetSchema),
@@ -298,7 +301,7 @@ export default function SurgicalCaseSheets() {
                           <FormLabel>Patient</FormLabel>
                           <Select onValueChange={(value) => {
                             field.onChange(value);
-                            const selectedPatient = Array.isArray(patients) ? patients.find((p: any) => p.id === value) : null;
+                            const selectedPatient = displayPatients.find((p: any) => p.id === value);
                             if (selectedPatient) {
                               form.setValue('patientName', selectedPatient.name);
                               form.setValue('age', selectedPatient.age);
@@ -311,17 +314,11 @@ export default function SurgicalCaseSheets() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {Array.isArray(patients) && patients.length > 0 ? (
-                                patients.map((patient: any) => (
-                                  <SelectItem key={patient.id} value={patient.id}>
-                                    {patient.name} - {patient.patientId}
-                                  </SelectItem>
-                                ))
-                              ) : (
-                                <SelectItem value="no-patients" disabled>
-                                  No patients found
+                              {displayPatients.map((patient: any) => (
+                                <SelectItem key={patient.id} value={patient.id}>
+                                  {patient.name} - {patient.patientId || `Age: ${patient.age}`}
                                 </SelectItem>
-                              )}
+                              ))}
                             </SelectContent>
                           </Select>
                           <FormMessage />

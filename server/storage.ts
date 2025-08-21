@@ -20,6 +20,7 @@ export interface IStorage {
   getPatient(id: string): Promise<Patient | undefined>;
   getPatientByPatientId(patientId: string): Promise<Patient | undefined>;
   createPatient(patient: InsertPatient): Promise<Patient>;
+  getAllPatients(): Promise<Patient[]>;
   searchPatients(query: string): Promise<Patient[]>;
   
   // Lab Tests
@@ -123,6 +124,10 @@ export class DatabaseStorage implements IStorage {
       patientId,
     }).returning();
     return newPatient;
+  }
+
+  async getAllPatients(): Promise<Patient[]> {
+    return await db.select().from(patients).orderBy(desc(patients.createdAt));
   }
 
   async searchPatients(query: string): Promise<Patient[]> {
