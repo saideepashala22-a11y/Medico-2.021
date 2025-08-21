@@ -414,7 +414,7 @@ export default function EnterResults() {
                   <div className="space-y-4">
                     <div>
                       <p className="text-sm text-gray-600">Ordered Date</p>
-                      <p className="font-medium">{format(new Date(labTest.requestedDate), 'MMM dd, yyyy')}</p>
+                      <p className="font-medium">{format(new Date(labTest.createdAt), 'MMM dd, yyyy')}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Test Count</p>
@@ -422,7 +422,7 @@ export default function EnterResults() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Total Cost</p>
-                      <p className="font-medium">₹{labTest.totalCost?.toFixed(2) || '0.00'}</p>
+                      <p className="font-medium">₹{parseFloat(labTest.totalCost || '0').toFixed(2)}</p>
                     </div>
                     
                     <Button 
