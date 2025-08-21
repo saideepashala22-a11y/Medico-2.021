@@ -93,13 +93,7 @@ function Router() {
         </ProtectedRoute>
       </Route>
       
-      <Route path="/lab/test-selection/:patientId">
-        <ProtectedRoute>
-          <TestSelection />
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path="/lab/enter-results/:patientId">
+      <Route path="/lab/enter-results/:testId">
         <ProtectedRoute>
           <EnterResults />
         </ProtectedRoute>
