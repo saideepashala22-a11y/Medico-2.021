@@ -142,152 +142,241 @@ export default function SurgicalCaseSheets() {
     createMutation.mutate(submitData);
   };
 
-  // Generate PDF function with exact hospital formatting specifications
+  // Generate PDF using HTML/CSS with perfect grid alignment
   const generatePDF = (caseSheet: any) => {
-    const doc = new jsPDF();
-    
     // Generate unique case sheet number based on patient ID
     const patientIdShort = caseSheet.patientId?.slice(-4) || Math.floor(Math.random() * 9999).toString().padStart(4, '0');
     const caseSheetNumber = `SCS${patientIdShort}-${String(Math.floor(Math.random() * 99) + 1).padStart(2, '0')}`;
+    const currentDate = new Date().toLocaleDateString('en-GB');
     
-    // 1. Header (center aligned)
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.text('NAKSHATRA HOSPITAL', 105, 25, { align: 'center' });
-    
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.', 105, 35, { align: 'center' });
-    doc.text('Cell: 7093939205', 105, 45, { align: 'center' });
-    
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('SURGICAL CASE SHEET', 105, 65, { align: 'center' });
-    doc.line(75, 68, 135, 68); // underline
-    
-    // 2. Below header: Case Sheet No (left) and Date (right)
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Case Sheet No: ${caseSheetNumber}`, 50, 85);
-    doc.text(`Date: ${new Date().toLocaleDateString('en-GB')}`, 150, 85);
-    
-    let y = 110;
-    
-    // 3. Patient Details (labels at x=50, values far right for proper alignment)
-    doc.setFontSize(11);
-    
-    // Name of the Patient
-    doc.setFont('helvetica', 'bold');
-    doc.text('Name of the Patient :', 50, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(caseSheet.patientName || '____________________________', 150, y);
-    y += 20;
-    
-    // Husband's/Father's Name
-    doc.setFont('helvetica', 'bold');
-    doc.text('Husband\'s/Father\'s Name :', 50, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(caseSheet.husbandFatherName || '____________________________', 150, y);
-    y += 20;
-    
-    // Religion & Nationality
-    doc.setFont('helvetica', 'bold');
-    doc.text('Religion & Nationality :', 50, y);
-    doc.setFont('helvetica', 'normal');
-    const religionNat = `${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim();
-    doc.text(religionNat || '____________________________', 150, y);
-    y += 20;
-    
-    // Address
-    doc.setFont('helvetica', 'bold');
-    doc.text('Address :', 50, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(caseSheet.address || '____________________________', 150, y);
-    y += 20;
-    
-    // Age and Sex on same line with proper spacing
-    doc.setFont('helvetica', 'bold');
-    doc.text('Age :', 50, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(String(caseSheet.age || ''), 80, y);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Sex :', 130, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(caseSheet.sex || '', 155, y);
-    y += 30;
-    
-    // 4. Medical Info (each field on new line with blank underline)
-    const medicalFields = [
-      ['Diagnosis :', caseSheet.diagnosis],
-      ['Nature of Operation :', caseSheet.natureOfOperation],
-      ['Date of Admission :', caseSheet.dateOfAdmission ? format(new Date(caseSheet.dateOfAdmission), 'dd/MM/yyyy') : ''],
-      ['Date of Operation :', caseSheet.dateOfOperation ? format(new Date(caseSheet.dateOfOperation), 'dd/MM/yyyy') : ''],
-      ['Date of Discharge :', caseSheet.dateOfDischarge ? format(new Date(caseSheet.dateOfDischarge), 'dd/MM/yyyy') : ''],
-      ['Complaints & Duration :', caseSheet.complaintsAndDuration],
-      ['History of Present Illness :', caseSheet.historyOfPresentIllness]
-    ];
-    
-    medicalFields.forEach(([label, value]) => {
-      doc.setFont('helvetica', 'bold');
-      doc.text(label, 50, y);
-      doc.setFont('helvetica', 'normal');
-      doc.text(value || '____________________________', 150, y);
-      y += 18;
-    });
-    
-    y += 10;
-    
-    // 5. Investigations block
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.text('INVESTIGATION:', 50, y);
-    y += 20;
-    
-    const investigations = [
-      '1) Hb%', '2) E.S.R.', '3) C.T.', '4) B.T.', '5) Bl. Grouping',
-      '6) RPL', '7) R.B.S', '8) Urine Sugar', '9) R.M.', '10) X-ray',
-      '11) E.C.G', '12) Blood Urea', '13) Serum Creatinine',
-      '14) Serum Bilirubin', '15) HBS A.G'
-    ];
-    
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    
-    investigations.forEach((item) => {
-      doc.text(`${item} : _____________________`, 50, y);
-      y += 15;
-    });
-    
-    y += 10;
-    
-    // 6. On Examination block
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.text('ON EXAMINATION:', 50, y);
-    y += 20;
-    
-    const examinations = [
-      'G.C. : _____________________',
-      'Temp. : _____ °F',
-      'P.R. : _____ /Min',
-      'B.P. : _____ mmHg',
-      'R.R. : _____ /Min',
-      'Heart : _____________________',
-      'Lungs : _____________________',
-      'Abd. : _____________________',
-      'C.N.S. : _____________________'
-    ];
-    
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    
-    examinations.forEach((item) => {
-      doc.text(item, 50, y);
-      y += 15;
-    });
-    
-    // Save the PDF
-    doc.save(`surgical-case-sheet-${caseSheetNumber}.pdf`);
+    const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Surgical Case Sheet - ${caseSheetNumber}</title>
+<style>
+  :root { --label-w: 40%; --gap: 12px; --border: #bfc7d1; }
+  * { box-sizing: border-box; }
+  html, body { height:100%; background:#f6f7f9; }
+  body { margin:0; font: 13px/1.35 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:#1d232a; }
+  @page { size: A4; margin:18mm; }
+  .page { width: 210mm; min-height: 297mm; background:#fff; margin: 0 auto; padding: 0; }
+  .inner { padding: 18mm; }
+  .hospital-header {
+    text-align:center; margin-bottom: 20px;
+  }
+  .hospital-name {
+    font-size: 18px; font-weight: bold; margin: 0;
+  }
+  .hospital-address {
+    font-size: 10px; margin: 5px 0 2px;
+  }
+  .hospital-phone {
+    font-size: 10px; margin: 2px 0 15px;
+  }
+  .title {
+    text-align:center; font-weight:700; font-size: 14px; margin:0 0 16px;
+    text-decoration: underline;
+  }
+  .meta { 
+    display:flex; justify-content:space-between; align-items:center; 
+    margin: 20px 0; font-size: 11px;
+  }
+  .meta div { font-weight:600; }
+  .form {
+    display:grid; grid-template-columns: var(--label-w) 1fr; column-gap:16px; row-gap: var(--gap);
+    margin-bottom: 20px;
+  }
+  .label { text-align:left; font-weight:600; white-space:nowrap; padding-top:2px; }
+  .value { display:flex; align-items:flex-end; min-height:20px; }
+  .underline { flex:1; border-bottom:1px solid #222; height:16px; min-width: 200px; }
+  .filled { border: none; font-weight: normal; }
+  .inline { display:flex; gap:15px; align-items:flex-end; }
+  .section-header { 
+    font-weight: bold; font-size: 12px; margin: 15px 0 10px; 
+    grid-column: 1 / -1;
+  }
+  .spacer { height: 10px; grid-column: 1 / -1; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="inner">
+      <div class="hospital-header">
+        <h1 class="hospital-name">NAKSHATRA HOSPITAL</h1>
+        <div class="hospital-address">Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.</div>
+        <div class="hospital-phone">Cell: 7093939205</div>
+      </div>
+
+      <h2 class="title">SURGICAL CASE SHEET</h2>
+
+      <div class="meta">
+        <div>Case Sheet No: <strong>${caseSheetNumber}</strong></div>
+        <div>Date: <strong>${currentDate}</strong></div>
+      </div>
+
+      <section class="form">
+        <div class="label">Name of the Patient :</div>
+        <div class="value">
+          ${caseSheet.patientName ? `<span class="filled">${caseSheet.patientName}</span>` : '<span class="underline"></span>'}
+        </div>
+
+        <div class="label">Husband's/Father's Name :</div>
+        <div class="value">
+          ${caseSheet.husbandFatherName ? `<span class="filled">${caseSheet.husbandFatherName}</span>` : '<span class="underline"></span>'}
+        </div>
+
+        <div class="label">Religion & Nationality :</div>
+        <div class="value">
+          ${caseSheet.religion || caseSheet.nationality ? 
+            `<span class="filled">${(caseSheet.religion || '') + ' ' + (caseSheet.nationality || '')}</span>` : 
+            '<span class="underline"></span>'}
+        </div>
+
+        <div class="label">Address :</div>
+        <div class="value">
+          ${caseSheet.address ? `<span class="filled">${caseSheet.address}</span>` : '<span class="underline"></span>'}
+        </div>
+
+        <div class="label">Age :</div>
+        <div class="value inline">
+          ${caseSheet.age ? `<span class="filled">${caseSheet.age}</span>` : '<span class="underline" style="max-width:60px"></span>'}
+          <span style="margin-left: 40px;">Sex :</span>
+          ${caseSheet.sex ? `<span class="filled">${caseSheet.sex}</span>` : '<span class="underline" style="max-width:100px"></span>'}
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="label">Diagnosis :</div>
+        <div class="value">
+          ${caseSheet.diagnosis ? `<span class="filled">${caseSheet.diagnosis}</span>` : '<span class="underline"></span>'}
+        </div>
+
+        <div class="label">Nature of Operation :</div>
+        <div class="value">
+          ${caseSheet.natureOfOperation ? `<span class="filled">${caseSheet.natureOfOperation}</span>` : '<span class="underline"></span>'}
+        </div>
+
+        <div class="label">Date of Admission :</div>
+        <div class="value">
+          ${caseSheet.dateOfAdmission ? `<span class="filled">${format(new Date(caseSheet.dateOfAdmission), 'dd/MM/yyyy')}</span>` : '<span class="underline"></span>'}
+        </div>
+
+        <div class="label">Date of Operation :</div>
+        <div class="value">
+          ${caseSheet.dateOfOperation ? `<span class="filled">${format(new Date(caseSheet.dateOfOperation), 'dd/MM/yyyy')}</span>` : '<span class="underline"></span>'}
+        </div>
+
+        <div class="label">Date of Discharge :</div>
+        <div class="value">
+          ${caseSheet.dateOfDischarge ? `<span class="filled">${format(new Date(caseSheet.dateOfDischarge), 'dd/MM/yyyy')}</span>` : '<span class="underline"></span>'}
+        </div>
+
+        <div class="label">Complaints & Duration :</div>
+        <div class="value">
+          ${caseSheet.complaintsAndDuration ? `<span class="filled">${caseSheet.complaintsAndDuration}</span>` : '<span class="underline"></span>'}
+        </div>
+
+        <div class="label">History of Present Illness :</div>
+        <div class="value">
+          ${caseSheet.historyOfPresentIllness ? `<span class="filled">${caseSheet.historyOfPresentIllness}</span>` : '<span class="underline"></span>'}
+        </div>
+
+        <div class="section-header">INVESTIGATION:</div>
+        
+        <div class="label">1) Hb% :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">2) E.S.R. :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">3) C.T. :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">4) B.T. :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">5) Bl. Grouping :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">6) RPL :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">7) R.B.S :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">8) Urine Sugar :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">9) R.M. :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">10) X-ray :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">11) E.C.G :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">12) Blood Urea :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">13) Serum Creatinine :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">14) Serum Bilirubin :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">15) HBS A.G :</div>
+        <div class="value"><span class="underline"></span></div>
+
+        <div class="section-header">ON EXAMINATION:</div>
+        
+        <div class="label">G.C. :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">Temp. :</div>
+        <div class="value"><span class="underline" style="max-width:60px"></span> <span style="margin-left:5px;">°F</span></div>
+        
+        <div class="label">P.R. :</div>
+        <div class="value"><span class="underline" style="max-width:60px"></span> <span style="margin-left:5px;">/Min</span></div>
+        
+        <div class="label">B.P. :</div>
+        <div class="value"><span class="underline" style="max-width:60px"></span> <span style="margin-left:5px;">mmHg</span></div>
+        
+        <div class="label">R.R. :</div>
+        <div class="value"><span class="underline" style="max-width:60px"></span> <span style="margin-left:5px;">/Min</span></div>
+        
+        <div class="label">Heart :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">Lungs :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">Abd. :</div>
+        <div class="value"><span class="underline"></span></div>
+        
+        <div class="label">C.N.S. :</div>
+        <div class="value"><span class="underline"></span></div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>`;
+
+    // Create new window and write HTML content
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      
+      // Wait for content to load then trigger print
+      printWindow.onload = () => {
+        setTimeout(() => {
+          printWindow.print();
+        }, 500);
+      };
+    }
   };
 
   const filteredCaseSheets = Array.isArray(caseSheets) ? caseSheets.filter((caseSheet: any) => {

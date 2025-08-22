@@ -1,0 +1,144 @@
+Prompt to fix alignment (HTML/CSS → print/PDF)
+
+You are improving a one-page A4 Surgical Case Sheet built with HTML/CSS and exported to PDF (browser print). The current page has misaligned labels/values and uneven spacing.
+Goal: perfect grid alignment, consistent spacing, print-ready.
+
+What to do
+
+Refactor layout
+
+Use CSS Grid for the form area: 2 columns: 35% (labels) / 65% (values).
+
+Vertically center labels and keep all label text right-aligned; value fields left-aligned.
+
+Keep equal row gaps (e.g., 12px).
+
+Header
+
+Center a bold title block “SURGICAL CASE SHEET” with a subtle background.
+
+First row under the title is a 2-column bar: Case Sheet No. (left) and Date (right) using display:flex; justify-content:space-between;.
+
+Typography & spacing
+
+Base font: system UI or Inter, 12–13px; titles 16–18px.
+
+Use a tight vertical rhythm: line-height:1.35.
+
+Consistent margins and padding.
+
+Print / PDF
+
+@page { size: A4; margin: 18mm; }
+
+Use a .page wrapper sized for A4 with white background.
+
+Avoid page breaks (single page); if needed, add page-break-inside: avoid;.
+
+Value fields
+
+For blank lines, render a 1px bottom border (.underline) that stretches full value column width.
+
+Keep units like Age and Sex on the same baseline.
+
+Accessibility & RTL safety
+
+Semantic HTML (<label for>, <dl>, or proper form grouping).
+
+Don’t use absolute positioning for alignment.
+
+Deliverables
+
+A single index.html with embedded <style> that I can open and Print to PDF.
+
+Keep all styles in the same file.
+
+No external fonts required.
+
+Acceptance checklist (verify before returning)
+
+All label/value pairs line up in a strict 2-column grid.
+
+Title centered; “Case Sheet No.” left & “Date” right on the same row.
+
+Every blank field shows a consistent underline across the value column.
+
+No content shifts when pressing Ctrl/Cmd+P → A4.
+
+No text overflow or wrapping of labels.
+
+Start from this skeleton (modify as needed)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Surgical Case Sheet</title>
+<style>
+  :root { --label-w: 35%; --gap: 12px; --border: #bfc7d1; }
+  * { box-sizing: border-box; }
+  html, body { height:100%; background:#f6f7f9; }
+  body { margin:0; font: 13px/1.35 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:#1d232a; }
+  @page { size: A4; margin:18mm; }
+  .page { width: 210mm; min-height: 297mm; background:#fff; margin: 0 auto; padding: 0; }
+  .inner { padding: 18mm; }
+  .title {
+    text-align:center; font-weight:700; letter-spacing:.4px; margin:0 0 16px;
+  }
+  .title span {
+    display:inline-block; padding:6px 12px; border-radius:6px; border:1px solid var(--border); background:#eaf2fb;
+  }
+  .meta { display:flex; justify-content:space-between; align-items:center; margin: 8px 0 18px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; background:#fafbfc; }
+  .meta div { font-weight:600; }
+  .form {
+    display:grid; grid-template-columns: var(--label-w) 1fr; column-gap:16px; row-gap: var(--gap);
+  }
+  .label { text-align:right; font-weight:600; white-space:nowrap; padding-top:2px; }
+  .value { display:flex; align-items:flex-end; min-height:24px; }
+  .underline { flex:1; border-bottom:1px solid #222; height:20px; }
+  .inline { display:flex; gap:18px; align-items:flex-end; }
+  .small { font-size:12px; opacity:.9; }
+  .spacer { height: 10px; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="inner">
+      <h1 class="title"><span>SURGICAL CASE SHEET</span></h1>
+
+      <div class="meta">
+        <div>Case Sheet No: <strong><!-- SCS2031-63 --></strong></div>
+        <div>Date: <strong><!-- 22/08/2025 --></strong></div>
+      </div>
+
+      <section class="form">
+        <div class="label">Name of the Patient :</div>
+        <div class="value"><span class="underline"></span></div>
+
+        <div class="label">Husband’s/Father’s Name :</div>
+        <div class="value"><span class="underline"></span></div>
+
+        <div class="label">Religion &amp; Nationality :</div>
+        <div class="value"><span class="underline"></span></div>
+
+        <div class="label">Address :</div>
+        <div class="value"><span class="underline"></span></div>
+
+        <div class="label">Age / Sex :</div>
+        <div class="value inline">
+          <span class="small">Age</span><span class="underline" style="max-width:60px"></span>
+          <span class="small">Sex</span><span class="underline" style="max-width:100px"></span>
+        </div>
+
+        <div class="label">Diagnosis :</div>
+        <div class="value"><span class="underline"></span></div>
+      </section>
+
+      <div class="spacer"></div>
+      <!-- Add more fields using the same pattern -->
+    </div>
+  </div>
+</body>
+</html>
+
+
+If the project uses React or a templating engine, keep the same CSS and structure inside the component/template, and still meet the checklist above.
