@@ -1,0 +1,175 @@
+🔹 Layout Plan
+
+Header (centered)
+
+Hospital Name (big, bold)
+
+Address & Phone (smaller)
+
+Form Title: SURGICAL CASE SHEET
+
+Case Info (top row)
+
+Left: Case Sheet No.
+
+Right: Date
+
+Patient Information (grid/table style)
+
+Name of Patient      :  [value]
+Husband/Father’s Name:  [value]
+Religion & Nationality: [value]     Address: [value]
+Age: [value]          Sex: [value]
+
+
+Medical Info (list style)
+
+Diagnosis
+
+Nature of Operation
+
+Date of Admission
+
+Date of Operation
+
+Date of Discharge
+
+Complaints & Duration
+
+History of Present Illness
+
+Two Column Section (Investigations vs On Examination)
+
+INVESTIGATION            ON EXAMINATION
+1) Hb%  : ____           G.C.   : ____
+2) ESR  : ____           Temp   : ____ °F
+3) CT   : ____           PR     : ____ /min
+...                      BP     : ____ mmHg
+                         Heart  : ____
+                         Lungs  : ____
+
+✅ Improved Code (TypeScript with pdfkit)
+import PDFDocument from "pdfkit";
+import fs from "fs";
+
+interface Patient {
+  id: string;
+  name: string;
+  fatherName: string;
+  religionNationality: string;
+  address: string;
+  age: number;
+  sex: string;
+}
+
+export function createSurgicalCaseSheet(patient: Patient) {
+  const doc = new PDFDocument({ margin: 50 });
+  const filePath = `surgical-case-sheet-SCS${patient.id}.pdf`;
+  doc.pipe(fs.createWriteStream(filePath));
+
+  // --- HEADER ---
+  doc.fontSize(18).font("Helvetica-Bold").text("NAKSHATRA HOSPITAL", { align: "center" });
+  doc.fontSize(10).font("Helvetica").text("Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.", { align: "center" });
+  doc.text("Cell: 7093939205", { align: "center" });
+
+  doc.moveDown();
+  doc.fontSize(14).font("Helvetica-Bold").text("SURGICAL CASE SHEET", { align: "center", underline: true });
+
+  // --- Case Info ---
+  doc.moveDown();
+  doc.fontSize(11).font("Helvetica-Bold");
+  doc.text(`No.: SCS${patient.id}`, 50, doc.y, { continued: true });
+  doc.text(`Date: ${new Date().toLocaleDateString("en-IN")}`, { align: "right" });
+
+  doc.moveDown(1);
+
+  // --- Patient Information (grid style) ---
+  function row(label: string, value: string, x = 50, labelWidth = 160) {
+    doc.font("Helvetica-Bold").text(label, x, doc.y, { width: labelWidth, continued: true });
+    doc.font("Helvetica").text(value || "");
+    doc.moveDown(0.7);
+  }
+
+  row("Name of the Patient :", patient.name);
+  row("Husband's/Father's Name :", patient.fatherName);
+
+  // Religion & Address on same line
+  doc.font("Helvetica-Bold").text("Religion & Nationality :", 50, doc.y, { width: 160, continued: true });
+  doc.font("Helvetica").text(patient.religionNationality || "", { continued: true });
+  doc.font("Helvetica-Bold").text("   Address :", 320, doc.y, { width: 80, continued: true });
+  doc.font("Helvetica").text(patient.address || "");
+  doc.moveDown(0.7);
+
+  // Age & Sex on same line
+  doc.font("Helvetica-Bold").text("Age :", 50, doc.y, { width: 50, continued: true });
+  doc.font("Helvetica").text(String(patient.age), { continued: true });
+  doc.font("Helvetica-Bold").text("   Sex :", 150, doc.y, { width: 50, continued: true });
+  doc.font("Helvetica").text(patient.sex);
+  doc.moveDown(1);
+
+  // --- Medical Info ---
+  [
+    "Diagnosis", "Nature of Operation", "Date of Admission",
+    "Date of Operation", "Date of Discharge",
+    "Complaints & Duration", "History of Present Illness"
+  ].forEach(sec => {
+    row(sec + " :", "");
+  });
+
+  doc.moveDown();
+
+  // --- Two Columns ---
+  const startY = doc.y;
+  const invX = 50;
+  const examX = 320;
+
+  doc.fontSize(12).font("Helvetica-Bold").text("INVESTIGATION:", invX, startY);
+  doc.text("ON EXAMINATION:", examX, startY);
+
+  const investigations = [
+    "1) Hb%", "2) E.S.R.", "3) C.T.", "4) B.T.", "5) Bl. Grouping",
+    "6) RPL", "7) R.B.S", "8) Urine Sugar", "9) R.M.", "10) X-ray",
+    "11) E.C.G", "12) Blood Urea", "13) Serum Creatinine",
+    "14) Serum Bilirubin", "15) HBS A.G"
+  ];
+
+  const exam = [
+    "G.C.", "Temp.  °F", "P.R.  /Min",
+    "B.P.  mmHg", "R.R.  /Min",
+    "Heart", "Lungs", "Abd.", "C.N.S."
+  ];
+
+  let invY = startY + 20;
+  investigations.forEach(item => {
+    doc.font("Helvetica").fontSize(10).text(item + " :", invX, invY);
+    invY += 15;
+  });
+
+  let examY = startY + 20;
+  exam.forEach(item => {
+    doc.font("Helvetica").fontSize(10).text(item + " :", examX, examY);
+    examY += 15;
+  });
+
+  doc.end();
+  console.log(`✅ PDF generated: ${filePath}`);
+}
+
+// Example
+createSurgicalCaseSheet({
+  id: "1443-44",
+  name: "vamshi",
+  fatherName: "Rathnala",
+  religionNationality: "Hindu",
+  address: "",
+  age: 23,
+  sex: "Male"
+});
+
+🔹 What’s Fixed
+
+✅ Patient details are lined up properly in a grid.
+✅ Religion & Nationality and Address no longer collide.
+✅ Age and Sex appear on the same line neatly.
+✅ Investigations vs On Examination look like two clean columns.
+✅ Overall layout feels like a structured hospital form.
