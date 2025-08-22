@@ -106,6 +106,44 @@ export function createSurgicalCaseSheet(patient: Patient) {
     examY += 20;
   });
 
+  // ---------- NEW PAGE: CONSENT FOR SURGERY ----------
+  doc.addPage();
+  
+  // Header on extreme left
+  doc.fontSize(16).font("Helvetica-Bold").text("CONSENT FOR SURGERY", 50, 80);
+  
+  // Consent text
+  doc.moveDown(2);
+  doc.fontSize(12).font("Helvetica");
+  const consentText = "I/We unreservedly and in my sense, give my complete consent for admission, Diagnostic procedures, Transfusions, Anaesthesia, Modification in anaesthesia during Surgery, Operation and Modification in Surgical procedures during the surgical procedures during depending the survey, depending of patient condition. No responsibility will be attached to the Surgeon, Anaesthesiologist or Hospital Management.";
+  
+  doc.text(consentText, 50, doc.y, { 
+    width: 500, 
+    align: 'left',
+    lineGap: 5
+  });
+  
+  doc.moveDown(3);
+  
+  // Representatives section (left alignment)
+  doc.fontSize(12).font("Helvetica-Bold");
+  doc.text("Name of the Representatives & Signature", 50, doc.y);
+  
+  doc.moveDown(1);
+  doc.fontSize(12).font("Helvetica");
+  
+  // Representative 1
+  doc.text("1)", 50, doc.y);
+  doc.moveDown(2);
+  
+  // Representative 2  
+  doc.text("2)", 50, doc.y);
+  doc.moveDown(3);
+  
+  // Patient signature section (right alignment)
+  doc.fontSize(12).font("Helvetica-Bold");
+  doc.text("Name of the Patient & Signature", 350, doc.y, { align: 'right' });
+
   // ---------- END ----------
   doc.end();
   console.log(`✅ PDF generated: ${filePath} (Case Sheet No: ${caseSheetNo})`);
