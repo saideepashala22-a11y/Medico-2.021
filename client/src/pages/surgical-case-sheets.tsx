@@ -142,7 +142,7 @@ export default function SurgicalCaseSheets() {
     createMutation.mutate(submitData);
   };
 
-  // Generate PDF function following the new clean format
+  // Generate PDF function with exact hospital formatting specifications
   const generatePDF = (caseSheet: any) => {
     const doc = new jsPDF();
     
@@ -150,7 +150,7 @@ export default function SurgicalCaseSheets() {
     const patientIdShort = caseSheet.patientId?.slice(-4) || Math.floor(Math.random() * 9999).toString().padStart(4, '0');
     const caseSheetNumber = `SCS${patientIdShort}-${String(Math.floor(Math.random() * 99) + 1).padStart(2, '0')}`;
     
-    // --- HEADER ---
+    // 1. Header (center aligned)
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
     doc.text('NAKSHATRA HOSPITAL', 105, 25, { align: 'center' });
@@ -163,88 +163,127 @@ export default function SurgicalCaseSheets() {
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.text('SURGICAL CASE SHEET', 105, 65, { align: 'center' });
-    doc.line(70, 68, 140, 68); // underline
+    doc.line(75, 68, 135, 68); // underline
     
-    // --- Case Info ---
+    // 2. Below header: Case Sheet No (left) and Date (right)
     doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('helvetica', 'normal');
     doc.text(`Case Sheet No: ${caseSheetNumber}`, 50, 85);
-    doc.text(`Date: ${new Date().toLocaleDateString('en-IN')}`, 150, 85);
+    doc.text(`Date: ${new Date().toLocaleDateString('en-GB')}`, 150, 85);
     
     let y = 110;
     
-    // Helper function for lines
-    const line = (label: string, value: string = "", unit: string = "") => {
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.text(label, 50, y);
-      
-      doc.setFont('helvetica', 'normal');
-      const displayValue = value || "____________________________";
-      doc.text(displayValue, 120, y);
-      
-      if (unit) {
-        doc.text(unit, 170, y);
-      }
-      y += 20;
-    };
+    // 3. Patient Details (labels at x=50, consistent 20px spacing)
+    doc.setFontSize(11);
     
-    // --- Patient Info ---
-    line("Name of the Patient :", caseSheet.patientName || "");
-    line("Husband's/Father's Name :", caseSheet.husbandFatherName || "");
-    line("Religion & Nationality :", `${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim() || "");
-    line("Address :", caseSheet.address || "");
-    line("Age :", String(caseSheet.age || ""), `   Sex : ${caseSheet.sex || ""}`);
-    
-    y += 10;
-    
-    // --- Medical Info ---
-    line("Diagnosis :", caseSheet.diagnosis || "");
-    line("Nature of Operation :", caseSheet.natureOfOperation || "");
-    line("Date of Admission :", caseSheet.dateOfAdmission ? format(new Date(caseSheet.dateOfAdmission), 'dd/MM/yyyy') : "");
-    line("Date of Operation :", caseSheet.dateOfOperation ? format(new Date(caseSheet.dateOfOperation), 'dd/MM/yyyy') : "");
-    line("Date of Discharge :", caseSheet.dateOfDischarge ? format(new Date(caseSheet.dateOfDischarge), 'dd/MM/yyyy') : "");
-    line("Complaints & Duration :", caseSheet.complaintsAndDuration || "");
-    line("History of Present Illness :", caseSheet.historyOfPresentIllness || "");
-    
-    y += 10;
-    
-    // --- INVESTIGATION ---
+    // Name of the Patient
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.text('INVESTIGATION:', 50, y);
-    y += 25;
+    doc.text('Name of the Patient :', 50, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(caseSheet.patientName || '____________________________', 120, y);
+    y += 20;
     
-    const investigations = [
-      "1) Hb%", "2) E.S.R.", "3) C.T.", "4) B.T.", "5) Bl. Grouping",
-      "6) RPL", "7) R.B.S", "8) Urine Sugar", "9) R.M.", "10) X-ray",
-      "11) E.C.G", "12) Blood Urea", "13) Serum Creatinine",
-      "14) Serum Bilirubin", "15) HBS A.G"
+    // Husband's/Father's Name
+    doc.setFont('helvetica', 'bold');
+    doc.text('Husband\'s/Father\'s Name :', 50, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(caseSheet.husbandFatherName || '____________________________', 130, y);
+    y += 20;
+    
+    // Religion & Nationality
+    doc.setFont('helvetica', 'bold');
+    doc.text('Religion & Nationality :', 50, y);
+    doc.setFont('helvetica', 'normal');
+    const religionNat = `${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim();
+    doc.text(religionNat || '____________________________', 125, y);
+    y += 20;
+    
+    // Address
+    doc.setFont('helvetica', 'bold');
+    doc.text('Address :', 50, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(caseSheet.address || '____________________________', 85, y);
+    y += 20;
+    
+    // Age and Sex on same line
+    doc.setFont('helvetica', 'bold');
+    doc.text('Age :', 50, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(String(caseSheet.age || ''), 75, y);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Sex :', 120, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(caseSheet.sex || '', 140, y);
+    y += 30;
+    
+    // 4. Medical Info (each field on new line with blank underline)
+    const medicalFields = [
+      ['Diagnosis :', caseSheet.diagnosis],
+      ['Nature of Operation :', caseSheet.natureOfOperation],
+      ['Date of Admission :', caseSheet.dateOfAdmission ? format(new Date(caseSheet.dateOfAdmission), 'dd/MM/yyyy') : ''],
+      ['Date of Operation :', caseSheet.dateOfOperation ? format(new Date(caseSheet.dateOfOperation), 'dd/MM/yyyy') : ''],
+      ['Date of Discharge :', caseSheet.dateOfDischarge ? format(new Date(caseSheet.dateOfDischarge), 'dd/MM/yyyy') : ''],
+      ['Complaints & Duration :', caseSheet.complaintsAndDuration],
+      ['History of Present Illness :', caseSheet.historyOfPresentIllness]
     ];
     
-    investigations.forEach((item) => {
-      line(item + " :");
+    medicalFields.forEach(([label, value]) => {
+      doc.setFont('helvetica', 'bold');
+      doc.text(label, 50, y);
+      doc.setFont('helvetica', 'normal');
+      doc.text(value || '____________________________', 130, y);
+      y += 18;
     });
     
     y += 10;
     
-    // --- ON EXAMINATION ---
+    // 5. Investigations block
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('INVESTIGATION:', 50, y);
+    y += 20;
+    
+    const investigations = [
+      '1) Hb%', '2) E.S.R.', '3) C.T.', '4) B.T.', '5) Bl. Grouping',
+      '6) RPL', '7) R.B.S', '8) Urine Sugar', '9) R.M.', '10) X-ray',
+      '11) E.C.G', '12) Blood Urea', '13) Serum Creatinine',
+      '14) Serum Bilirubin', '15) HBS A.G'
+    ];
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    
+    investigations.forEach((item) => {
+      doc.text(`${item} : _____________________`, 50, y);
+      y += 15;
+    });
+    
+    y += 10;
+    
+    // 6. On Examination block
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
     doc.text('ON EXAMINATION:', 50, y);
-    y += 25;
+    y += 20;
     
-    const exam = [
-      "G.C.", "Temp.", "P.R.", "B.P.", "R.R.",
-      "Heart", "Lungs", "Abd.", "C.N.S."
+    const examinations = [
+      'G.C. : _____________________',
+      'Temp. : _____ °F',
+      'P.R. : _____ /Min',
+      'B.P. : _____ mmHg',
+      'R.R. : _____ /Min',
+      'Heart : _____________________',
+      'Lungs : _____________________',
+      'Abd. : _____________________',
+      'C.N.S. : _____________________'
     ];
     
-    exam.forEach((item) => {
-      if (item === "Temp.") line(item + " :", "", "°F");
-      else if (item === "P.R.") line(item + " :", "", "/Min");
-      else if (item === "B.P.") line(item + " :", "", "mmHG");
-      else if (item === "R.R.") line(item + " :", "", "/Min");
-      else line(item + " :");
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    
+    examinations.forEach((item) => {
+      doc.text(item, 50, y);
+      y += 15;
     });
     
     // Save the PDF

@@ -1,0 +1,54 @@
+Create a Node.js (TypeScript) script using pdfkit that generates a hospital Surgical Case Sheet PDF with the exact formatting below:
+
+1. Header (center aligned):
+   - "NAKSHATRA HOSPITAL" (big, bold, font size 18)
+   - "Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S." (small, font size 10)
+   - "Cell: 7093939205"
+   - Title: "SURGICAL CASE SHEET" (bold, font size 14, underline)
+
+2. Below header:
+   - Left: "Case Sheet No: SCS<patient_id>"
+   - Right: "Date: <today in dd/mm/yyyy format>"
+
+3. Patient Details (each on its own line, labels bold, values normal, with underlines if empty):
+   - Name of the Patient : <value or ____________________________>
+   - Husband's/Father's Name : <value or ____________________________>
+   - Religion & Nationality : <value or ____________________________>
+   - Address : <value or ____________________________>
+   - Age : <value>   Sex : <value>
+
+4. Medical Info (each field on new line, with blank underline for manual entry):
+   - Diagnosis
+   - Nature of Operation
+   - Date of Admission
+   - Date of Operation
+   - Date of Discharge
+   - Complaints & Duration
+   - History of Present Illness
+
+5. Investigations (block section with heading "INVESTIGATION:")
+   Each line should look like:
+   1) Hb% : _____________________
+   2) E.S.R. : _____________________
+   ...
+   15) HBS A.G : _____________________
+
+6. On Examination (block section with heading "ON EXAMINATION:")
+   Each line should look like:
+   G.C. : _____________________
+   Temp. : _____ °F
+   P.R. : _____ /Min
+   B.P. : _____ mmHg
+   R.R. : _____ /Min
+   Heart : _____________________
+   Lungs : _____________________
+   Abd. : _____________________
+   C.N.S. : _____________________
+
+Make sure:
+- All labels are aligned at x=50.
+- Values or blanks appear neatly after labels.
+- Spacing between rows is consistent (about 18–20px).
+- The entire form fits neatly on one A4 page.
+
+Export the script as `surgicalCaseSheet.ts` and save the generated PDF as `surgical-case-sheet-SCS<patient_id>.pdf`.
