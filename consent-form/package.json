@@ -1,0 +1,11 @@
+{
+  "name": "consent-form-pdf",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "pdf": "node generate.js"
+  },
+  "dependencies": {
+    "puppeteer": "^23.3.0"
+  }
+}

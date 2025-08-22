@@ -1,0 +1,109 @@
+@page {
+  size: A4;
+  margin: 18mm;
+}
+:root{
+  --ink:#222;
+  --muted:#6c6c6c;
+  --rule:#9b9b9b;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:"Noto Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color:var(--ink);
+  line-height:1.35;
+  margin:0;
+}
+.sheet{page-break-inside:avoid}
+
+.heading h1{
+  font-size:16pt;
+  letter-spacing:0.5px;
+  font-weight:700;
+  margin:0 0 6px 0;
+  text-transform:uppercase;
+}
+.lead{
+  font-size:11.5pt;
+  color:var(--ink);
+  margin:0 0 14px 0;
+}
+.english{max-width:100%}
+
+.siggrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:22px;
+  align-items:start;
+  margin:8px 0 14px;
+}
+.siggrid .label{
+  font-size:11.5pt;
+  font-weight:600;
+  margin-bottom:6px;
+}
+.siglist{
+  margin:0 0 10px 18px;
+  padding:0;
+}
+.siglist li{
+  margin:8px 0;
+}
+.line{
+  display:inline-block;
+  border-bottom:1px dotted var(--rule);
+  width:100%;
+  transform:translateY(-2px);
+}
+.rel, .date, .sigline{
+  display:flex; gap:8px; align-items:center;
+  font-size:11.5pt;
+}
+.dots{
+  flex:1; border-bottom:1px dotted var(--rule); height:1em;
+}
+
+.telugu{
+  font-family:"Noto Sans Telugu","Noto Sans", Arial, sans-serif;
+  margin-top:2px;
+}
+.telugu h2{
+  font-size:14pt;
+  font-weight:700;
+  margin:6px 0 6px;
+}
+.telugu .te{
+  font-size:11.5pt;
+  text-align:justify;
+  margin:0 0 8px 0;
+}
+.two-col{
+  display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start;
+}
+.tel-list{
+  margin:4px 0 0 18px; padding:0;
+}
+.tel-list li{ margin:8px 0 }
+.tiny{ font-size:10.5pt; color:var(--muted) }
+.sub{ font-weight:600; margin-bottom:4px }
+
+.prepbox{
+  margin-top:16px;
+  border:1px solid var(--rule);
+  position:relative;
+  min-height:220px;
+  padding:14px 12px 12px;
+}
+.preplabel{
+  position:absolute;
+  top:-10px; left:10px;
+  background:#fff; padding:0 6px;
+  font-size:11.5pt; font-weight:600; color:#333;
+}
+.bigarea{ min-height:180px }
+
+/* Print fidelity */
+@media print{
+  body{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

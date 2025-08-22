@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Consent for Surgery</title>
+  <link href="styles.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <main class="sheet">
+
+    <header class="heading">
+      <h1>CONSENT FOR SURGERY</h1>
+      <p class="lead english">
+        {{ENGLISH_CONSENT_PARAGRAPH}}
+      </p>
+    </header>
+
+    <section class="siggrid">
+      <div class="left">
+        <div class="label">Name of the Representatives &amp; Signature</div>
+        <ol class="siglist">
+          <li><span class="line"></span></li>
+          <li><span class="line"></span></li>
+        </ol>
+        <div class="rel">
+          <span>Relationship to Patient :</span>
+          <span class="dots"></span>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="label">Name of the Patient &amp; Signature</div>
+        <div class="sigline"><span class="line"></span></div>
+        <div class="date">
+          <span>Date :</span><span class="dots"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="telugu">
+      <h2>{{TELUGU_HEADING}}</h2>
+      <p class="te">
+        {{TELUGU_PARAGRAPH}}
+      </p>
+
+      <div class="two-col">
+        <div class="leftcol">
+          <div class="sub">శస్త్రచికిత్స ముందు నిర్ధారణలు</div>
+          <ol class="tel-list">
+            <li><span class="line"></span></li>
+            <li><span class="line"></span></li>
+          </ol>
+        </div>
+        <div class="rightcol">
+          <div class="tiny">{{RIGHT_SMALL_LABEL}}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="prepbox">
+      <div class="preplabel">PRE-OPERATIVE PREPARATION &amp; INSTRUCTION:</div>
+      <div class="bigarea"></div>
+    </section>
+
+  </main>
+</body>
+</html>

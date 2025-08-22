@@ -1,0 +1,318 @@
+Replit AI Agent Prompt (copy all of this):
+
+Create a Node.js project that produces a single-page A4 PDF replicating a medical “CONSENT FOR SURGERY” form from an image. Use semantic HTML/CSS and export to PDF with Puppeteer.
+
+Requirements
+
+Files to create:
+
+index.html – the form layout with placeholder text blocks that I can edit.
+
+styles.css – A4 print styles. Keep 18mm margins; use a subtle grid; consistent line spacing.
+
+generate.js – a Node script that launches Puppeteer and saves output/consent-form.pdf at 300 DPI-like quality (high res) with print backgrounds.
+
+package.json – include puppeteer and a script "pdf": "node generate.js".
+
+Typography:
+
+Load Google Fonts: Noto Sans (English), Noto Sans Telugu (Telugu).
+
+Body 11.5pt, headings 13–16pt. Tight letter-spacing for headings like the scanned form.
+
+Layout (A4, portrait):
+
+Top heading: CONSENT FOR SURGERY (bold, small-caps look).
+
+Under it, a paragraph block (English) – I’ll paste the consent sentence.
+
+Two columns for signature lines:
+
+Left: “Name of the Representatives & Signature”, numbered 1) and 2), and a line for “Relationship to Patient”.
+
+Right: “Name of the Patient & Signature”, with a “Date:” line under it.
+
+Telugu section: a bold subheading and a multi-line paragraph block (I will paste exact Telugu content). Leave generous line-height for readability.
+
+Two enumerated items under Telugu section (1), 2)) on the left; on the right, a small label (per the scan) e.g., “రోగి చేతి చిహ్నం సంకేతం” placeholder.
+
+A bottom bordered rectangle labeled PRE-OPERATIVE PREPARATION & INSTRUCTION: (top-left label inside the border), leaving a large blank area.
+
+Visual details to match the scan:
+
+Light grey rules and box border (0.8px).
+
+Dotted leader lines for signature and date fields.
+
+Slightly condensed spacing under headings.
+
+Ensure everything prints within margins and looks identical in print preview and PDF.
+
+Accessibility/Print:
+
+Use @page { size: A4; margin: 18mm; } and @media print styles.
+
+Avoid page breaks; keep everything on one page.
+
+After creating files, run npm install and npm run pdf. The output should appear at output/consent-form.pdf.
+
+Placeholders I will replace (put obvious markers):
+
+{{ENGLISH_CONSENT_PARAGRAPH}}
+
+{{TELUGU_HEADING}}
+
+{{TELUGU_PARAGRAPH}}
+
+{{RIGHT_SMALL_LABEL}}
+
+Please now create all files with solid, production-ready code, then show me where to paste my text and how to run.
+
+2) The exact files the Agent should create
+
+If you prefer, you can also just create these yourself.
+
+package.json
+{
+  "name": "consent-form-pdf",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "pdf": "node generate.js"
+  },
+  "dependencies": {
+    "puppeteer": "^23.3.0"
+  }
+}
+
+index.html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Consent for Surgery</title>
+  <link href="styles.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <main class="sheet">
+
+    <header class="heading">
+      <h1>CONSENT FOR SURGERY</h1>
+      <p class="lead english">
+        {{ENGLISH_CONSENT_PARAGRAPH}}
+      </p>
+    </header>
+
+    <section class="siggrid">
+      <div class="left">
+        <div class="label">Name of the Representatives &amp; Signature</div>
+        <ol class="siglist">
+          <li><span class="line"></span></li>
+          <li><span class="line"></span></li>
+        </ol>
+        <div class="rel">
+          <span>Relationship to Patient :</span>
+          <span class="dots"></span>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="label">Name of the Patient &amp; Signature</div>
+        <div class="sigline"><span class="line"></span></div>
+        <div class="date">
+          <span>Date :</span><span class="dots"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="telugu">
+      <h2>{{TELUGU_HEADING}}</h2>
+      <p class="te">
+        {{TELUGU_PARAGRAPH}}
+      </p>
+
+      <div class="two-col">
+        <div class="leftcol">
+          <div class="sub">శస్త్రచికిత్స ముందు నిర్ధారణలు</div>
+          <ol class="tel-list">
+            <li><span class="line"></span></li>
+            <li><span class="line"></span></li>
+          </ol>
+        </div>
+        <div class="rightcol">
+          <div class="tiny">{{RIGHT_SMALL_LABEL}}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="prepbox">
+      <div class="preplabel">PRE-OPERATIVE PREPARATION &amp; INSTRUCTION:</div>
+      <div class="bigarea"></div>
+    </section>
+
+  </main>
+</body>
+</html>
+
+styles.css
+@page {
+  size: A4;
+  margin: 18mm;
+}
+:root{
+  --ink:#222;
+  --muted:#6c6c6c;
+  --rule:#9b9b9b;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:"Noto Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color:var(--ink);
+  line-height:1.35;
+  margin:0;
+}
+.sheet{page-break-inside:avoid}
+
+.heading h1{
+  font-size:16pt;
+  letter-spacing:0.5px;
+  font-weight:700;
+  margin:0 0 6px 0;
+  text-transform:uppercase;
+}
+.lead{
+  font-size:11.5pt;
+  color:var(--ink);
+  margin:0 0 14px 0;
+}
+.english{max-width:100%}
+
+.siggrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:22px;
+  align-items:start;
+  margin:8px 0 14px;
+}
+.siggrid .label{
+  font-size:11.5pt;
+  font-weight:600;
+  margin-bottom:6px;
+}
+.siglist{
+  margin:0 0 10px 18px;
+  padding:0;
+}
+.siglist li{
+  margin:8px 0;
+}
+.line{
+  display:inline-block;
+  border-bottom:1px dotted var(--rule);
+  width:100%;
+  transform:translateY(-2px);
+}
+.rel, .date, .sigline{
+  display:flex; gap:8px; align-items:center;
+  font-size:11.5pt;
+}
+.dots{
+  flex:1; border-bottom:1px dotted var(--rule); height:1em;
+}
+
+.telugu{
+  font-family:"Noto Sans Telugu","Noto Sans", Arial, sans-serif;
+  margin-top:2px;
+}
+.telugu h2{
+  font-size:14pt;
+  font-weight:700;
+  margin:6px 0 6px;
+}
+.telugu .te{
+  font-size:11.5pt;
+  text-align:justify;
+  margin:0 0 8px 0;
+}
+.two-col{
+  display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start;
+}
+.tel-list{
+  margin:4px 0 0 18px; padding:0;
+}
+.tel-list li{ margin:8px 0 }
+.tiny{ font-size:10.5pt; color:var(--muted) }
+.sub{ font-weight:600; margin-bottom:4px }
+
+.prepbox{
+  margin-top:16px;
+  border:1px solid var(--rule);
+  position:relative;
+  min-height:220px;
+  padding:14px 12px 12px;
+}
+.preplabel{
+  position:absolute;
+  top:-10px; left:10px;
+  background:#fff; padding:0 6px;
+  font-size:11.5pt; font-weight:600; color:#333;
+}
+.bigarea{ min-height:180px }
+
+/* Print fidelity */
+@media print{
+  body{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+generate.js
+import fs from "fs";
+import path from "path";
+import puppeteer from "puppeteer";
+
+const outDir = path.join("output");
+if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
+
+const fileUrl = "file://" + path.resolve("index.html");
+
+const browser = await puppeteer.launch({
+  headless: "new",
+  args: ["--no-sandbox"]
+});
+const page = await browser.newPage();
+await page.goto(fileUrl, { waitUntil: "networkidle0" });
+
+// Ensure fonts render before printing
+await page.evaluateHandle("document.fonts.ready");
+
+await page.pdf({
+  path: path.join(outDir, "consent-form.pdf"),
+  format: "A4",
+  printBackground: true,
+  margin: { top: "18mm", right: "18mm", bottom: "18mm", left: "18mm" },
+  preferCSSPageSize: true
+});
+
+await browser.close();
+console.log("✅ PDF saved to output/consent-form.pdf");
+
+How to use (quick)
+
+In Replit, create a new Node.js repl.
+
+Paste the Agent Prompt above, let it create files.
+
+Open index.html and paste your exact text into:
+
+{{ENGLISH_CONSENT_PARAGRAPH}}
+
+{{TELUGU_HEADING}}
+
+{{TELUGU_PARAGRAPH}}
+
+{{RIGHT_SMALL_LABEL}}
+
+In the Shell:
