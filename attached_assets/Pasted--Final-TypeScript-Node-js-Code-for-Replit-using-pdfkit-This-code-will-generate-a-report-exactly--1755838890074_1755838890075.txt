@@ -1,0 +1,109 @@
+✅ Final TypeScript/Node.js Code for Replit (using pdfkit)
+
+This code will generate a report exactly like the PDF you uploaded:
+
+import PDFDocument from "pdfkit";
+import fs from "fs";
+
+interface Patient {
+  id: string;
+  name: string;
+  fatherName: string;
+  religionNationality: string;
+  address: string;
+  age: number;
+  sex: string;
+}
+
+export function createSurgicalCaseSheet(patient: Patient) {
+  const doc = new PDFDocument({ margin: 50 });
+  const filePath = `surgical-case-sheet-SCS${patient.id}.pdf`;
+  doc.pipe(fs.createWriteStream(filePath));
+
+  // --- HEADER ---
+  doc.fontSize(18).font("Helvetica-Bold").text("NAKSHATRA HOSPITAL", { align: "center" });
+  doc.fontSize(10).text("Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.", { align: "center" });
+  doc.text("Cell: 7093939205", { align: "center" });
+
+  doc.moveDown();
+  doc.fontSize(14).font("Helvetica-Bold").text("SURGICAL CASE SHEET", { align: "center", underline: true });
+
+  doc.moveDown();
+
+  // --- Case Info ---
+  doc.fontSize(11).font("Helvetica-Bold");
+  doc.text(`Case Sheet No: SCS${patient.id}`, 50, doc.y);
+  doc.text(`Date: ${new Date().toLocaleDateString("en-IN")}`, 400, doc.y - 12);
+
+  let y = doc.y + 20;
+
+  function line(label: string, value: string = "", unit = "") {
+    doc.font("Helvetica-Bold").text(label, 50, y, { continued: true });
+    doc.font("Helvetica").text(value || "____________________________", { continued: !!unit });
+    if (unit) {
+      doc.font("Helvetica").text(" " + unit);
+    }
+    y += 20;
+  }
+
+  // --- Patient Info ---
+  line("Name of the Patient :", patient.name);
+  line("Husband's/Father's Name :", patient.fatherName);
+  line("Religion & Nationality :", patient.religionNationality);
+  line("Address :", patient.address);
+  line("Age :", String(patient.age), "   Sex : " + patient.sex);
+
+  // --- Medical Info ---
+  line("Diagnosis :");
+  line("Nature of Operation :");
+  line("Date of Admission :");
+  line("Date of Operation :");
+  line("Date of Discharge :");
+  line("Complaints & Duration :");
+  line("History of Present Illness :");
+
+  doc.moveDown();
+  doc.font("Helvetica-Bold").text("INVESTIGATION:", 50, y);
+  y += 25;
+
+  const investigations = [
+    "1) Hb%", "2) E.S.R.", "3) C.T.", "4) B.T.", "5) Bl. Grouping",
+    "6) RPL", "7) R.B.S", "8) Urine Sugar", "9) R.M.", "10) X-ray",
+    "11) E.C.G", "12) Blood Urea", "13) Serum Creatinine",
+    "14) Serum Bilirubin", "15) HBS A.G"
+  ];
+  investigations.forEach((item) => {
+    line(item + " :");
+  });
+
+  doc.moveDown();
+  doc.font("Helvetica-Bold").text("ON EXAMINATION:", 50, y);
+  y += 25;
+
+  const exam = [
+    "G.C.", "Temp.", "P.R.", "B.P.", "R.R.",
+    "Heart", "Lungs", "Abd.", "C.N.S."
+  ];
+
+  exam.forEach((item) => {
+    if (item === "Temp.") line(item + " :", "", "°F");
+    else if (item === "P.R.") line(item + " :", "", "/Min");
+    else if (item === "B.P.") line(item + " :", "", "mmHG");
+    else if (item === "R.R.") line(item + " :", "", "/Min");
+    else line(item + " :");
+  });
+
+  doc.end();
+  console.log(`✅ PDF generated: ${filePath}`);
+}
+
+// Example usage
+createSurgicalCaseSheet({
+  id: "1174-79",
+  name: "mr Saideep Ashala",
+  fatherName: "",
+  religionNationality: "23",
+  address: "",
+  age: 12,
+  sex: "Male"
+});
