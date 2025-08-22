@@ -202,12 +202,13 @@ export default function SurgicalCaseSheets() {
     y += 20;
     
     // Age and Sex on same line (exact spacing like form)
-    doc.text('Age :', 160, y);
-    doc.text(String(caseSheet.age || ''), 175, y);
-    doc.line(170, y + 2, 185, y + 2);
+    doc.text('Age :', 140, y);
+    doc.text(String(caseSheet.age || ''), 155, y);
+    doc.line(150, y + 2, 170, y + 2);
     
-    doc.text('Sex :', 187, y);
-    doc.text(caseSheet.sex || '', 200, y);
+    doc.text('Sex :', 175, y);
+    doc.text(caseSheet.sex || '', 185, y);
+    doc.line(180, y + 2, 190, y + 2);
     y += 20;
     
     // Village, Mandal, District line (like in the form)
