@@ -602,42 +602,68 @@ export default function SurgicalCaseSheets() {
       pdf.text(`Date: ${currentDate}`, 150, yPos);
       yPos += 15;
       
-      // Patient Information Fields
-      const fields = [
+      // Create professional form layout with dotted lines like browser version
+      const leftFields = [
         ['Name:', caseSheet.patientName || ''],
-        ['Husband/Father Name:', caseSheet.husbandFatherName || ''],
         ['Religion:', caseSheet.religion || ''],
-        ['Nationality:', caseSheet.nationality || ''],
         ['Age:', (caseSheet.age || '') + ' years'],
-        ['Sex:', caseSheet.sex || ''],
         ['Address:', caseSheet.address || ''],
         ['Village:', caseSheet.village || ''],
-        ['District:', caseSheet.district || ''],
         ['Diagnosis:', caseSheet.diagnosis || ''],
+        ['Complaints & Duration:', caseSheet.complaintsAndDuration || '']
+      ];
+      
+      const rightFields = [
+        ['Husband/Father Name:', caseSheet.husbandFatherName || ''],
+        ['Nationality:', caseSheet.nationality || ''],
+        ['Sex:', caseSheet.sex || ''],
+        ['', ''], // Empty to align
+        ['District:', caseSheet.district || ''],
         ['Nature of Operation:', caseSheet.natureOfOperation || ''],
-        ['Complaints & Duration:', caseSheet.complaintsAndDuration || ''],
         ['History of Present Illness:', caseSheet.historyOfPresentIllness || '']
       ];
       
-      fields.forEach(([label, value]) => {
-        if (yPos > 270) {
+      // Two-column layout
+      for (let i = 0; i < Math.max(leftFields.length, rightFields.length); i++) {
+        if (yPos > 260) {
           pdf.addPage();
           yPos = 20;
         }
-        pdf.setFont('helvetica', 'bold');
-        pdf.text(label, 20, yPos);
-        pdf.setFont('helvetica', 'normal');
         
-        // Draw underline
-        const lineY = yPos + 2;
-        pdf.line(60, lineY, 190, lineY);
-        
-        // Add value if present
-        if (value) {
-          pdf.text(value, 62, yPos);
+        // Left column
+        if (i < leftFields.length && leftFields[i][0]) {
+          pdf.setFont('helvetica', 'bold');
+          pdf.text(leftFields[i][0], 20, yPos);
+          
+          // Dotted line for left field
+          pdf.setFont('helvetica', 'normal');
+          for (let x = 60; x < 95; x += 2) {
+            pdf.circle(x, yPos + 1, 0.2, 'F');
+          }
+          
+          if (leftFields[i][1]) {
+            pdf.text(leftFields[i][1], 62, yPos);
+          }
         }
-        yPos += 12;
-      });
+        
+        // Right column
+        if (i < rightFields.length && rightFields[i][0]) {
+          pdf.setFont('helvetica', 'bold');
+          pdf.text(rightFields[i][0], 105, yPos);
+          
+          // Dotted line for right field
+          pdf.setFont('helvetica', 'normal');
+          for (let x = 145; x < 190; x += 2) {
+            pdf.circle(x, yPos + 1, 0.2, 'F');
+          }
+          
+          if (rightFields[i][1]) {
+            pdf.text(rightFields[i][1], 147, yPos);
+          }
+        }
+        
+        yPos += 15;
+      }
       
       // PAGE 2: Consent Form
       pdf.addPage();
@@ -645,7 +671,7 @@ export default function SurgicalCaseSheets() {
       
       // Hospital header again
       pdf.setFontSize(18);
-      pdf.setFont(undefined, 'bold');
+      pdf.setFont('helvetica', 'bold');
       pdf.text('NAKSHATRA HOSPITAL', 105, yPos, { align: 'center' });
       yPos += 20;
       
@@ -654,7 +680,7 @@ export default function SurgicalCaseSheets() {
       yPos += 20;
       
       pdf.setFontSize(10);
-      pdf.setFont(undefined, 'normal');
+      pdf.setFont('helvetica', 'normal');
       pdf.text('I hereby give consent for the surgical procedure as explained to me.', 20, yPos);
       yPos += 10;
       pdf.text('I understand the risks and benefits associated with the procedure.', 20, yPos);
@@ -668,7 +694,7 @@ export default function SurgicalCaseSheets() {
       yPos += 40;
       
       // Pre-operative preparation box
-      pdf.setFont(undefined, 'bold');
+      pdf.setFont('helvetica', 'bold');
       pdf.text('PRE-OPERATIVE PREPARATION & INSTRUCTION:', 20, yPos);
       yPos += 10;
       pdf.rect(20, yPos, 170, 80);
@@ -678,14 +704,14 @@ export default function SurgicalCaseSheets() {
       yPos = 20;
       
       pdf.setFontSize(16);
-      pdf.setFont(undefined, 'bold');
+      pdf.setFont('helvetica', 'bold');
       pdf.text('PROGRESS NOTES', 105, yPos, { align: 'center' });
       yPos += 15;
       
       // Progress notes table
       const tableStartY = yPos;
       pdf.setFontSize(10);
-      pdf.setFont(undefined, 'bold');
+      pdf.setFont('helvetica', 'bold');
       
       // Table headers
       pdf.text('Date', 25, yPos);
@@ -711,7 +737,7 @@ export default function SurgicalCaseSheets() {
       yPos = 20;
       
       pdf.setFontSize(14);
-      pdf.setFont(undefined, 'bold');
+      pdf.setFont('helvetica', 'bold');
       pdf.text('OPERATION & ANAESTHESIA RECORD', 105, yPos, { align: 'center' });
       yPos += 20;
       
@@ -737,42 +763,73 @@ export default function SurgicalCaseSheets() {
       yPos = 20;
       
       pdf.setFontSize(16);
-      pdf.setFont(undefined, 'bold');
+      pdf.setFont('helvetica', 'bold');
       pdf.text('NURSING NOTES', 105, yPos, { align: 'center' });
       yPos += 15;
       
-      // Nursing notes table
-      pdf.setFontSize(8);
-      const colWidths = [15, 20, 15, 15, 15, 20, 15, 15, 15, 20];
-      const headers = ['Sl.No.', 'Time', 'G.C.', 'Temp.', 'P.R.', 'B.P.', 'H/L', 'R/R', 'P/A', 'U/O'];
+      // Professional Nursing Notes Table with proper borders and formatting
+      pdf.setFontSize(9);
+      pdf.setLineWidth(0.5);
       
+      const colWidths = [15, 18, 15, 15, 15, 18, 15, 15, 15, 18];
+      const headers = ['Sl.No.', 'Time', 'G.C.', 'Temp.', 'P.R.', 'B.P.', 'H/L', 'R/R', 'P/A', 'U/O'];
+      const totalWidth = colWidths.reduce((sum, width) => sum + width, 0);
+      const tableHeight = 24 * 10; // Increased row height for better readability
+      
+      // Table header with gray background
+      pdf.setFillColor(230, 230, 230);
+      pdf.rect(20, yPos - 2, totalWidth, 12, 'F');
+      
+      // Header borders
+      pdf.setDrawColor(0, 0, 0);
+      pdf.rect(20, yPos - 2, totalWidth, 12);
+      
+      // Draw header text
       let xPos = 20;
-      // Draw headers
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(0, 0, 0);
       headers.forEach((header, i) => {
-        pdf.text(header, xPos + colWidths[i]/2, yPos, { align: 'center' });
+        pdf.text(header, xPos + colWidths[i]/2, yPos + 5, { align: 'center' });
+        if (i < headers.length - 1) {
+          pdf.line(xPos + colWidths[i], yPos - 2, xPos + colWidths[i], yPos + 10);
+        }
         xPos += colWidths[i];
       });
-      yPos += 8;
       
-      // Draw table grid
-      const tableHeight = 24 * 8;
-      pdf.rect(20, yPos - 8, 150, tableHeight + 8);
+      yPos += 10;
       
-      // Vertical lines
-      xPos = 20;
-      colWidths.forEach((width) => {
-        xPos += width;
-        pdf.line(xPos, yPos - 8, xPos, yPos + tableHeight);
-      });
-      
-      // Horizontal lines and row numbers
-      for (let i = 0; i <= 24; i++) {
-        const rowY = yPos + (i * 8);
-        pdf.line(20, rowY, 170, rowY);
-        if (i < 24) {
-          pdf.text((i + 1).toString(), 27.5, rowY + 5, { align: 'center' });
+      // Data rows with alternating background
+      pdf.setFont('helvetica', 'normal');
+      for (let row = 0; row < 24; row++) {
+        const rowY = yPos + (row * 10);
+        
+        // Alternating row background
+        if (row % 2 === 0) {
+          pdf.setFillColor(250, 250, 250);
+          pdf.rect(20, rowY, totalWidth, 10, 'F');
+        }
+        
+        // Row border
+        pdf.setDrawColor(200, 200, 200);
+        pdf.rect(20, rowY, totalWidth, 10);
+        
+        // Row number
+        pdf.setTextColor(0, 0, 0);
+        pdf.text((row + 1).toString(), 20 + colWidths[0]/2, rowY + 6, { align: 'center' });
+        
+        // Vertical separators
+        xPos = 20;
+        for (let col = 0; col < colWidths.length - 1; col++) {
+          xPos += colWidths[col];
+          pdf.setDrawColor(200, 200, 200);
+          pdf.line(xPos, rowY, xPos, rowY + 10);
         }
       }
+      
+      // Outer table border
+      pdf.setDrawColor(0, 0, 0);
+      pdf.setLineWidth(1);
+      pdf.rect(20, yPos - 2, totalWidth, tableHeight + 12)
       
       // Download the PDF
       pdf.save(`Surgical-Case-Sheet-${caseSheetNumber}.pdf`);
