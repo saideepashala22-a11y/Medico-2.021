@@ -578,12 +578,12 @@ export default function SurgicalCaseSheets() {
       
       // Hospital Header
       pdf.setFontSize(18);
-      pdf.setFont(undefined, 'bold');
+      pdf.setFont('helvetica', 'bold');
       pdf.text('NAKSHATRA HOSPITAL', 105, yPos, { align: 'center' });
       yPos += 7;
       
       pdf.setFontSize(10);
-      pdf.setFont(undefined, 'normal');
+      pdf.setFont('helvetica', 'normal');
       pdf.text('Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.', 105, yPos, { align: 'center' });
       yPos += 5;
       pdf.text('Cell: 7093939205', 105, yPos, { align: 'center' });
@@ -591,13 +591,13 @@ export default function SurgicalCaseSheets() {
       
       // Title
       pdf.setFontSize(14);
-      pdf.setFont(undefined, 'bold');
+      pdf.setFont('helvetica', 'bold');
       pdf.text('SURGICAL CASE SHEET', 105, yPos, { align: 'center' });
       yPos += 15;
       
       // Case info
       pdf.setFontSize(10);
-      pdf.setFont(undefined, 'normal');
+      pdf.setFont('helvetica', 'normal');
       pdf.text(`Case Sheet No: ${caseSheetNumber}`, 20, yPos);
       pdf.text(`Date: ${currentDate}`, 150, yPos);
       yPos += 15;
@@ -624,9 +624,9 @@ export default function SurgicalCaseSheets() {
           pdf.addPage();
           yPos = 20;
         }
-        pdf.setFont(undefined, 'bold');
+        pdf.setFont('helvetica', 'bold');
         pdf.text(label, 20, yPos);
-        pdf.setFont(undefined, 'normal');
+        pdf.setFont('helvetica', 'normal');
         
         // Draw underline
         const lineY = yPos + 2;
@@ -725,7 +725,7 @@ export default function SurgicalCaseSheets() {
       ];
       
       sections.forEach((section) => {
-        pdf.setFont(undefined, 'bold');
+        pdf.setFont('helvetica', 'bold');
         pdf.text(section, 20, yPos);
         yPos += 10;
         pdf.rect(20, yPos, 170, 40);
