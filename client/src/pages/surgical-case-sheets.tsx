@@ -239,19 +239,13 @@ export default function SurgicalCaseSheets() {
           ${caseSheet.address ? `<span class="filled">${caseSheet.address}</span>` : '<span class="underline"></span>'}
         </div>
 
-        <div class="label">Vlg :</div>
-        <div class="value">
-          ${caseSheet.village ? `<span class="filled">${caseSheet.village}</span>` : '<span class="underline"></span>'}
-        </div>
-
-        <div class="label">Mdl :</div>
-        <div class="value">
-          ${caseSheet.mandal ? `<span class="filled">${caseSheet.mandal}</span>` : '<span class="underline"></span>'}
-        </div>
-
-        <div class="label">Dist :</div>
-        <div class="value">
-          ${caseSheet.district ? `<span class="filled">${caseSheet.district}</span>` : '<span class="underline"></span>'}
+        <div class="label">Vlg / Mdl / Dist :</div>
+        <div class="value inline">
+          ${caseSheet.village ? `<span class="filled">${caseSheet.village}</span>` : '<span class="underline" style="max-width:80px"></span>'}
+          <span style="margin-left: 10px; font-weight: 600;">Mdl :</span>
+          ${caseSheet.mandal ? `<span class="filled">${caseSheet.mandal}</span>` : '<span class="underline" style="max-width:80px"></span>'}
+          <span style="margin-left: 10px; font-weight: 600;">Dist :</span>
+          ${caseSheet.district ? `<span class="filled">${caseSheet.district}</span>` : '<span class="underline" style="max-width:80px"></span>'}
         </div>
 
         <div class="label">Age :</div>
