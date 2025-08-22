@@ -142,7 +142,7 @@ export default function SurgicalCaseSheets() {
     createMutation.mutate(submitData);
   };
 
-  // Generate PDF function with professional alignment and fixed coordinates
+  // Generate PDF function with clean table-style layout using absolute positioning
   const generatePDF = (caseSheet: any) => {
     const doc = new jsPDF();
     
@@ -150,7 +150,7 @@ export default function SurgicalCaseSheets() {
     const patientIdShort = caseSheet.patientId?.slice(-4) || Math.floor(Math.random() * 9999).toString().padStart(4, '0');
     const caseSheetNumber = `SCS${patientIdShort}-${String(Math.floor(Math.random() * 99) + 1).padStart(2, '0')}`;
     
-    // Header with hospital details
+    // --- HEADER ---
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
     doc.text('NAKSHATRA HOSPITAL', 105, 20, { align: 'center' });
@@ -165,134 +165,97 @@ export default function SurgicalCaseSheets() {
     doc.text('SURGICAL CASE SHEET', 105, 55, { align: 'center' });
     doc.line(60, 58, 150, 58); // underline
     
-    // Case No (left) and Date (right) on same line
+    // --- Case Info ---
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.text(`No.: ${caseSheetNumber}`, 50, 75);
-    doc.text(`Date: ${new Date().toLocaleDateString('en-IN')}`, 160, 75);
-    
-    // Fixed coordinates for perfect alignment (following the strategy)
-    const leftX = 50;    // Left column starts at x=50
-    const rightX = 320;  // Right column starts at x=320 (but we'll use 120 for better fit on A4)
-    const valueX = 140;  // Values aligned at x=140
-    const rightValueX = 170; // Right values at x=170
+    doc.text(`Date: ${new Date().toLocaleDateString('en-IN')}`, 160, 75); // force right position
     
     let y = 95;
-    doc.setFontSize(11);
     
-    // Helper function for aligned fields
-    const field = (label: string, value: string, x: number = leftX, lineHeight: number = 18) => {
+    // --- Patient Info in grid style using absolute positioning ---
+    function field(label: string, value: string, yPos: number, xLabel: number = 50, xValue: number = 150) {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
-      doc.text(label, x, y);
+      doc.text(label, xLabel, yPos);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(11);
-      // Use safe value positioning to prevent overflow
-      const safeValue = (value || '').substring(0, 30); // Limit text length
-      doc.text(safeValue, valueX, y);
-      y += lineHeight;
-    };
+      doc.text(value || '', xValue, yPos);
+    }
     
-    // Patient Information (aligned grid)
-    field('Name of the Patient :', caseSheet.patientName || '');
-    field('Husband\'s/Father\'s Name :', caseSheet.husbandFatherName || '');
+    field('Name of the Patient :', caseSheet.patientName || '', y); y += 18;
+    field('Husband\'s/Father\'s Name :', caseSheet.husbandFatherName || '', y); y += 18;
     
-    // Religion & Address in same line with proper spacing
+    // Religion & Address on same line with absolute positioning
     doc.setFont('helvetica', 'bold');
-    doc.text('Religion & Nationality :', leftX, y);
+    doc.text('Religion & Nationality :', 50, y);
     doc.setFont('helvetica', 'normal');
-    const religionText = `${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim();
-    doc.text(religionText.substring(0, 15), valueX, y); // Limit length
-    
+    doc.text(`${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim() || '', 150, y);
     doc.setFont('helvetica', 'bold');
-    doc.text('Address :', rightValueX, y);
+    doc.text('Address :', 110, y);
     doc.setFont('helvetica', 'normal');
-    const addressText = (caseSheet.address || '').substring(0, 20); // Limit address length
-    doc.text(addressText, rightValueX + 30, y);
+    doc.text(caseSheet.address || '', 140, y);
     y += 18;
     
-    // Age & Sex in same line with proper spacing
+    // Age & Sex on same line with absolute positioning
     doc.setFont('helvetica', 'bold');
-    doc.text('Age :', leftX, y);
+    doc.text('Age :', 50, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(String(caseSheet.age || ''), leftX + 40, y);
-    
+    doc.text(String(caseSheet.age || ''), 80, y);
     doc.setFont('helvetica', 'bold');
-    doc.text('Sex :', rightValueX, y);
+    doc.text('Sex :', 120, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(caseSheet.sex || '', rightValueX + 30, y);
+    doc.text(caseSheet.sex || '', 140, y);
     y += 25;
     
-    // Medical sections
+    // Medical Info sections
     const medicalSections = [
-      ['Diagnosis :', caseSheet.diagnosis],
-      ['Nature of Operation :', caseSheet.natureOfOperation],
-      ['Date of Admission :', caseSheet.dateOfAdmission ? format(new Date(caseSheet.dateOfAdmission), 'dd/MM/yyyy') : ''],
-      ['Date of Operation :', caseSheet.dateOfOperation ? format(new Date(caseSheet.dateOfOperation), 'dd/MM/yyyy') : ''],
-      ['Date of Discharge :', caseSheet.dateOfDischarge ? format(new Date(caseSheet.dateOfDischarge), 'dd/MM/yyyy') : ''],
-      ['Complaints & Duration :', caseSheet.complaintsAndDuration],
-      ['History of Present Illness :', caseSheet.historyOfPresentIllness]
+      'Diagnosis', 'Nature of Operation', 'Date of Admission',
+      'Date of Operation', 'Date of Discharge',
+      'Complaints & Duration', 'History of Present Illness'
     ];
     
-    medicalSections.forEach(([label, value]) => {
-      field(label, value || '');
+    medicalSections.forEach(sec => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text(sec + ' :', 50, y);
+      y += 18;
     });
     
     y += 10;
     
-    // Two columns for Investigation vs Examination (aligned properly)
-    const invX = leftX;         // Investigation at x=50
-    const examX = 120;          // Examination at x=120 (safer than 320 for A4)
-    
-    doc.setFontSize(12);
+    // --- Two-Column Section with absolute positioning ---
     doc.setFont('helvetica', 'bold');
-    doc.text('INVESTIGATION:', invX, y);
-    doc.text('ON EXAMINATION:', examX, y);
+    doc.setFontSize(12);
+    doc.text('INVESTIGATION:', 50, y);
+    doc.text('ON EXAMINATION:', 120, y); // Fixed position for examination column
+    y += 20;
     
     const investigations = [
-      '1) Hb%',
-      '2) E.S.R.',
-      '3) C.T.',
-      '4) B.T.',
-      '5) Bl. Grouping',
-      '6) RPL',
-      '7) R.B.S',
-      '8) Urine Sugar',
-      '9) R.M.',
-      '10) X-ray',
-      '11) E.C.G',
-      '12) Blood Urea',
-      '13) Serum Creatinine',
-      '14) Serum Bilirubin',
-      '15) HBS A.G'
+      '1) Hb%', '2) E.S.R.', '3) C.T.', '4) B.T.', '5) Bl. Grouping',
+      '6) RPL', '7) R.B.S', '8) Urine Sugar', '9) R.M.', '10) X-ray',
+      '11) E.C.G', '12) Blood Urea', '13) Serum Creatinine',
+      '14) Serum Bilirubin', '15) HBS A.G'
     ];
     
     const examinations = [
-      'G.C.',
-      'Temp. ......... °F',
-      'P.R. ......... /Min',
-      'B.P. ......... mmHg',
-      'R.R. ......... /Min',
-      'Heart',
-      'Lungs',
-      'Abd.',
-      'C.N.S.'
+      'G.C.', 'Temp. °F', 'P.R. /Min',
+      'B.P. mmHg', 'R.R. /Min',
+      'Heart', 'Lungs', 'Abd.', 'C.N.S.'
     ];
     
-    // Print both columns in parallel with proper alignment
     const maxRows = Math.max(investigations.length, examinations.length);
-    y += 20;
     
     for (let i = 0; i < maxRows; i++) {
       if (i < investigations.length) {
-        doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
-        doc.text(investigations[i] + ' :', invX, y);
+        doc.setFontSize(10);
+        doc.text(investigations[i] + ' :', 50, y); // Investigation column at x=50
       }
       if (i < examinations.length) {
-        doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
-        doc.text(examinations[i] + ' :', examX, y);
+        doc.setFontSize(10);
+        doc.text(examinations[i] + ' :', 120, y); // Examination column at x=120
       }
       y += 15;
       
