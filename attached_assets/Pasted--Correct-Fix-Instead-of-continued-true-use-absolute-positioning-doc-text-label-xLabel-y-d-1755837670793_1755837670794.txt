@@ -1,0 +1,128 @@
+🔹 Correct Fix
+
+Instead of continued: true, use absolute positioning:
+
+doc.text(label, xLabel, y);
+doc.text(value, xValue, y);
+
+✅ Clean Table-Style Layout Code
+import PDFDocument from "pdfkit";
+import fs from "fs";
+
+interface Patient {
+  id: string;
+  name: string;
+  fatherName: string;
+  religionNationality: string;
+  address: string;
+  age: number;
+  sex: string;
+}
+
+export function createSurgicalCaseSheet(patient: Patient) {
+  const doc = new PDFDocument({ margin: 50 });
+  const filePath = `surgical-case-sheet-SCS${patient.id}.pdf`;
+  doc.pipe(fs.createWriteStream(filePath));
+
+  // --- HEADER ---
+  doc.fontSize(18).font("Helvetica-Bold").text("NAKSHATRA HOSPITAL", { align: "center" });
+  doc.fontSize(10).text("Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.", { align: "center" });
+  doc.text("Cell: 7093939205", { align: "center" });
+
+  doc.moveDown();
+  doc.fontSize(14).font("Helvetica-Bold").text("SURGICAL CASE SHEET", { align: "center", underline: true });
+
+  // --- Case Info ---
+  doc.moveDown();
+  doc.fontSize(11).font("Helvetica-Bold");
+  doc.text(`No.: SCS${patient.id}`, 50, doc.y);
+  doc.text(`Date: ${new Date().toLocaleDateString("en-IN")}`, 400, doc.y - 12); // force right
+
+  let y = doc.y + 20;
+
+  // --- Patient Info in grid style ---
+  function field(label: string, value: string, yPos: number, xLabel = 50, xValue = 220) {
+    doc.font("Helvetica-Bold").text(label, xLabel, yPos);
+    doc.font("Helvetica").text(value || "", xValue, yPos);
+  }
+
+  field("Name of the Patient :", patient.name, y); y += 18;
+  field("Husband's/Father's Name :", patient.fatherName, y); y += 18;
+
+  // Religion & Address on same line
+  doc.font("Helvetica-Bold").text("Religion & Nationality :", 50, y);
+  doc.font("Helvetica").text(patient.religionNationality || "", 220, y);
+  doc.font("Helvetica-Bold").text("Address :", 350, y);
+  doc.font("Helvetica").text(patient.address || "", 420, y);
+  y += 18;
+
+  // Age & Sex on same line
+  doc.font("Helvetica-Bold").text("Age :", 50, y);
+  doc.font("Helvetica").text(String(patient.age), 100, y);
+  doc.font("Helvetica-Bold").text("Sex :", 180, y);
+  doc.font("Helvetica").text(patient.sex, 220, y);
+  y += 25;
+
+  // Medical Info
+  [
+    "Diagnosis", "Nature of Operation", "Date of Admission",
+    "Date of Operation", "Date of Discharge",
+    "Complaints & Duration", "History of Present Illness"
+  ].forEach(sec => {
+    doc.font("Helvetica-Bold").text(sec + " :", 50, y);
+    y += 18;
+  });
+
+  y += 10;
+
+  // --- Two-Column Section ---
+  doc.font("Helvetica-Bold").text("INVESTIGATION:", 50, y);
+  doc.font("Helvetica-Bold").text("ON EXAMINATION:", 320, y);
+  y += 20;
+
+  const investigations = [
+    "1) Hb%", "2) E.S.R.", "3) C.T.", "4) B.T.", "5) Bl. Grouping",
+    "6) RPL", "7) R.B.S", "8) Urine Sugar", "9) R.M.", "10) X-ray",
+    "11) E.C.G", "12) Blood Urea", "13) Serum Creatinine",
+    "14) Serum Bilirubin", "15) HBS A.G"
+  ];
+
+  const exam = [
+    "G.C.", "Temp. °F", "P.R. /Min",
+    "B.P. mmHg", "R.R. /Min",
+    "Heart", "Lungs", "Abd.", "C.N.S."
+  ];
+
+  const maxRows = Math.max(investigations.length, exam.length);
+
+  for (let i = 0; i < maxRows; i++) {
+    if (i < investigations.length) {
+      doc.font("Helvetica").fontSize(10).text(investigations[i] + " :", 50, y);
+    }
+    if (i < exam.length) {
+      doc.font("Helvetica").fontSize(10).text(exam[i] + " :", 320, y);
+    }
+    y += 15;
+  }
+
+  doc.end();
+  console.log(`✅ PDF generated: ${filePath}`);
+}
+
+// Example
+createSurgicalCaseSheet({
+  id: "1174-95",
+  name: "mr Saideep Ashala",
+  fatherName: "",
+  religionNationality: "Hindu",
+  address: "Hyderabad",
+  age: 12,
+  sex: "male"
+});
+
+🔹 What This Fixes
+
+✅ No “continued” flow → fields won’t merge anymore.
+✅ Fixed X positions → labels always at left, values aligned neatly next to them.
+✅ Religion & Address and Age & Sex appear on one row without overlap.
+✅ Investigations vs On Examination → now truly side-by-side columns, not mixed into one line.
