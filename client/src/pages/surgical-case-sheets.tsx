@@ -569,54 +569,216 @@ export default function SurgicalCaseSheets() {
       printWindow.document.close();
     }
 
-    // Also create PDF download using the HTML content
+    // Create PDF with same content as the browser window
     try {
-      // Create a temporary div with the HTML content for PDF generation
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = htmlContent;
-      tempDiv.style.position = 'absolute';
-      tempDiv.style.left = '-9999px';
-      tempDiv.style.top = '0';
-      tempDiv.style.width = '210mm';
-      tempDiv.style.backgroundColor = 'white';
-      document.body.appendChild(tempDiv);
-      
-      // Use the existing jsPDF to create PDF
       const pdf = new jsPDF('p', 'mm', 'a4');
       
-      // Convert HTML to PDF
-      pdf.html(tempDiv, {
-        callback: function (doc) {
-          // Download the PDF
-          doc.save(`Surgical-Case-Sheet-${caseSheetNumber}.pdf`);
-          // Clean up
-          document.body.removeChild(tempDiv);
-        },
-        margin: [10, 10, 10, 10],
-        autoPaging: 'text',
-        html2canvas: { 
-          scale: 0.5,
-          useCORS: true,
-          logging: false,
-          backgroundColor: 'white'
-        },
-        width: 190,
-        windowWidth: 794
+      // PAGE 1: Patient Demographics
+      let yPos = 20;
+      
+      // Hospital Header
+      pdf.setFontSize(18);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('NAKSHATRA HOSPITAL', 105, yPos, { align: 'center' });
+      yPos += 7;
+      
+      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'normal');
+      pdf.text('Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.', 105, yPos, { align: 'center' });
+      yPos += 5;
+      pdf.text('Cell: 7093939205', 105, yPos, { align: 'center' });
+      yPos += 15;
+      
+      // Title
+      pdf.setFontSize(14);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('SURGICAL CASE SHEET', 105, yPos, { align: 'center' });
+      yPos += 15;
+      
+      // Case info
+      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'normal');
+      pdf.text(`Case Sheet No: ${caseSheetNumber}`, 20, yPos);
+      pdf.text(`Date: ${currentDate}`, 150, yPos);
+      yPos += 15;
+      
+      // Patient Information Fields
+      const fields = [
+        ['Name:', caseSheet.patientName || ''],
+        ['Husband/Father Name:', caseSheet.husbandFatherName || ''],
+        ['Religion:', caseSheet.religion || ''],
+        ['Nationality:', caseSheet.nationality || ''],
+        ['Age:', (caseSheet.age || '') + ' years'],
+        ['Sex:', caseSheet.sex || ''],
+        ['Address:', caseSheet.address || ''],
+        ['Village:', caseSheet.village || ''],
+        ['District:', caseSheet.district || ''],
+        ['Diagnosis:', caseSheet.diagnosis || ''],
+        ['Nature of Operation:', caseSheet.natureOfOperation || ''],
+        ['Complaints & Duration:', caseSheet.complaintsAndDuration || ''],
+        ['History of Present Illness:', caseSheet.historyOfPresentIllness || '']
+      ];
+      
+      fields.forEach(([label, value]) => {
+        if (yPos > 270) {
+          pdf.addPage();
+          yPos = 20;
+        }
+        pdf.setFont(undefined, 'bold');
+        pdf.text(label, 20, yPos);
+        pdf.setFont(undefined, 'normal');
+        
+        // Draw underline
+        const lineY = yPos + 2;
+        pdf.line(60, lineY, 190, lineY);
+        
+        // Add value if present
+        if (value) {
+          pdf.text(value, 62, yPos);
+        }
+        yPos += 12;
       });
-    } catch (error) {
-      console.error('PDF download error:', error);
-      // Show user message that they can print from the opened window
-      if (printWindow) {
-        const noticeDiv = printWindow.document.createElement('div');
-        noticeDiv.style.cssText = 'position: fixed; top: 10px; right: 10px; background: #f44336; color: white; padding: 10px; border-radius: 5px; z-index: 1000;';
-        noticeDiv.innerHTML = 'PDF download failed. Please use Ctrl+P to print this document.';
-        printWindow.document.body.appendChild(noticeDiv);
-        setTimeout(() => {
-          if (printWindow.document.body.contains(noticeDiv)) {
-            printWindow.document.body.removeChild(noticeDiv);
-          }
-        }, 5000);
+      
+      // PAGE 2: Consent Form
+      pdf.addPage();
+      yPos = 20;
+      
+      // Hospital header again
+      pdf.setFontSize(18);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('NAKSHATRA HOSPITAL', 105, yPos, { align: 'center' });
+      yPos += 20;
+      
+      pdf.setFontSize(14);
+      pdf.text('CONSENT FOR SURGERY', 105, yPos, { align: 'center' });
+      yPos += 20;
+      
+      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'normal');
+      pdf.text('I hereby give consent for the surgical procedure as explained to me.', 20, yPos);
+      yPos += 10;
+      pdf.text('I understand the risks and benefits associated with the procedure.', 20, yPos);
+      yPos += 30;
+      
+      // Consent signatures
+      pdf.text('Patient/Guardian Signature: ________________', 20, yPos);
+      pdf.text('Date: ________________', 130, yPos);
+      yPos += 20;
+      pdf.text('Doctor Signature: ________________', 20, yPos);
+      yPos += 40;
+      
+      // Pre-operative preparation box
+      pdf.setFont(undefined, 'bold');
+      pdf.text('PRE-OPERATIVE PREPARATION & INSTRUCTION:', 20, yPos);
+      yPos += 10;
+      pdf.rect(20, yPos, 170, 80);
+      
+      // PAGE 3: Progress Notes
+      pdf.addPage();
+      yPos = 20;
+      
+      pdf.setFontSize(16);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('PROGRESS NOTES', 105, yPos, { align: 'center' });
+      yPos += 15;
+      
+      // Progress notes table
+      const tableStartY = yPos;
+      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'bold');
+      
+      // Table headers
+      pdf.text('Date', 25, yPos);
+      pdf.text('Time', 55, yPos);
+      pdf.text('Progress Notes', 85, yPos);
+      pdf.text('Doctor Sign', 160, yPos);
+      yPos += 8;
+      
+      // Table borders
+      pdf.rect(20, tableStartY - 5, 170, 150);
+      pdf.line(50, tableStartY - 5, 50, tableStartY + 145);
+      pdf.line(80, tableStartY - 5, 80, tableStartY + 145);
+      pdf.line(155, tableStartY - 5, 155, tableStartY + 145);
+      
+      // Add rows
+      for (let i = 0; i < 15; i++) {
+        pdf.line(20, yPos, 190, yPos);
+        yPos += 10;
       }
+      
+      // PAGE 4: Operation/Anaesthesia/Post-operative
+      pdf.addPage();
+      yPos = 20;
+      
+      pdf.setFontSize(14);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('OPERATION & ANAESTHESIA RECORD', 105, yPos, { align: 'center' });
+      yPos += 20;
+      
+      // Create sections
+      const sections = [
+        'INVESTIGATION:',
+        'EXAMINATION:', 
+        'OPERATION:',
+        'ANAESTHESIA:',
+        'POST OPERATIVE INSTRUCTIONS:'
+      ];
+      
+      sections.forEach((section) => {
+        pdf.setFont(undefined, 'bold');
+        pdf.text(section, 20, yPos);
+        yPos += 10;
+        pdf.rect(20, yPos, 170, 40);
+        yPos += 50;
+      });
+      
+      // PAGE 5: Nursing Notes
+      pdf.addPage();
+      yPos = 20;
+      
+      pdf.setFontSize(16);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('NURSING NOTES', 105, yPos, { align: 'center' });
+      yPos += 15;
+      
+      // Nursing notes table
+      pdf.setFontSize(8);
+      const colWidths = [15, 20, 15, 15, 15, 20, 15, 15, 15, 20];
+      const headers = ['Sl.No.', 'Time', 'G.C.', 'Temp.', 'P.R.', 'B.P.', 'H/L', 'R/R', 'P/A', 'U/O'];
+      
+      let xPos = 20;
+      // Draw headers
+      headers.forEach((header, i) => {
+        pdf.text(header, xPos + colWidths[i]/2, yPos, { align: 'center' });
+        xPos += colWidths[i];
+      });
+      yPos += 8;
+      
+      // Draw table grid
+      const tableHeight = 24 * 8;
+      pdf.rect(20, yPos - 8, 150, tableHeight + 8);
+      
+      // Vertical lines
+      xPos = 20;
+      colWidths.forEach((width) => {
+        xPos += width;
+        pdf.line(xPos, yPos - 8, xPos, yPos + tableHeight);
+      });
+      
+      // Horizontal lines and row numbers
+      for (let i = 0; i <= 24; i++) {
+        const rowY = yPos + (i * 8);
+        pdf.line(20, rowY, 170, rowY);
+        if (i < 24) {
+          pdf.text((i + 1).toString(), 27.5, rowY + 5, { align: 'center' });
+        }
+      }
+      
+      // Download the PDF
+      pdf.save(`Surgical-Case-Sheet-${caseSheetNumber}.pdf`);
+      
+    } catch (error) {
+      console.error('PDF generation error:', error);
     }
   };
 
