@@ -243,19 +243,10 @@ export default function PatientRegistration() {
       return false;
     }
 
-    if (!formData.emergencyContactName.trim()) {
+    if (formData.emergencyContactPhone && !/^\d{10}$/.test(formData.emergencyContactPhone)) {
       toast({
         title: 'Error',
-        description: 'Emergency contact name is required',
-        variant: 'destructive',
-      });
-      return false;
-    }
-
-    if (!formData.emergencyContactPhone || !/^\d{10}$/.test(formData.emergencyContactPhone)) {
-      toast({
-        title: 'Error',
-        description: 'Emergency contact phone must be exactly 10 digits',
+        description: 'Emergency contact phone must be exactly 10 digits when provided',
         variant: 'destructive',
       });
       return false;
@@ -538,29 +529,27 @@ export default function PatientRegistration() {
               </div>
 
               {/* Emergency Contact */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-l-4 border-red-500 bg-red-50 p-4 rounded-r-lg">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-l-4 border-blue-500 bg-blue-50 p-4 rounded-r-lg">
                 <div>
-                  <Label htmlFor="emergencyContactName">Emergency Contact Name *</Label>
+                  <Label htmlFor="emergencyContactName">Emergency Contact Name</Label>
                   <Input
                     id="emergencyContactName"
                     value={formData.emergencyContactName}
                     onChange={(e) => setFormData(prev => ({ ...prev, emergencyContactName: e.target.value }))}
-                    placeholder="Emergency contact name"
+                    placeholder="Emergency contact name (optional)"
                     className="border-gray-300 bg-white"
-                    required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="emergencyContactPhone">Emergency Contact Phone *</Label>
+                  <Label htmlFor="emergencyContactPhone">Emergency Contact Phone</Label>
                   <Input
                     id="emergencyContactPhone"
                     value={formData.emergencyContactPhone}
                     onChange={(e) => setFormData(prev => ({ ...prev, emergencyContactPhone: e.target.value.replace(/\D/g, '').slice(0, 10) }))}
-                    placeholder="10-digit phone number"
+                    placeholder="10-digit phone number (optional)"
                     className="border-gray-300 bg-white"
                     maxLength={10}
-                    required
                   />
                 </div>
               </div>
