@@ -429,7 +429,7 @@ export default function SurgicalCaseSheets() {
         </div>
         
         <!-- PRE-OPERATIVE PREPARATION BOX -->
-        <div style="margin-top: 50px; border: 2px solid #000; min-height: 200px; padding: 20px;">
+        <div style="margin-top: 50px; border: 2px solid #000; min-height: 400px; padding: 20px;">
           <h3 style="font-size: 14px; font-weight: bold; margin: 0 0 20px 0; text-align: left;">PRE-OPERATIVE PREPARATION & INSTRUCTION :</h3>
         </div>
       </div>
