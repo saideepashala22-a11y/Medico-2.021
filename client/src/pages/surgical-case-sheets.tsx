@@ -390,11 +390,22 @@ export default function SurgicalCaseSheets() {
           condition. No responsibility will be attached to the Surgeon, Anaesthesiologist or Hospital Management.
         </div>
         
+        <h3 style="font-size: 14px; font-weight: bold; margin: 30px 0 20px 0; text-align: left;">శస్త్ర చికిత్సకు అంగీకార పత్రము</h3>
+        
+        <div style="font-size: 12px; line-height: 1.6; margin-bottom: 40px; text-align: left;">
+          నేను / మేము నా / మా పూర్తి స్పృహతో ఆసుపత్రిలో చేరికకు, నిర్ధారణాత్మక పరీక్షలకు, రక్త మార్పిడి, రోగ స్థితిని బట్టి శస్త్రచికిత్సలో అనస్థీషియాలో మార్పులు, శస్త్రచికిత్సలో అవసరమైన శస్త్ర విధానాల్లో మార్పులు మొదలైన వాటికి నా / మా పూర్తి అంగీకారాన్ని ఇస్తున్నాము.<br>
+          శస్త్రచికిత్స సమయంలో రోగి స్థితిని బట్టి వైద్యులు తగిన నిర్ణయాలు తీసుకోవచ్చని నాకు అవగాహన ఉంది.<br>
+          దీనికి సంబంధించి ఎటువంటి బాధ్యతను శస్త్రచికిత్స నిపుణుడు, అనస్థీషియాలజిస్ట్ లేదా ఆసుపత్రి నిర్వహణ స్వీకరించరాదని అంగీకరిస్తున్నాము.
+        </div>
+        
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 50px;">
           <!-- Left side: Representatives -->
           <div style="flex: 1; margin-right: 40px;">
-            <div style="font-size: 12px; font-weight: bold; margin-bottom: 20px;">
+            <div style="font-size: 12px; font-weight: bold; margin-bottom: 10px;">
               Name of the Representatives & Signature
+            </div>
+            <div style="font-size: 12px; font-weight: bold; margin-bottom: 20px;">
+              సాక్షుల పేర్లు
             </div>
             
             <div style="margin-bottom: 30px;">
