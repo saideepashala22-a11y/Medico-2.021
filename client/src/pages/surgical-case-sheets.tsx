@@ -142,130 +142,127 @@ export default function SurgicalCaseSheets() {
     createMutation.mutate(submitData);
   };
 
-  // Generate PDF function
+  // Generate PDF function using professional hospital format
   const generatePDF = (caseSheet: any) => {
     const doc = new jsPDF();
     
-    // Header
-    doc.setFontSize(16);
+    // Header with hospital details
+    doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text('SURGICAL CASE SHEET', 105, 20, { align: 'center' });
+    doc.text('NAKSHATRA HOSPITAL', 105, 20, { align: 'center' });
     
-    doc.setFontSize(12);
+    doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Case Number: ${caseSheet.caseNumber}`, 20, 35);
+    doc.text('Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.', 105, 30, { align: 'center' });
+    doc.text('Cell: 7093939205', 105, 40, { align: 'center' });
+    
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('SURGICAL CASE SHEET', 105, 55, { align: 'center' });
+    doc.line(60, 58, 150, 58); // underline
+    
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 160, 70);
     
     // Patient Information Section
-    doc.setFont('helvetica', 'bold');
-    doc.text('PATIENT INFORMATION', 20, 50);
-    doc.setFont('helvetica', 'normal');
+    let y = 85;
+    doc.setFontSize(10);
+    doc.text(`Name of the Patient : ${caseSheet.patientName || '____________________________'}`, 20, y);
+    y += 8;
+    doc.text(`Husband's/Father's Name : ${caseSheet.husbandFatherName || '____________________________'}`, 20, y);
+    y += 8;
+    doc.text(`Religion & Nationality : ${(caseSheet.religion || '') + ' ' + (caseSheet.nationality || '') || '____________________________'}`, 20, y);
+    y += 8;
+    doc.text(`Address : ${caseSheet.address || '____________________________'}`, 20, y);
+    y += 8;
+    doc.text(`Age : ${caseSheet.age || '____'}        Sex : ${caseSheet.sex || '____'}`, 20, y);
+    y += 15;
     
-    let y = 60;
-    const addField = (label: string, value: string) => {
-      if (value) {
-        doc.text(`${label}: ${value}`, 20, y);
-        y += 10;
+    // Medical Information
+    doc.text(`Diagnosis : ${caseSheet.diagnosis || '____________________________'}`, 20, y);
+    y += 8;
+    doc.text(`Nature of Operation : ${caseSheet.natureOfOperation || '____________________________'}`, 20, y);
+    y += 8;
+    doc.text(`Date of Admission : ${caseSheet.dateOfAdmission ? format(new Date(caseSheet.dateOfAdmission), 'dd/MM/yyyy') : '____________________________'}`, 20, y);
+    y += 8;
+    doc.text(`Date of Operation : ${caseSheet.dateOfOperation ? format(new Date(caseSheet.dateOfOperation), 'dd/MM/yyyy') : '____________________________'}`, 20, y);
+    y += 8;
+    doc.text(`Date of Discharge : ${caseSheet.dateOfDischarge ? format(new Date(caseSheet.dateOfDischarge), 'dd/MM/yyyy') : '____________________________'}`, 20, y);
+    y += 8;
+    doc.text(`Complaints & Duration : ${caseSheet.complaintsAndDuration || '____________________________'}`, 20, y);
+    y += 8;
+    doc.text(`History of Present Illness : ${caseSheet.historyOfPresentIllness || '____________________________'}`, 20, y);
+    y += 15;
+    // Investigations Section
+    doc.setFont('helvetica', 'bold');
+    doc.text('INVESTIGATION:', 20, y);
+    doc.line(20, y + 2, 70, y + 2); // underline
+    doc.setFont('helvetica', 'normal');
+    y += 10;
+    
+    const investigations = [
+      `1) Hb% : ${caseSheet.hb || '_____________________'}`,
+      `2) E.S.R. : ${caseSheet.bsa || '_____________________'}`,
+      `3) C.T. : ${caseSheet.ct || '_____________________'}`,
+      `4) B.T. : ${caseSheet.bt || '_____________________'}`,
+      `5) Bl. Grouping : ${caseSheet.bloodGrouping || '_____________________'}`,
+      `6) RPL : ${caseSheet.prl || '_____________________'}`,
+      `7) R.B.S : ${caseSheet.rbs || '_____________________'}`,
+      `8) Urine Sugar : ${caseSheet.urineSugar || '_____________________'}`,
+      `9) R.M. : _____________________`,
+      `10) X-ray : ${caseSheet.xray || '_____________________'}`,
+      `11) E.C.G : ${caseSheet.ecg || '_____________________'}`,
+      `12) Blood Urea : ${caseSheet.bloodUrea || '_____________________'}`,
+      `13) Serum Creatinine : ${caseSheet.serumCreatinine || '_____________________'}`,
+      `14) Serum Bilirubin : ${caseSheet.serumBilirubin || '_____________________'}`,
+      `15) HBS A.G : ${caseSheet.hbsag || '_____________________'}`
+    ];
+    
+    investigations.forEach(item => {
+      if (y > 270) { // Add new page if needed
+        doc.addPage();
+        y = 20;
       }
-    };
+      doc.text(item, 20, y);
+      y += 7;
+    });
     
-    addField('Name', caseSheet.patientName);
-    addField('Husband/Father Name', caseSheet.husbandFatherName);
-    addField('Age', caseSheet.age?.toString());
-    addField('Sex', caseSheet.sex);
-    addField('Religion', caseSheet.religion);
-    addField('Nationality', caseSheet.nationality);
-    addField('Address', caseSheet.address);
-    addField('Village', caseSheet.village);
-    addField('District', caseSheet.district);
-    
+    // On Examination Section
     y += 10;
-    doc.setFont('helvetica', 'bold');
-    doc.text('MEDICAL INFORMATION', 20, y);
-    doc.setFont('helvetica', 'normal');
-    y += 10;
-    
-    addField('Diagnosis', caseSheet.diagnosis);
-    addField('Nature of Operation', caseSheet.natureOfOperation);
-    addField('LP No', caseSheet.lpNo);
-    addField('Complaints and Duration', caseSheet.complaintsAndDuration);
-    addField('History of Present Illness', caseSheet.historyOfPresentIllness);
-    
-    // Dates
-    if (caseSheet.dateOfAdmission) {
-      addField('Date of Admission', format(new Date(caseSheet.dateOfAdmission), 'dd/MM/yyyy'));
-    }
-    if (caseSheet.dateOfOperation) {
-      addField('Date of Operation', format(new Date(caseSheet.dateOfOperation), 'dd/MM/yyyy'));
-    }
-    if (caseSheet.dateOfDischarge) {
-      addField('Date of Discharge', format(new Date(caseSheet.dateOfDischarge), 'dd/MM/yyyy'));
-    }
-    if (caseSheet.edd) {
-      addField('EDD', format(new Date(caseSheet.edd), 'dd/MM/yyyy'));
-    }
-    
-    // Investigation Results (if they fit on page)
-    if (y < 250) {
-      y += 10;
-      doc.setFont('helvetica', 'bold');
-      doc.text('INVESTIGATION RESULTS', 20, y);
-      doc.setFont('helvetica', 'normal');
-      y += 10;
-      
-      addField('Hb', caseSheet.hb);
-      addField('BSA', caseSheet.bsa);
-      addField('CT', caseSheet.ct);
-      addField('BT', caseSheet.bt);
-      addField('Blood Grouping', caseSheet.bloodGrouping);
-      addField('Rh Factor', caseSheet.rhFactor);
-      addField('PRL', caseSheet.prl);
-      addField('RBS', caseSheet.rbs);
-      addField('Urine Sugar', caseSheet.urineSugar);
-      addField('X-Ray', caseSheet.xray);
-      addField('ECG', caseSheet.ecg);
-      addField('Blood Urea', caseSheet.bloodUrea);
-      addField('Serum Creatinine', caseSheet.serumCreatinine);
-      addField('Serum Bilirubin', caseSheet.serumBilirubin);
-      addField('HBsAg', caseSheet.hbsag);
-    }
-    
-    // Add page 2 if needed for examination results
-    if (y > 250 || caseSheet.generalCondition) {
+    if (y > 250) {
       doc.addPage();
       y = 20;
-      
-      doc.setFont('helvetica', 'bold');
-      doc.text('ON EXAMINATION', 20, y);
-      doc.setFont('helvetica', 'normal');
-      y += 10;
-      
-      addField('General Condition', caseSheet.generalCondition);
-      addField('Temperature', caseSheet.temperature);
-      addField('Pulse', caseSheet.pulse);
-      addField('Blood Pressure', caseSheet.bloodPressure);
-      addField('Respiratory Rate', caseSheet.respiratoryRate);
-      addField('Heart', caseSheet.heart);
-      addField('Lungs', caseSheet.lungs);
-      addField('Abdomen', caseSheet.abdomen);
-      addField('CNS', caseSheet.cns);
     }
+    doc.setFont('helvetica', 'bold');
+    doc.text('ON EXAMINATION:', 20, y);
+    doc.line(20, y + 2, 80, y + 2); // underline
+    doc.setFont('helvetica', 'normal');
+    y += 10;
     
-    // Footer
-    const pageCount = doc.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.text(`Generated on: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 20, 285);
-      doc.text(`Page ${i} of ${pageCount}`, 180, 285);
-    }
+    const examinations = [
+      `G.C. : ${caseSheet.generalCondition || '_____________________'}`,
+      `Temp. : ${caseSheet.temperature || '_____'} °F`,
+      `P.R. : ${caseSheet.pulse || '_____'} /Min`,
+      `B.P. : ${caseSheet.bloodPressure || '_____'} mmHG`,
+      `R.R. : ${caseSheet.respiratoryRate || '_____'} /Min`,
+      `Heart : ${caseSheet.heart || '_____________________'}`,
+      `Lungs : ${caseSheet.lungs || '_____________________'}`,
+      `Abd. : ${caseSheet.abdomen || '_____________________'}`,
+      `C.N.S. : ${caseSheet.cns || '_____________________'}`
+    ];
     
-    // Save PDF
-    doc.save(`surgical-case-sheet-${caseSheet.caseNumber}.pdf`);
-    
-    toast({
-      title: "Success",
-      description: "PDF downloaded successfully",
+    examinations.forEach(item => {
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.text(item, 20, y);
+      y += 7;
     });
+    
+    // Save the PDF
+    doc.save(`surgical-case-sheet-${caseSheet.caseNumber || 'draft'}.pdf`);
   };
 
   const filteredCaseSheets = Array.isArray(caseSheets) ? caseSheets.filter((caseSheet: any) =>

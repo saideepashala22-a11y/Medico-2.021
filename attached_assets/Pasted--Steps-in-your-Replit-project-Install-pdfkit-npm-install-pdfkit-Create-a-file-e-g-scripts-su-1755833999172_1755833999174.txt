@@ -1,0 +1,85 @@
+✅ Steps in your Replit project
+
+Install pdfkit:
+
+npm install pdfkit
+
+
+Create a file, e.g. scripts/surgicalCaseSheet.ts
+
+Paste this code:
+
+import PDFDocument from "pdfkit";
+import fs from "fs";
+
+export function createSurgicalCaseSheet() {
+  const doc = new PDFDocument({ margin: 50 });
+  const filePath = "surgical_case_sheet.pdf";
+  doc.pipe(fs.createWriteStream(filePath));
+
+  // Header
+  doc.fontSize(18).text("NAKSHATRA HOSPITAL", { align: "center" });
+  doc.fontSize(10).text("Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.", { align: "center" });
+  doc.text("Cell: 7093939205", { align: "center" });
+
+  doc.moveDown();
+  doc.fontSize(14).text("SURGICAL CASE SHEET", { align: "center", underline: true });
+
+  doc.moveDown();
+  doc.fontSize(11).text("Date: 10.03.2025", { align: "right" });
+
+  // Patient Info
+  doc.moveDown();
+  doc.text("Name of the Patient : Mrs. M. Upendra");
+  doc.text("Husband’s/Father’s Name : __________________________");
+  doc.text("Religion & Nationality : ____________________________");
+  doc.text("Address : __________________________________________");
+  doc.text("Age : 50        Sex : F");
+
+  doc.moveDown();
+  doc.text("Diagnosis : ________________________________________");
+  doc.text("Nature of Operation : ______________________________");
+  doc.text("Date of Admission : _______________________________");
+  doc.text("Date of Operation : _______________________________");
+  doc.text("Date of Discharge : _______________________________");
+  doc.text("Complaints & Duration : ___________________________");
+  doc.text("History of Present Illness : ________________________");
+
+  // Investigations
+  doc.moveDown();
+  doc.fontSize(12).text("INVESTIGATION:", { underline: true });
+  doc.fontSize(10);
+  const investigations = [
+    "1) Hb%", "2) E.S.R.", "3) C.T.", "4) B.T.", "5) Bl. Grouping",
+    "6) RPL", "7) R.B.S", "8) Urine Sugar", "9) R.M.", "10) X-ray",
+    "11) E.C.G", "12) Blood Urea", "13) Serum Creatinine",
+    "14) Serum Bilirubin", "15) HBS A.G"
+  ];
+  investigations.forEach((item) => doc.text(item + " : _____________________"));
+
+  // On Examination
+  doc.moveDown();
+  doc.fontSize(12).text("ON EXAMINATION:", { underline: true });
+  doc.fontSize(10);
+  const exam = [
+    "G.C.", "Temp. ......... °F", "P.R. ......... /Min",
+    "B.P. ......... mmHG", "R.R. ......... /Min",
+    "Heart", "Lungs", "Abd.", "C.N.S."
+  ];
+  exam.forEach((item) => doc.text(item + " : _____________________"));
+
+  // Finalize
+  doc.end();
+  console.log(`✅ PDF generated: ${filePath}`);
+}
+
+// Run directly
+createSurgicalCaseSheet();
+
+🔹 Run it in Replit
+ts-node scripts/surgicalCaseSheet.ts
+
+
+(or npm run dev if you set it up in package.json)
+
+This will generate surgical_case_sheet.pdf inside your Replit workspace, formatted like your hospital sheet.
