@@ -242,7 +242,7 @@ export default function SurgicalCaseSheets() {
         <div class="label">Age :</div>
         <div class="value inline">
           ${caseSheet.age ? `<span class="filled">${caseSheet.age}</span>` : '<span class="underline" style="max-width:60px"></span>'}
-          <span style="margin-left: 40px;">Sex :</span>
+          <span style="margin-left: 40px; font-weight: bold;">Sex :</span>
           ${caseSheet.sex ? `<span class="filled">${caseSheet.sex}</span>` : '<span class="underline" style="max-width:100px"></span>'}
         </div>
 
