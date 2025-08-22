@@ -401,11 +401,8 @@ export default function SurgicalCaseSheets() {
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 50px;">
           <!-- Left side: Representatives -->
           <div style="flex: 1; margin-right: 40px;">
-            <div style="font-size: 12px; font-weight: bold; margin-bottom: 10px;">
-              Name of the Representatives & Signature
-            </div>
             <div style="font-size: 12px; font-weight: bold; margin-bottom: 20px;">
-              సాక్షుల పేర్లు
+              Name of the Representatives & Signature / సాక్షుల పేర్లు
             </div>
             
             <div style="margin-bottom: 30px;">
