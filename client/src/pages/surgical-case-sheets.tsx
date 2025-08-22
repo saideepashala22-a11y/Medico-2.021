@@ -239,13 +239,14 @@ export default function SurgicalCaseSheets() {
           ${caseSheet.address ? `<span class="filled">${caseSheet.address}</span>` : '<span class="underline"></span>'}
         </div>
 
-        <div class="label">Vlg / Mdl / Dist :</div>
-        <div class="value inline">
+        <div class="label"></div>
+        <div class="value inline" style="gap: 15px;">
+          <span>(Vlg )</span>
           ${caseSheet.village ? `<span class="filled">${caseSheet.village}</span>` : '<span class="underline" style="max-width:80px"></span>'}
-          <span style="margin-left: 10px; font-weight: 600;">Mdl :</span>
+          <span>( Mdl)</span>
           ${caseSheet.mandal ? `<span class="filled">${caseSheet.mandal}</span>` : '<span class="underline" style="max-width:80px"></span>'}
-          <span style="margin-left: 10px; font-weight: 600;">Dist :</span>
-          ${caseSheet.district ? `<span class="filled">${caseSheet.district}</span>` : '<span class="underline" style="max-width:80px"></span>'}
+          <span>(Dist )</span>
+          ${caseSheet.district ? `<span class="filled">${caseSheet.district}</span>` : '<span class="underline" style="max-width:100px"></span>'}
         </div>
 
         <div class="label">Age :</div>
