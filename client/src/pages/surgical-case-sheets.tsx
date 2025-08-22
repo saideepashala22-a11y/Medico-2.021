@@ -142,7 +142,7 @@ export default function SurgicalCaseSheets() {
     createMutation.mutate(submitData);
   };
 
-  // Generate PDF function with clean table-style layout using absolute positioning
+  // Generate PDF function matching the exact NAKSHATRA HOSPITAL format
   const generatePDF = (caseSheet: any) => {
     const doc = new jsPDF();
     
@@ -150,123 +150,163 @@ export default function SurgicalCaseSheets() {
     const patientIdShort = caseSheet.patientId?.slice(-4) || Math.floor(Math.random() * 9999).toString().padStart(4, '0');
     const caseSheetNumber = `SCS${patientIdShort}-${String(Math.floor(Math.random() * 99) + 1).padStart(2, '0')}`;
     
-    // --- HEADER ---
+    // --- HEADER matching exact format ---
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text('NAKSHATRA HOSPITAL', 105, 20, { align: 'center' });
+    doc.text('NAKSHATRA HOSPITAL', 105, 25, { align: 'center' });
     
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text('Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.', 105, 30, { align: 'center' });
-    doc.text('Cell: 7093939205', 105, 40, { align: 'center' });
+    doc.text('Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.', 105, 35, { align: 'center' });
+    doc.text('Cell: 7093939205', 105, 45, { align: 'center' });
     
+    // Title with underline
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('SURGICAL CASE SHEET', 105, 55, { align: 'center' });
-    doc.line(60, 58, 150, 58); // underline
+    doc.text('SURGICAL CASE SHEET', 105, 60, { align: 'center' });
+    doc.line(70, 63, 140, 63); // underline
     
-    // --- Case Info ---
+    // Case No. and Date (exact positioning like the form)
     doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`No.: ${caseSheetNumber}`, 50, 75);
-    doc.text(`Date: ${new Date().toLocaleDateString('en-IN')}`, 160, 75); // force right position
-    
-    let y = 95;
-    
-    // --- Patient Info in grid style using absolute positioning ---
-    function field(label: string, value: string, yPos: number, xLabel: number = 50, xValue: number = 150) {
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.text(label, xLabel, yPos);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(11);
-      doc.text(value || '', xValue, yPos);
-    }
-    
-    field('Name of the Patient :', caseSheet.patientName || '', y); y += 18;
-    field('Husband\'s/Father\'s Name :', caseSheet.husbandFatherName || '', y); y += 18;
-    
-    // Religion & Address on same line with absolute positioning
-    doc.setFont('helvetica', 'bold');
-    doc.text('Religion & Nationality :', 50, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(`${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim() || '', 150, y);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Address :', 110, y);
+    doc.text('No.:', 20, 80);
+    doc.text('Date:', 170, 80);
+    doc.text(new Date().toLocaleDateString('en-IN'), 185, 80);
+    
+    let y = 100;
+    
+    // --- Patient Information Section (exact format) ---
     doc.setFont('helvetica', 'normal');
-    doc.text(caseSheet.address || '', 140, y);
-    y += 18;
+    doc.setFontSize(11);
     
-    // Age & Sex on same line with absolute positioning
-    doc.setFont('helvetica', 'bold');
-    doc.text('Age :', 50, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(String(caseSheet.age || ''), 80, y);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Sex :', 120, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(caseSheet.sex || '', 140, y);
-    y += 25;
-    
-    // Medical Info sections
-    const medicalSections = [
-      'Diagnosis', 'Nature of Operation', 'Date of Admission',
-      'Date of Operation', 'Date of Discharge',
-      'Complaints & Duration', 'History of Present Illness'
-    ];
-    
-    medicalSections.forEach(sec => {
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.text(sec + ' :', 50, y);
-      y += 18;
-    });
-    
-    y += 10;
-    
-    // --- Two-Column Section with absolute positioning ---
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.text('INVESTIGATION:', 50, y);
-    doc.text('ON EXAMINATION:', 120, y); // Fixed position for examination column
+    // Name of the Patient with long line
+    doc.text('Name of the Patient :', 20, y);
+    doc.text(caseSheet.patientName || '', 80, y);
+    doc.line(75, y + 2, 190, y + 2); // dotted line effect
     y += 20;
     
+    // Husband's/Father's Name  
+    doc.text('Husband\'s/Father\'s Name :', 20, y);
+    doc.text(caseSheet.husbandFatherName || '', 90, y);
+    doc.line(85, y + 2, 190, y + 2);
+    y += 20;
+    
+    // Religion & Nationality and Address on same line (like the form)
+    doc.text('Religion & Nationality :', 20, y);
+    doc.text(`${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim(), 75, y);
+    doc.line(70, y + 2, 110, y + 2);
+    
+    doc.text('Address :', 115, y);
+    doc.text(caseSheet.address || '', 135, y);
+    doc.line(130, y + 2, 190, y + 2);
+    y += 20;
+    
+    // Age and Sex on same line (exact spacing like form)
+    doc.text('Age :', 160, y);
+    doc.text(String(caseSheet.age || ''), 175, y);
+    doc.line(170, y + 2, 185, y + 2);
+    
+    doc.text('Sex :', 187, y);
+    doc.text(caseSheet.sex || '', 200, y);
+    y += 20;
+    
+    // Village, Mandal, District line (like in the form)
+    doc.text('(Vill) :', 20, y);
+    doc.text(caseSheet.village || '', 40, y);
+    doc.line(35, y + 2, 75, y + 2);
+    
+    doc.text('(Mdl) :', 80, y);
+    doc.text('', 100, y);
+    doc.line(95, y + 2, 125, y + 2);
+    
+    doc.text('(Dist) :', 130, y);
+    doc.text(caseSheet.district || '', 150, y);
+    doc.line(145, y + 2, 190, y + 2);
+    y += 25;
+    
+    // Medical sections (matching form layout)
+    doc.text('Diagnosis :', 20, y);
+    doc.text(caseSheet.diagnosis || '', 50, y);
+    doc.line(45, y + 2, 110, y + 2);
+    
+    doc.text('L.M.P :', 115, y);
+    doc.line(130, y + 2, 190, y + 2);
+    y += 20;
+    
+    doc.text('Nature of Operation :', 20, y);
+    doc.text(caseSheet.natureOfOperation || '', 70, y);
+    doc.line(65, y + 2, 110, y + 2);
+    
+    doc.text('E.D.D :', 115, y);
+    doc.line(130, y + 2, 190, y + 2);
+    y += 20;
+    
+    doc.text('Date of Admission :', 20, y);
+    doc.line(60, y + 2, 110, y + 2);
+    y += 15;
+    
+    doc.text('Date of Operation :', 20, y);
+    doc.line(60, y + 2, 110, y + 2);
+    y += 15;
+    
+    doc.text('Date of Discharge :', 20, y);
+    doc.line(60, y + 2, 110, y + 2);
+    
+    doc.text('I.P No. :', 130, y);
+    doc.line(150, y + 2, 190, y + 2);
+    y += 20;
+    
+    doc.text('Complaints & Duration :', 20, y);
+    doc.line(20, y + 5, 190, y + 5);
+    y += 15;
+    
+    doc.text('History of Present Illness :', 20, y);
+    doc.line(20, y + 5, 190, y + 5);
+    y += 25;
+    
+    // --- INVESTIGATION and ON EXAMINATION (exact two-column format) ---
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('INVESTIGATION:', 20, y);
+    doc.text('ON EXAMINATION:', 110, y);
+    y += 15;
+    
     const investigations = [
-      '1) Hb%', '2) E.S.R.', '3) C.T.', '4) B.T.', '5) Bl. Grouping',
-      '6) RPL', '7) R.B.S', '8) Urine Sugar', '9) R.M.', '10) X-ray',
+      '1) HB%', '2) E.S.R', '3) C.T', '4) B.T', '5) Bl. Grouping',
+      '6) RRL', '7) R.B.S', '8) Urine Sugar', '9) R.I.V', '10) X-ray',
       '11) E.C.G', '12) Blood Urea', '13) Serum Creatinine',
       '14) Serum Bilirubin', '15) HBS A.G'
     ];
     
     const examinations = [
-      'G.C.', 'Temp. °F', 'P.R. /Min',
-      'B.P. mmHg', 'R.R. /Min',
+      'G.C.', 'Temp.', 'P.R.', 'B.P.', 'R.R.',
       'Heart', 'Lungs', 'Abd.', 'C.N.S.'
     ];
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
     
     const maxRows = Math.max(investigations.length, examinations.length);
     
     for (let i = 0; i < maxRows; i++) {
       if (i < investigations.length) {
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        doc.text(investigations[i] + ' :', 50, y); // Investigation column at x=50
+        doc.text(investigations[i] + ' :', 20, y);
+        doc.line(45, y + 2, 95, y + 2); // dotted line for values
       }
       if (i < examinations.length) {
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        doc.text(examinations[i] + ' :', 120, y); // Examination column at x=120
+        doc.text(examinations[i] + ' :', 110, y);
+        doc.line(130, y + 2, 190, y + 2); // dotted line for values
       }
-      y += 15;
+      y += 12;
       
-      // Check for page break
+      // Page break if needed
       if (y > 270) {
         doc.addPage();
         y = 20;
       }
     }
     
-    // Save the PDF with unique case sheet number
+    // Save the PDF
     doc.save(`surgical-case-sheet-${caseSheetNumber}.pdf`);
   };
 
