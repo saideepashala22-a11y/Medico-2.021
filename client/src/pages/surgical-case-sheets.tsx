@@ -562,18 +562,40 @@ export default function SurgicalCaseSheets() {
 </body>
 </html>`;
 
-    // Create new window and write HTML content
+    // Create new window and write HTML content for viewing/printing
     const printWindow = window.open('', '_blank');
     if (printWindow) {
       printWindow.document.write(htmlContent);
       printWindow.document.close();
+    }
+
+    // Also create and download actual PDF file
+    try {
+      const pdf = new jsPDF('p', 'mm', 'a4');
       
-      // Wait for content to load then trigger print
-      printWindow.onload = () => {
-        setTimeout(() => {
-          printWindow.print();
-        }, 500);
-      };
+      // Create a temporary div to render the HTML content
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = htmlContent;
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      document.body.appendChild(tempDiv);
+      
+      // Generate PDF from the HTML content
+      pdf.html(tempDiv, {
+        callback: function (doc) {
+          // Download the PDF
+          doc.save(`Surgical-Case-Sheet-${caseSheetNumber}.pdf`);
+          
+          // Clean up
+          document.body.removeChild(tempDiv);
+        },
+        margin: [10, 10, 10, 10],
+        autoPaging: 'text',
+        html2canvas: { scale: 0.6 }
+      });
+    } catch (error) {
+      console.error('PDF download error:', error);
+      // If PDF download fails, user can still print from the opened window
     }
   };
 
