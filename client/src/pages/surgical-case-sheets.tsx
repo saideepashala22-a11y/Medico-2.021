@@ -283,11 +283,24 @@ export default function SurgicalCaseSheets() {
     doc.save(`surgical-case-sheet-${caseSheetNumber}.pdf`);
   };
 
-  const filteredCaseSheets = Array.isArray(caseSheets) ? caseSheets.filter((caseSheet: any) =>
-    caseSheet.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    caseSheet.caseNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    caseSheet.diagnosis?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) : [];
+  const filteredCaseSheets = Array.isArray(caseSheets) ? caseSheets.filter((caseSheet: any) => {
+    const matchesPatientName = caseSheet.patientName?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCaseNumber = caseSheet.caseNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesDiagnosis = caseSheet.diagnosis?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Debug log to see the data structure and search matching
+    if (searchTerm) {
+      console.log('Search term:', searchTerm);
+      console.log('Case sheet data:', { 
+        patientName: caseSheet.patientName, 
+        caseNumber: caseSheet.caseNumber, 
+        diagnosis: caseSheet.diagnosis 
+      });
+      console.log('Matches:', { matchesPatientName, matchesCaseNumber, matchesDiagnosis });
+    }
+    
+    return matchesPatientName || matchesCaseNumber || matchesDiagnosis;
+  }) : [];
 
   return (
     <div className="min-h-screen bg-medical-background">
