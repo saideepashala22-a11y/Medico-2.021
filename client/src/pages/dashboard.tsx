@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
+import { ChatWidget } from '@/components/ChatWidget';
 import { 
   Hospital, 
   LogOut, 
@@ -376,6 +377,9 @@ export default function Dashboard() {
           </Link>
         </div>
       </div>
+      
+      {/* AI Chat Widget */}
+      <ChatWidget />
     </div>
   );
 }
