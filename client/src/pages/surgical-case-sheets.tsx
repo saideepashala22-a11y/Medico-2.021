@@ -173,21 +173,21 @@ export default function SurgicalCaseSheets() {
     
     let y = 110;
     
-    // 3. Patient Details (labels at x=50, consistent 20px spacing)
+    // 3. Patient Details (labels at x=50, values far right for proper alignment)
     doc.setFontSize(11);
     
     // Name of the Patient
     doc.setFont('helvetica', 'bold');
     doc.text('Name of the Patient :', 50, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(caseSheet.patientName || '____________________________', 120, y);
+    doc.text(caseSheet.patientName || '____________________________', 150, y);
     y += 20;
     
     // Husband's/Father's Name
     doc.setFont('helvetica', 'bold');
     doc.text('Husband\'s/Father\'s Name :', 50, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(caseSheet.husbandFatherName || '____________________________', 130, y);
+    doc.text(caseSheet.husbandFatherName || '____________________________', 150, y);
     y += 20;
     
     // Religion & Nationality
@@ -195,25 +195,25 @@ export default function SurgicalCaseSheets() {
     doc.text('Religion & Nationality :', 50, y);
     doc.setFont('helvetica', 'normal');
     const religionNat = `${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim();
-    doc.text(religionNat || '____________________________', 125, y);
+    doc.text(religionNat || '____________________________', 150, y);
     y += 20;
     
     // Address
     doc.setFont('helvetica', 'bold');
     doc.text('Address :', 50, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(caseSheet.address || '____________________________', 85, y);
+    doc.text(caseSheet.address || '____________________________', 150, y);
     y += 20;
     
-    // Age and Sex on same line
+    // Age and Sex on same line with proper spacing
     doc.setFont('helvetica', 'bold');
     doc.text('Age :', 50, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(String(caseSheet.age || ''), 75, y);
+    doc.text(String(caseSheet.age || ''), 80, y);
     doc.setFont('helvetica', 'bold');
-    doc.text('Sex :', 120, y);
+    doc.text('Sex :', 130, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(caseSheet.sex || '', 140, y);
+    doc.text(caseSheet.sex || '', 155, y);
     y += 30;
     
     // 4. Medical Info (each field on new line with blank underline)
@@ -231,7 +231,7 @@ export default function SurgicalCaseSheets() {
       doc.setFont('helvetica', 'bold');
       doc.text(label, 50, y);
       doc.setFont('helvetica', 'normal');
-      doc.text(value || '____________________________', 130, y);
+      doc.text(value || '____________________________', 150, y);
       y += 18;
     });
     
