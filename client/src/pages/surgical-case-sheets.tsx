@@ -414,6 +414,9 @@ export default function SurgicalCaseSheets() {
               Name of the Patient & Signature
             </div>
             <div style="border-bottom: 1px solid #000; width: 200px; margin-top: 30px; margin-left: auto;"></div>
+            <div style="font-size: 12px; margin-top: 20px;">
+              Date: <span style="border-bottom: 1px solid #000; display: inline-block; width: 120px; margin-left: 10px;"></span>
+            </div>
           </div>
         </div>
       </div>
