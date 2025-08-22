@@ -174,33 +174,44 @@ export default function SurgicalCaseSheets() {
     let y = 90;
     doc.setFontSize(11);
     
-    // Helper function for clean label + value format (no lines)
-    const drawField = (label: string, value: string, yPos: number, startX: number = 20) => {
+    // Helper function for aligned field rows (two-column layout)
+    const fieldRow = (label: string, value: string, yPos: number, labelWidth: number = 180) => {
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(12);
-      doc.text(label, startX, yPos);
+      doc.setFontSize(11);
+      doc.text(label, 20, yPos);
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(12);
-      const labelWidth = doc.getTextWidth(label);
-      doc.text(value || '', startX + labelWidth + 5, yPos);
+      doc.setFontSize(11);
+      doc.text(value || '', 20 + labelWidth + 5, yPos);
     };
     
-    // Patient Information with clean formatting (no lines)
-    drawField('Name of the Patient :', caseSheet.patientName || '', y, 20);
-    y += 15;
+    // Patient Information with professional alignment
+    fieldRow('Name of the Patient :', caseSheet.patientName || '', y);
+    y += 14;
     
-    drawField('Husband\'s/Father\'s Name :', caseSheet.husbandFatherName || '', y, 20);
-    y += 15;
+    fieldRow('Husband\'s/Father\'s Name :', caseSheet.husbandFatherName || '', y);
+    y += 14;
     
-    // Religion & Nationality and Address on same line
-    drawField('Religion & Nationality :', `${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim(), y, 20);
-    drawField('Address :', caseSheet.address || '', y, 130);
-    y += 15;
+    // Same line: Religion & Nationality + Address
+    doc.setFont('helvetica', 'bold');
+    doc.text('Religion & Nationality :', 20, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim() || '', 205, y);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Address :', 120, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(caseSheet.address || '', 160, y);
+    y += 14;
     
-    // Age and Sex on same line  
-    drawField('Age :', caseSheet.age?.toString() || '', y, 20);
-    drawField('Sex :', caseSheet.sex || '', y, 80);
-    y += 20;
+    // Same line: Age + Sex
+    doc.setFont('helvetica', 'bold');
+    doc.text('Age :', 20, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(caseSheet.age?.toString() || '', 50, y);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Sex :', 100, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(caseSheet.sex || '', 125, y);
+    y += 18;
     
     // Medical sections with dotted lines
     const medicalSections = [
@@ -214,69 +225,69 @@ export default function SurgicalCaseSheets() {
     ];
     
     medicalSections.forEach(([label, value]) => {
-      drawField(label, value || '', y, 20);
-      y += 15;
+      fieldRow(label, value || '', y);
+      y += 14;
     });
     
-    y += 10;
-    // Investigations and Examination sections side by side
-    const invStartX = 20;
-    const examStartX = 110;
+    y += 15;
+    
+    // Side-by-side sections with professional alignment
+    const yStart = y;
+    const invX = 20;
+    const examX = 110;
     
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text('INVESTIGATION:', invStartX, y);
-    doc.text('ON EXAMINATION:', examStartX, y);
+    doc.text('INVESTIGATION:', invX, yStart);
+    doc.text('ON EXAMINATION:', examX, yStart);
     
     const investigations = [
-      ['1) Hb%', caseSheet.hb],
-      ['2) E.S.R.', caseSheet.bsa],
-      ['3) C.T.', caseSheet.ct],
-      ['4) B.T.', caseSheet.bt],
-      ['5) Bl. Grouping', caseSheet.bloodGrouping],
-      ['6) RPL', caseSheet.prl],
-      ['7) R.B.S', caseSheet.rbs],
-      ['8) Urine Sugar', caseSheet.urineSugar],
-      ['9) R.M.', ''],
-      ['10) X-ray', caseSheet.xray],
-      ['11) E.C.G', caseSheet.ecg],
-      ['12) Blood Urea', caseSheet.bloodUrea],
-      ['13) Serum Creatinine', caseSheet.serumCreatinine],
-      ['14) Serum Bilirubin', caseSheet.serumBilirubin],
-      ['15) HBS A.G', caseSheet.hbsag]
+      `1) Hb% : ${caseSheet.hb || ''}`,
+      `2) E.S.R. : ${caseSheet.bsa || ''}`,
+      `3) C.T. : ${caseSheet.ct || ''}`,
+      `4) B.T. : ${caseSheet.bt || ''}`,
+      `5) Bl. Grouping : ${caseSheet.bloodGrouping || ''}`,
+      `6) RPL : ${caseSheet.prl || ''}`,
+      `7) R.B.S : ${caseSheet.rbs || ''}`,
+      `8) Urine Sugar : ${caseSheet.urineSugar || ''}`,
+      `9) R.M. :`,
+      `10) X-ray : ${caseSheet.xray || ''}`,
+      `11) E.C.G : ${caseSheet.ecg || ''}`,
+      `12) Blood Urea : ${caseSheet.bloodUrea || ''}`,
+      `13) Serum Creatinine : ${caseSheet.serumCreatinine || ''}`,
+      `14) Serum Bilirubin : ${caseSheet.serumBilirubin || ''}`,
+      `15) HBS A.G : ${caseSheet.hbsag || ''}`
     ];
     
     const examinations = [
-      ['G.C.', caseSheet.generalCondition],
-      ['Temp. ......... °F', caseSheet.temperature],
-      ['P.R. ......... /Min', caseSheet.pulse],
-      ['B.P. ......... mmHG', caseSheet.bloodPressure],
-      ['R.R. ......... /Min', caseSheet.respiratoryRate],
-      ['Heart', caseSheet.heart],
-      ['Lungs', caseSheet.lungs],
-      ['Abd.', caseSheet.abdomen],
-      ['C.N.S.', caseSheet.cns]
+      `G.C. : ${caseSheet.generalCondition || ''}`,
+      `Temp. : ${caseSheet.temperature || ''} °F`,
+      `P.R. : ${caseSheet.pulse || ''} /Min`,
+      `B.P. : ${caseSheet.bloodPressure || ''} mmHG`,
+      `R.R. : ${caseSheet.respiratoryRate || ''} /Min`,
+      `Heart : ${caseSheet.heart || ''}`,
+      `Lungs : ${caseSheet.lungs || ''}`,
+      `Abd. : ${caseSheet.abdomen || ''}`,
+      `C.N.S. : ${caseSheet.cns || ''}`
     ];
     
     doc.setFontSize(10);
-    let invY = y + 15;
-    let examY = y + 15;
+    doc.setFont('helvetica', 'normal');
     
-    // Draw investigations column
-    investigations.forEach(([label, value]) => {
+    let invY = yStart + 20;
+    investigations.forEach(item => {
       if (invY > 270) {
         doc.addPage();
         invY = 20;
-        examY = 20;
       }
-      drawField(label, value || '', invY, invStartX);
-      invY += 12;
+      doc.text(item, invX, invY);
+      invY += 15;
     });
     
-    // Draw examinations column
-    examinations.forEach(([label, value]) => {
-      drawField(label, value || '', examY, examStartX);
-      examY += 12;
+    let examY = yStart + 20;
+    examinations.forEach(item => {
+      doc.text(item, examX, examY);
+      examY += 15;
     });
     
     // Save the PDF with unique case sheet number
@@ -288,16 +299,16 @@ export default function SurgicalCaseSheets() {
     const matchesCaseNumber = caseSheet.caseNumber?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDiagnosis = caseSheet.diagnosis?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    // Debug log to see the data structure and search matching
-    if (searchTerm) {
-      console.log('Search term:', searchTerm);
-      console.log('Case sheet data:', { 
-        patientName: caseSheet.patientName, 
-        caseNumber: caseSheet.caseNumber, 
-        diagnosis: caseSheet.diagnosis 
-      });
-      console.log('Matches:', { matchesPatientName, matchesCaseNumber, matchesDiagnosis });
-    }
+    // Debug log to see the data structure and search matching (remove in production)
+    // if (searchTerm) {
+    //   console.log('Search term:', searchTerm);
+    //   console.log('Case sheet data:', { 
+    //     patientName: caseSheet.patientName, 
+    //     caseNumber: caseSheet.caseNumber, 
+    //     diagnosis: caseSheet.diagnosis 
+    //   });
+    //   console.log('Matches:', { matchesPatientName, matchesCaseNumber, matchesDiagnosis });
+    // }
     
     return matchesPatientName || matchesCaseNumber || matchesDiagnosis;
   }) : [];

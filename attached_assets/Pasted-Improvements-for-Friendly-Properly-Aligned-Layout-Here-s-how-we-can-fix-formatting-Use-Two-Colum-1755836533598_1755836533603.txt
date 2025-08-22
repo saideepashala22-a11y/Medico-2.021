@@ -1,0 +1,161 @@
+Improvements for Friendly, Properly Aligned Layout
+
+Here’s how we can fix formatting:
+
+Use Two-Column Grid for Details
+
+Left column → Label (fixed width, e.g. 180px).
+
+Right column → Value (flexible).
+This keeps every field neatly aligned.
+
+Group Fields on the Same Line
+
+Example: Religion & Nationality (left) and Address (right).
+
+Example: Age (left) and Sex (right).
+
+Consistent Line Height (14–16px)
+
+Not too wide, not too packed.
+
+Looks like real hospital forms.
+
+Bold Labels, Normal Values
+
+Makes it easy to scan.
+
+Side-by-Side Sections for Investigations & On Examination
+
+Left column: Investigations list.
+
+Right column: Examination list.
+
+Use equal column widths (e.g. 50% of page width each).
+
+✅ Refined TypeScript (pdfkit) Example
+import PDFDocument from "pdfkit";
+import fs from "fs";
+
+interface Patient {
+  id: string;
+  name: string;
+  fatherName: string;
+  religionNationality: string;
+  address: string;
+  age: number;
+  sex: string;
+}
+
+export function createSurgicalCaseSheet(patient: Patient) {
+  const doc = new PDFDocument({ margin: 50 });
+  const filePath = `surgical-case-sheet-SCS${patient.id}.pdf`;
+  doc.pipe(fs.createWriteStream(filePath));
+
+  // Header
+  doc.fontSize(18).text("NAKSHATRA HOSPITAL", { align: "center" });
+  doc.fontSize(10).text("Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.", { align: "center" });
+  doc.text("Cell: 7093939205", { align: "center" });
+
+  doc.moveDown();
+  doc.fontSize(14).text("SURGICAL CASE SHEET", { align: "center", underline: true });
+
+  // Case No + Date
+  doc.moveDown();
+  doc.fontSize(11);
+  doc.text(`No.: SCS${patient.id}`, 50, doc.y, { continued: true });
+  doc.text(`Date: ${new Date().toLocaleDateString("en-IN")}`, { align: "right" });
+
+  doc.moveDown();
+
+  // Helper function for aligned rows
+  function fieldRow(label: string, value: string, labelWidth = 180) {
+    const y = doc.y;
+    doc.font("Helvetica-Bold").text(label, 50, y, { width: labelWidth, continued: true });
+    doc.font("Helvetica").text(value || "");
+    doc.moveDown(0.5);
+  }
+
+  // Patient Info
+  fieldRow("Name of the Patient :", patient.name);
+  fieldRow("Husband's/Father's Name :", patient.fatherName);
+  // Same line: Religion + Address
+  doc.font("Helvetica-Bold").text("Religion & Nationality :", 50, doc.y, { width: 180, continued: true });
+  doc.font("Helvetica").text(patient.religionNationality || "", { continued: true });
+  doc.font("Helvetica-Bold").text("   Address :", doc.x + 30, doc.y, { width: 100, continued: true });
+  doc.font("Helvetica").text(patient.address || "");
+  doc.moveDown(0.5);
+
+  // Same line: Age + Sex
+  doc.font("Helvetica-Bold").text("Age :", 50, doc.y, { width: 50, continued: true });
+  doc.font("Helvetica").text(String(patient.age), { continued: true });
+  doc.font("Helvetica-Bold").text("   Sex :", doc.x + 30, doc.y, { width: 50, continued: true });
+  doc.font("Helvetica").text(patient.sex);
+  doc.moveDown(1);
+
+  // Sections
+  [
+    "Diagnosis", "Nature of Operation", "Date of Admission",
+    "Date of Operation", "Date of Discharge",
+    "Complaints & Duration", "History of Present Illness"
+  ].forEach(sec => fieldRow(sec + " :", ""));
+
+  doc.moveDown();
+
+  // Side-by-side sections
+  const yStart = doc.y;
+  const invX = 50;
+  const examX = 300;
+
+  doc.font("Helvetica-Bold").text("INVESTIGATION:", invX, yStart);
+  doc.font("Helvetica-Bold").text("ON EXAMINATION:", examX, yStart);
+
+  const investigations = [
+    "1) Hb%", "2) E.S.R.", "3) C.T.", "4) B.T.", "5) Bl. Grouping",
+    "6) RPL", "7) R.B.S", "8) Urine Sugar", "9) R.M.", "10) X-ray",
+    "11) E.C.G", "12) Blood Urea", "13) Serum Creatinine",
+    "14) Serum Bilirubin", "15) HBS A.G"
+  ];
+
+  const exam = [
+    "G.C.", "Temp. ......... °F", "P.R. ......... /Min",
+    "B.P. ......... mmHG", "R.R. ......... /Min",
+    "Heart", "Lungs", "Abd.", "C.N.S."
+  ];
+
+  let invY = yStart + 20;
+  investigations.forEach(item => {
+    doc.font("Helvetica").fontSize(10).text(item, invX, invY);
+    invY += 15;
+  });
+
+  let examY = yStart + 20;
+  exam.forEach(item => {
+    doc.font("Helvetica").fontSize(10).text(item, examX, examY);
+    examY += 15;
+  });
+
+  doc.end();
+  console.log(`✅ PDF generated: ${filePath}`);
+}
+
+// Example call
+createSurgicalCaseSheet({
+  id: "1174-69",
+  name: "mr Saideep Ashala",
+  fatherName: "",
+  religionNationality: "23",
+  address: "",
+  age: 12,
+  sex: "male"
+});
+
+🔹 What’s Improved
+
+Labels + values align in columns, no jagged spacing.
+
+Combined fields (Religion + Address, Age + Sex) are on the same row.
+
+Investigations vs Examination lists are side-by-side like a table.
+
+Overall looks more like an official hospital form, not plain text.
