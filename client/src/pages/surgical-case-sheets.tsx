@@ -142,7 +142,7 @@ export default function SurgicalCaseSheets() {
     createMutation.mutate(submitData);
   };
 
-  // Generate PDF function using professional hospital format with improved layout
+  // Generate PDF function with professional dotted line formatting
   const generatePDF = (caseSheet: any) => {
     const doc = new jsPDF();
     
@@ -165,115 +165,128 @@ export default function SurgicalCaseSheets() {
     doc.text('SURGICAL CASE SHEET', 105, 55, { align: 'center' });
     doc.line(60, 58, 150, 58); // underline
     
-    // Case sheet number and date aligned to right
+    // Case No (left) and Date (right) on same line
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Case Sheet No: ${caseSheetNumber}`, 190, 70, { align: 'right' });
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 190, 78, { align: 'right' });
+    doc.text(`No.: ${caseSheetNumber}`, 20, 75);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 160, 75);
     
-    // Patient Information Section with better formatting
     let y = 90;
-    doc.setFontSize(10);
+    doc.setFontSize(11);
     
-    // Helper function for clean field formatting
-    const drawField = (label: string, value: string) => {
+    // Helper function for dotted underlines
+    const drawField = (label: string, value: string, x: number, yPos: number, underlineWidth: number = 100) => {
       doc.setFont('helvetica', 'bold');
-      doc.text(label, 20, y, { maxWidth: 90 });
-      doc.setFont('helvetica', 'normal');
-      doc.text(value || '____________________________', 110, y);
-      y += 8;
+      doc.text(label, x, yPos);
+      const labelWidth = doc.getTextWidth(label);
+      const startX = x + labelWidth + 2;
+      const endX = startX + underlineWidth;
+      
+      // Draw dotted line using repeated dots
+      const dotSpacing = 2;
+      for (let dotX = startX; dotX < endX; dotX += dotSpacing) {
+        doc.circle(dotX, yPos + 3, 0.2, 'F');
+      }
+      
+      // Write value if available
+      if (value) {
+        doc.setFont('helvetica', 'normal');
+        doc.text(value, startX + 2, yPos);
+      }
     };
     
-    drawField('Name of the Patient :', caseSheet.patientName);
-    drawField('Husband\'s/Father\'s Name :', caseSheet.husbandFatherName);
-    drawField('Religion & Nationality :', `${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim());
-    drawField('Address :', caseSheet.address);
-    
-    // Age and Sex on same line
-    doc.setFont('helvetica', 'bold');
-    doc.text('Age :', 20, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`${caseSheet.age || '____'}`, 50, y);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Sex :', 100, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`${caseSheet.sex || '____'}`, 120, y);
+    // Patient Information with dotted lines
+    drawField('Name of the Patient :', caseSheet.patientName || '', 20, y, 120);
     y += 15;
     
-    // Medical Information
-    drawField('Diagnosis :', caseSheet.diagnosis);
-    drawField('Nature of Operation :', caseSheet.natureOfOperation);
-    drawField('Date of Admission :', caseSheet.dateOfAdmission ? format(new Date(caseSheet.dateOfAdmission), 'dd/MM/yyyy') : '');
-    drawField('Date of Operation :', caseSheet.dateOfOperation ? format(new Date(caseSheet.dateOfOperation), 'dd/MM/yyyy') : '');
-    drawField('Date of Discharge :', caseSheet.dateOfDischarge ? format(new Date(caseSheet.dateOfDischarge), 'dd/MM/yyyy') : '');
-    drawField('Complaints & Duration :', caseSheet.complaintsAndDuration);
-    drawField('History of Present Illness :', caseSheet.historyOfPresentIllness);
-    y += 5;
-    // Investigations Section
-    doc.setFont('helvetica', 'bold');
-    doc.text('INVESTIGATION:', 20, y);
-    doc.line(20, y + 2, 70, y + 2); // underline
-    doc.setFont('helvetica', 'normal');
-    y += 10;
+    drawField('Husband\'s/Father\'s Name :', caseSheet.husbandFatherName || '', 20, y, 120);
+    y += 15;
     
-    const investigations = [
-      `1) Hb% : ${caseSheet.hb || '_____________________'}`,
-      `2) E.S.R. : ${caseSheet.bsa || '_____________________'}`,
-      `3) C.T. : ${caseSheet.ct || '_____________________'}`,
-      `4) B.T. : ${caseSheet.bt || '_____________________'}`,
-      `5) Bl. Grouping : ${caseSheet.bloodGrouping || '_____________________'}`,
-      `6) RPL : ${caseSheet.prl || '_____________________'}`,
-      `7) R.B.S : ${caseSheet.rbs || '_____________________'}`,
-      `8) Urine Sugar : ${caseSheet.urineSugar || '_____________________'}`,
-      `9) R.M. : _____________________`,
-      `10) X-ray : ${caseSheet.xray || '_____________________'}`,
-      `11) E.C.G : ${caseSheet.ecg || '_____________________'}`,
-      `12) Blood Urea : ${caseSheet.bloodUrea || '_____________________'}`,
-      `13) Serum Creatinine : ${caseSheet.serumCreatinine || '_____________________'}`,
-      `14) Serum Bilirubin : ${caseSheet.serumBilirubin || '_____________________'}`,
-      `15) HBS A.G : ${caseSheet.hbsag || '_____________________'}`
+    // Religion & Nationality and Address on same line
+    drawField('Religion & Nationality :', `${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim(), 20, y, 80);
+    drawField('Address :', caseSheet.address || '', 130, y, 80);
+    y += 15;
+    
+    // Age and Sex on same line  
+    drawField('Age :', caseSheet.age?.toString() || '', 20, y, 30);
+    drawField('Sex :', caseSheet.sex || '', 80, y, 30);
+    y += 25;
+    
+    // Medical sections with dotted lines
+    const medicalSections = [
+      ['Diagnosis :', caseSheet.diagnosis],
+      ['Nature of Operation :', caseSheet.natureOfOperation],
+      ['Date of Admission :', caseSheet.dateOfAdmission ? format(new Date(caseSheet.dateOfAdmission), 'dd/MM/yyyy') : ''],
+      ['Date of Operation :', caseSheet.dateOfOperation ? format(new Date(caseSheet.dateOfOperation), 'dd/MM/yyyy') : ''],
+      ['Date of Discharge :', caseSheet.dateOfDischarge ? format(new Date(caseSheet.dateOfDischarge), 'dd/MM/yyyy') : ''],
+      ['Complaints & Duration :', caseSheet.complaintsAndDuration],
+      ['History of Present Illness :', caseSheet.historyOfPresentIllness]
     ];
     
-    investigations.forEach(item => {
-      if (y > 270) { // Add new page if needed
-        doc.addPage();
-        y = 20;
-      }
-      doc.text(item, 20, y);
-      y += 7;
+    medicalSections.forEach(([label, value]) => {
+      drawField(label, value || '', 20, y, 150);
+      y += 15;
     });
     
-    // On Examination Section
     y += 10;
-    if (y > 250) {
-      doc.addPage();
-      y = 20;
-    }
-    doc.setFont('helvetica', 'bold');
-    doc.text('ON EXAMINATION:', 20, y);
-    doc.line(20, y + 2, 80, y + 2); // underline
-    doc.setFont('helvetica', 'normal');
-    y += 10;
+    // Investigations and Examination sections side by side
+    const invStartX = 20;
+    const examStartX = 110;
     
-    const examinations = [
-      `G.C. : ${caseSheet.generalCondition || '_____________________'}`,
-      `Temp. : ${caseSheet.temperature || '_____'} °F`,
-      `P.R. : ${caseSheet.pulse || '_____'} /Min`,
-      `B.P. : ${caseSheet.bloodPressure || '_____'} mmHG`,
-      `R.R. : ${caseSheet.respiratoryRate || '_____'} /Min`,
-      `Heart : ${caseSheet.heart || '_____________________'}`,
-      `Lungs : ${caseSheet.lungs || '_____________________'}`,
-      `Abd. : ${caseSheet.abdomen || '_____________________'}`,
-      `C.N.S. : ${caseSheet.cns || '_____________________'}`
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('INVESTIGATION:', invStartX, y);
+    doc.text('ON EXAMINATION:', examStartX, y);
+    
+    const investigations = [
+      ['1) Hb%', caseSheet.hb],
+      ['2) E.S.R.', caseSheet.bsa],
+      ['3) C.T.', caseSheet.ct],
+      ['4) B.T.', caseSheet.bt],
+      ['5) Bl. Grouping', caseSheet.bloodGrouping],
+      ['6) RPL', caseSheet.prl],
+      ['7) R.B.S', caseSheet.rbs],
+      ['8) Urine Sugar', caseSheet.urineSugar],
+      ['9) R.M.', ''],
+      ['10) X-ray', caseSheet.xray],
+      ['11) E.C.G', caseSheet.ecg],
+      ['12) Blood Urea', caseSheet.bloodUrea],
+      ['13) Serum Creatinine', caseSheet.serumCreatinine],
+      ['14) Serum Bilirubin', caseSheet.serumBilirubin],
+      ['15) HBS A.G', caseSheet.hbsag]
     ];
     
-    examinations.forEach(item => {
-      if (y > 270) {
+    const examinations = [
+      ['G.C.', caseSheet.generalCondition],
+      ['Temp. ......... °F', caseSheet.temperature],
+      ['P.R. ......... /Min', caseSheet.pulse],
+      ['B.P. ......... mmHG', caseSheet.bloodPressure],
+      ['R.R. ......... /Min', caseSheet.respiratoryRate],
+      ['Heart', caseSheet.heart],
+      ['Lungs', caseSheet.lungs],
+      ['Abd.', caseSheet.abdomen],
+      ['C.N.S.', caseSheet.cns]
+    ];
+    
+    doc.setFontSize(10);
+    let invY = y + 15;
+    let examY = y + 15;
+    
+    // Draw investigations column
+    investigations.forEach(([label, value]) => {
+      if (invY > 270) {
         doc.addPage();
-        y = 20;
+        invY = 20;
+        examY = 20;
       }
-      doc.text(item, 20, y);
-      y += 7;
+      drawField(label, value || '', invStartX, invY, 60);
+      invY += 12;
+    });
+    
+    // Draw examinations column
+    examinations.forEach(([label, value]) => {
+      drawField(label, value || '', examStartX, examY, 60);
+      examY += 12;
     });
     
     // Save the PDF with unique case sheet number

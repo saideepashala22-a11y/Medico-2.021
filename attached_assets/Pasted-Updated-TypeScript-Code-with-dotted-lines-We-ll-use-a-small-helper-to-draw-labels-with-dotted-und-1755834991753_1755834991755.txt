@@ -1,3 +1,7 @@
+Updated TypeScript Code (with dotted lines)
+
+We’ll use a small helper to draw labels with dotted underline space.
+
 import PDFDocument from "pdfkit";
 import fs from "fs";
 
@@ -58,14 +62,14 @@ export function createSurgicalCaseSheet(patient: Patient) {
   doc.moveDown();
   doc.fontSize(11);
   doc.text(`No.: ${caseSheetNo}`, 50, doc.y, { continued: true });
-  doc.text(`Date: ${new Date().toLocaleDateString()}`, { align: "right" });
+  doc.text(`Date: 10.03.2025`, { align: "right" });
 
   let y = doc.y + 10;
 
   // ---------- PATIENT DETAILS ----------
   doc.fontSize(11);
   drawField(doc, "Name of the Patient :", patient.name, 50, y); y += 25;
-  drawField(doc, "Husband's/Father's Name :", patient.fatherName, 50, y); y += 25;
+  drawField(doc, "Husband’s/Father’s Name :", patient.fatherName, 50, y); y += 25;
 
   // Religion & Nationality + Address same line
   drawField(doc, "Religion & Nationality :", patient.religionNationality, 50, y, 150);
@@ -126,18 +130,25 @@ export function createSurgicalCaseSheet(patient: Patient) {
   doc.end();
   console.log(`✅ PDF generated: ${filePath} (Case Sheet No: ${caseSheetNo})`);
   caseCounter++;
-  return filePath;
 }
 
-// For testing - can be removed in production
-if (require.main === module) {
-  createSurgicalCaseSheet({
-    id: "12345",
-    name: "Mrs. M. Upendra",
-    fatherName: "",
-    religionNationality: "Hindu / Indian",
-    address: "Hyderabad",
-    age: 50,
-    sex: "F"
-  });
-}
+// Example
+createSurgicalCaseSheet({
+  id: "12345",
+  name: "Mrs. M. Upendra",
+  fatherName: "",
+  religionNationality: "Hindu / Indian",
+  address: "Hyderabad",
+  age: 50,
+  sex: "F"
+});
+
+🔹 What’s New
+
+Added drawField() helper → prints label + dotted underline + value if provided.
+
+Multi-field rows (Religion & Address, Age & Sex) are aligned on one line.
+
+All sections now have dotted underline across page (like in your scanned sheet).
+
+Investigations (left) + On Examination (right) both have dotted underlines.

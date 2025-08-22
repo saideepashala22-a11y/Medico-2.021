@@ -6,6 +6,16 @@ This is a comprehensive Hospital Management System built as a full-stack web app
 
 ## Recent Changes (Latest)
 
+**Professional Surgical Case Sheet System (August 2025)**
+- Implemented complete surgical case sheet functionality with professional NAKSHATRA HOSPITAL format
+- Added unique case sheet numbering system (SCS + patient ID + counter format like SCS1234-01)
+- Created comprehensive PDF generation with dotted line formatting matching hospital templates
+- Fixed form validation and server-side database integration with proper error handling
+- Implemented patient dropdown with real database data and auto-fill functionality
+- Added professional 2-column layout for investigations and examinations sections
+- Successfully integrated PDFKit for enhanced PDF formatting with hospital branding
+- System now fully functional: form submission → database storage → immediate PDF download
+
 **Enhanced Lab Testing Workflow (August 2025)**
 - Redesigned lab testing into a comprehensive 4-step process: Patient Registration → Test Selection → Results Entry → Report Generation
 - Enhanced patient registration form with professional fields: salutation, age units, blood group, emergency contacts, email, address, and referring doctor information
