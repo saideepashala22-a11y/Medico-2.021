@@ -418,13 +418,15 @@ export default function SurgicalCaseSheets() {
           
           <!-- Right side: Patient -->
           <div style="flex: 1; text-align: right;">
-            <div style="font-size: 12px; font-weight: bold; margin-bottom: 20px;">
-              Name of the Patient & Signature
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px;">
+              <div style="font-size: 12px; font-weight: bold;">
+                Name of the Patient & Signature
+              </div>
+              <div style="font-size: 12px;">
+                Date :
+              </div>
             </div>
             <div style="border-bottom: 1px solid #000; width: 200px; margin-top: 30px; margin-left: auto;"></div>
-            <div style="font-size: 12px; margin-top: 20px;">
-              Date :
-            </div>
           </div>
         </div>
       </div>
