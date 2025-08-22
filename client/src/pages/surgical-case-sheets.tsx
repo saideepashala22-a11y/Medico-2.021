@@ -479,7 +479,7 @@ export default function SurgicalCaseSheets() {
   <!-- OPERATION & ANAESTHESIA NOTES PAGE -->
   <div class="page" style="page-break-before: always;">
     <div class="inner">
-      <div style="margin-top: 10px; height: 780px;">
+      <div style="margin-top: 10px; height: 950px;">
         
         <!-- Top Half: Operation Notes and Anaesthesia Notes -->
         <div style="display: flex; height: 50%; border: 2px solid #000; border-bottom: none;">
