@@ -380,7 +380,7 @@ export default function SurgicalCaseSheets() {
   <!-- CONSENT FOR SURGERY PAGE -->
   <div class="page" style="page-break-before: always;">
     <div class="inner">
-      <div style="margin-top: 20px;">
+      <div style="margin-top: 40px;">
         <h2 style="font-size: 16px; font-weight: bold; margin: 0 0 30px 0; text-align: left;">CONSENT FOR SURGERY</h2>
         
         <div style="font-size: 12px; line-height: 1.6; margin-bottom: 40px; text-align: left;">
@@ -431,7 +431,7 @@ export default function SurgicalCaseSheets() {
         </div>
         
         <!-- PRE-OPERATIVE PREPARATION BOX -->
-        <div style="margin-top: 40px; border: 2px solid #000; min-height: 500px; padding: 20px;">
+        <div style="margin-top: 50px; border: 2px solid #000; min-height: 400px; padding: 20px;">
           <h3 style="font-size: 14px; font-weight: bold; margin: 0 0 20px 0; text-align: left;">PRE-OPERATIVE PREPARATION & INSTRUCTION :</h3>
         </div>
       </div>
@@ -441,11 +441,11 @@ export default function SurgicalCaseSheets() {
   <!-- PROGRESS NOTES PAGE -->
   <div class="page" style="page-break-before: always;">
     <div class="inner">
-      <div style="margin-top: 15px;">
-        <h2 style="font-size: 16px; font-weight: bold; margin: 0 0 15px 0; text-align: center;">PROGRESS NOTES</h2>
+      <div style="margin-top: 20px;">
+        <h2 style="font-size: 16px; font-weight: bold; margin: 0 0 20px 0; text-align: center;">PROGRESS NOTES</h2>
         
         <!-- Progress Notes Table -->
-        <div style="border: 2px solid #000; height: 770px;">
+        <div style="border: 2px solid #000; height: 750px;">
           <!-- Header Row -->
           <div style="display: flex; border-bottom: 2px solid #000;">
             <div style="flex: 1; border-right: 2px solid #000; padding: 10px; font-size: 12px; font-weight: bold; text-align: center;">
@@ -479,7 +479,7 @@ export default function SurgicalCaseSheets() {
   <!-- OPERATION & ANAESTHESIA NOTES PAGE -->
   <div class="page" style="page-break-before: always;">
     <div class="inner">
-      <div style="margin-top: 5px; height: 970px;">
+      <div style="margin-top: 10px; height: 950px;">
         
         <!-- Top Half: Operation Notes and Anaesthesia Notes -->
         <div style="display: flex; height: 50%; border: 2px solid #000; border-bottom: none;">
