@@ -1,0 +1,130 @@
+1. Unique Case Sheet Number
+
+We’ll generate like this:
+
+SCS + patient_id + counter
+
+
+Example: SCS12345-01
+
+You can pass in patientId and maintain a counter (e.g. from DB or just increment in memory).
+
+2. Header Layout
+
+Instead of dumping lines, we’ll create a 2-column alignment using pdfkit → left for labels, right for values. That way it looks neat, not staggered.
+
+✅ Updated TypeScript Code
+import PDFDocument from "pdfkit";
+import fs from "fs";
+
+interface Patient {
+  id: string;
+  name: string;
+  fatherName: string;
+  religionNationality: string;
+  address: string;
+  age: number;
+  sex: string;
+}
+
+let caseCounter = 1; // You can persist this in DB
+
+function generateCaseSheetNumber(patientId: string): string {
+  return `SCS${patientId}-${String(caseCounter).padStart(2, "0")}`;
+}
+
+export function createSurgicalCaseSheet(patient: Patient) {
+  const doc = new PDFDocument({ margin: 50 });
+  const filePath = `surgical_case_sheet_${patient.id}.pdf`;
+  doc.pipe(fs.createWriteStream(filePath));
+
+  // Case sheet number
+  const caseSheetNo = generateCaseSheetNumber(patient.id);
+
+  // Header
+  doc.fontSize(18).text("NAKSHATRA HOSPITAL", { align: "center" });
+  doc.fontSize(10).text("Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.", { align: "center" });
+  doc.text("Cell: 7093939205", { align: "center" });
+
+  doc.moveDown();
+  doc.fontSize(14).text("SURGICAL CASE SHEET", { align: "center", underline: true });
+  doc.moveDown();
+
+  doc.fontSize(11).text(`Case Sheet No: ${caseSheetNo}`, { align: "right" });
+  doc.text("Date: 10.03.2025", { align: "right" });
+
+  // Patient Info in proper alignment
+  doc.moveDown();
+  const leftMargin = 50;
+  const labelWidth = 180; // space reserved for labels
+
+  function drawField(label: string, value: string) {
+    doc.font("Helvetica-Bold").text(label, leftMargin, doc.y, { continued: true });
+    doc.font("Helvetica").text(value);
+  }
+
+  drawField("Name of the Patient :", patient.name);
+  drawField("Husband’s/Father’s Name :", patient.fatherName || "____________________________");
+  drawField("Religion & Nationality :", patient.religionNationality);
+  drawField("Address :", patient.address || "____________________________");
+  drawField("Age :", patient.age.toString() + "     Sex : " + patient.sex);
+
+  doc.moveDown();
+  doc.text("Diagnosis : ________________________________________");
+  doc.text("Nature of Operation : ______________________________");
+  doc.text("Date of Admission : _______________________________");
+  doc.text("Date of Operation : _______________________________");
+  doc.text("Date of Discharge : _______________________________");
+  doc.text("Complaints & Duration : ___________________________");
+  doc.text("History of Present Illness : ________________________");
+
+  // Investigations
+  doc.moveDown();
+  doc.fontSize(12).text("INVESTIGATION:", { underline: true });
+  doc.fontSize(10);
+  const investigations = [
+    "1) Hb%", "2) E.S.R.", "3) C.T.", "4) B.T.", "5) Bl. Grouping",
+    "6) RPL", "7) R.B.S", "8) Urine Sugar", "9) R.M.", "10) X-ray",
+    "11) E.C.G", "12) Blood Urea", "13) Serum Creatinine",
+    "14) Serum Bilirubin", "15) HBS A.G"
+  ];
+  investigations.forEach((item) => doc.text(item + " : _____________________"));
+
+  // On Examination
+  doc.moveDown();
+  doc.fontSize(12).text("ON EXAMINATION:", { underline: true });
+  doc.fontSize(10);
+  const exam = [
+    "G.C.", "Temp. ......... °F", "P.R. ......... /Min",
+    "B.P. ......... mmHG", "R.R. ......... /Min",
+    "Heart", "Lungs", "Abd.", "C.N.S."
+  ];
+  exam.forEach((item) => doc.text(item + " : _____________________"));
+
+  doc.end();
+  console.log(`✅ PDF generated: ${filePath} (Case Sheet No: ${caseSheetNo})`);
+
+  // Increment counter for next case sheet
+  caseCounter++;
+}
+
+// Example usage:
+createSurgicalCaseSheet({
+  id: "12345",
+  name: "John Doe",
+  fatherName: "Michael Doe",
+  religionNationality: "Christian / Indian",
+  address: "Hyderabad",
+  age: 12,
+  sex: "Male"
+});
+
+🔹 What Changed
+
+generateCaseSheetNumber() → builds ID like SCS12345-01.
+
+Aligned header fields → Name of Patient, Age, Sex all neat.
+
+Dynamic patient info from an object.
+
+Still generates the rest of the format as per your scanned sheet.

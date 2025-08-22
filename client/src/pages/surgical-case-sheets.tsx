@@ -142,9 +142,13 @@ export default function SurgicalCaseSheets() {
     createMutation.mutate(submitData);
   };
 
-  // Generate PDF function using professional hospital format
+  // Generate PDF function using professional hospital format with improved layout
   const generatePDF = (caseSheet: any) => {
     const doc = new jsPDF();
+    
+    // Generate unique case sheet number based on patient ID
+    const patientIdShort = caseSheet.patientId?.slice(-4) || Math.floor(Math.random() * 9999).toString().padStart(4, '0');
+    const caseSheetNumber = `SCS${patientIdShort}-${String(Math.floor(Math.random() * 99) + 1).padStart(2, '0')}`;
     
     // Header with hospital details
     doc.setFontSize(18);
@@ -161,39 +165,50 @@ export default function SurgicalCaseSheets() {
     doc.text('SURGICAL CASE SHEET', 105, 55, { align: 'center' });
     doc.line(60, 58, 150, 58); // underline
     
+    // Case sheet number and date aligned to right
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 160, 70);
+    doc.text(`Case Sheet No: ${caseSheetNumber}`, 190, 70, { align: 'right' });
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 190, 78, { align: 'right' });
     
-    // Patient Information Section
-    let y = 85;
+    // Patient Information Section with better formatting
+    let y = 90;
     doc.setFontSize(10);
-    doc.text(`Name of the Patient : ${caseSheet.patientName || '____________________________'}`, 20, y);
-    y += 8;
-    doc.text(`Husband's/Father's Name : ${caseSheet.husbandFatherName || '____________________________'}`, 20, y);
-    y += 8;
-    doc.text(`Religion & Nationality : ${(caseSheet.religion || '') + ' ' + (caseSheet.nationality || '') || '____________________________'}`, 20, y);
-    y += 8;
-    doc.text(`Address : ${caseSheet.address || '____________________________'}`, 20, y);
-    y += 8;
-    doc.text(`Age : ${caseSheet.age || '____'}        Sex : ${caseSheet.sex || '____'}`, 20, y);
+    
+    // Helper function for clean field formatting
+    const drawField = (label: string, value: string) => {
+      doc.setFont('helvetica', 'bold');
+      doc.text(label, 20, y, { maxWidth: 90 });
+      doc.setFont('helvetica', 'normal');
+      doc.text(value || '____________________________', 110, y);
+      y += 8;
+    };
+    
+    drawField('Name of the Patient :', caseSheet.patientName);
+    drawField('Husband\'s/Father\'s Name :', caseSheet.husbandFatherName);
+    drawField('Religion & Nationality :', `${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim());
+    drawField('Address :', caseSheet.address);
+    
+    // Age and Sex on same line
+    doc.setFont('helvetica', 'bold');
+    doc.text('Age :', 20, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${caseSheet.age || '____'}`, 50, y);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Sex :', 100, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${caseSheet.sex || '____'}`, 120, y);
     y += 15;
     
     // Medical Information
-    doc.text(`Diagnosis : ${caseSheet.diagnosis || '____________________________'}`, 20, y);
-    y += 8;
-    doc.text(`Nature of Operation : ${caseSheet.natureOfOperation || '____________________________'}`, 20, y);
-    y += 8;
-    doc.text(`Date of Admission : ${caseSheet.dateOfAdmission ? format(new Date(caseSheet.dateOfAdmission), 'dd/MM/yyyy') : '____________________________'}`, 20, y);
-    y += 8;
-    doc.text(`Date of Operation : ${caseSheet.dateOfOperation ? format(new Date(caseSheet.dateOfOperation), 'dd/MM/yyyy') : '____________________________'}`, 20, y);
-    y += 8;
-    doc.text(`Date of Discharge : ${caseSheet.dateOfDischarge ? format(new Date(caseSheet.dateOfDischarge), 'dd/MM/yyyy') : '____________________________'}`, 20, y);
-    y += 8;
-    doc.text(`Complaints & Duration : ${caseSheet.complaintsAndDuration || '____________________________'}`, 20, y);
-    y += 8;
-    doc.text(`History of Present Illness : ${caseSheet.historyOfPresentIllness || '____________________________'}`, 20, y);
-    y += 15;
+    drawField('Diagnosis :', caseSheet.diagnosis);
+    drawField('Nature of Operation :', caseSheet.natureOfOperation);
+    drawField('Date of Admission :', caseSheet.dateOfAdmission ? format(new Date(caseSheet.dateOfAdmission), 'dd/MM/yyyy') : '');
+    drawField('Date of Operation :', caseSheet.dateOfOperation ? format(new Date(caseSheet.dateOfOperation), 'dd/MM/yyyy') : '');
+    drawField('Date of Discharge :', caseSheet.dateOfDischarge ? format(new Date(caseSheet.dateOfDischarge), 'dd/MM/yyyy') : '');
+    drawField('Complaints & Duration :', caseSheet.complaintsAndDuration);
+    drawField('History of Present Illness :', caseSheet.historyOfPresentIllness);
+    y += 5;
     // Investigations Section
     doc.setFont('helvetica', 'bold');
     doc.text('INVESTIGATION:', 20, y);
@@ -261,8 +276,8 @@ export default function SurgicalCaseSheets() {
       y += 7;
     });
     
-    // Save the PDF
-    doc.save(`surgical-case-sheet-${caseSheet.caseNumber || 'draft'}.pdf`);
+    // Save the PDF with unique case sheet number
+    doc.save(`surgical-case-sheet-${caseSheetNumber}.pdf`);
   };
 
   const filteredCaseSheets = Array.isArray(caseSheets) ? caseSheets.filter((caseSheet: any) =>

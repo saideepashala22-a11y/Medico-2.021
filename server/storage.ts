@@ -517,11 +517,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createSurgicalCaseSheet(caseSheet: InsertSurgicalCaseSheet & { createdBy?: string }): Promise<SurgicalCaseSheet> {
-    // Generate case number
-    const today = new Date();
-    const year = today.getFullYear();
-    const existingSheets = await this.getRecentSurgicalCaseSheets();
-    const caseNumber = `SCS-${year}-${String(existingSheets.length + 1).padStart(3, '0')}`;
+    // Generate unique case number based on patient ID
+    const patientIdShort = caseSheet.patientId.slice(-4);
+    const existingSheets = await this.getSurgicalCaseSheetsByPatient(caseSheet.patientId);
+    const patientCaseCounter = existingSheets.length + 1;
+    const caseNumber = `SCS${patientIdShort}-${String(patientCaseCounter).padStart(2, '0')}`;
 
     const caseSheetData = {
       ...caseSheet,
