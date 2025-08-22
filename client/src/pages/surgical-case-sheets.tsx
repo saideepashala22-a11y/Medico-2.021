@@ -174,42 +174,32 @@ export default function SurgicalCaseSheets() {
     let y = 90;
     doc.setFontSize(11);
     
-    // Helper function for dotted underlines
-    const drawField = (label: string, value: string, x: number, yPos: number, underlineWidth: number = 100) => {
+    // Helper function for clean label + value format (no lines)
+    const drawField = (label: string, value: string, yPos: number, startX: number = 20) => {
       doc.setFont('helvetica', 'bold');
-      doc.text(label, x, yPos);
+      doc.setFontSize(12);
+      doc.text(label, startX, yPos);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(12);
       const labelWidth = doc.getTextWidth(label);
-      const startX = x + labelWidth + 2;
-      const endX = startX + underlineWidth;
-      
-      // Draw dotted line using repeated dots (closer to baseline)
-      const dotSpacing = 2;
-      for (let dotX = startX; dotX < endX; dotX += dotSpacing) {
-        doc.circle(dotX, yPos + 2, 0.2, 'F');
-      }
-      
-      // Write value if available
-      if (value) {
-        doc.setFont('helvetica', 'normal');
-        doc.text(value, startX + 2, yPos);
-      }
+      doc.text(value || '', startX + labelWidth + 5, yPos);
     };
     
-    // Patient Information with dotted lines (compact spacing)
-    drawField('Name of the Patient :', caseSheet.patientName || '', 20, y, 120);
+    // Patient Information with clean formatting (no lines)
+    drawField('Name of the Patient :', caseSheet.patientName || '', y, 20);
     y += 15;
     
-    drawField('Husband\'s/Father\'s Name :', caseSheet.husbandFatherName || '', 20, y, 120);
+    drawField('Husband\'s/Father\'s Name :', caseSheet.husbandFatherName || '', y, 20);
     y += 15;
     
     // Religion & Nationality and Address on same line
-    drawField('Religion & Nationality :', `${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim(), 20, y, 80);
-    drawField('Address :', caseSheet.address || '', 130, y, 80);
+    drawField('Religion & Nationality :', `${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim(), y, 20);
+    drawField('Address :', caseSheet.address || '', y, 130);
     y += 15;
     
     // Age and Sex on same line  
-    drawField('Age :', caseSheet.age?.toString() || '', 20, y, 30);
-    drawField('Sex :', caseSheet.sex || '', 80, y, 30);
+    drawField('Age :', caseSheet.age?.toString() || '', y, 20);
+    drawField('Sex :', caseSheet.sex || '', y, 80);
     y += 20;
     
     // Medical sections with dotted lines
@@ -224,7 +214,7 @@ export default function SurgicalCaseSheets() {
     ];
     
     medicalSections.forEach(([label, value]) => {
-      drawField(label, value || '', 20, y, 150);
+      drawField(label, value || '', y, 20);
       y += 15;
     });
     
@@ -279,13 +269,13 @@ export default function SurgicalCaseSheets() {
         invY = 20;
         examY = 20;
       }
-      drawField(label, value || '', invStartX, invY, 60);
+      drawField(label, value || '', invY, invStartX);
       invY += 12;
     });
     
     // Draw examinations column
     examinations.forEach(([label, value]) => {
-      drawField(label, value || '', examStartX, examY, 60);
+      drawField(label, value || '', examY, examStartX);
       examY += 12;
     });
     

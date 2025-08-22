@@ -17,26 +17,10 @@ function generateCaseSheetNumber(patientId: string): string {
   return `SCS${patientId}-${String(caseCounter).padStart(2, "0")}`;
 }
 
-// Helper: draw label + dotted underline (flexible width)
-function drawField(doc: PDFKit.PDFDocument, label: string, value: string, x: number, y: number, underlineWidth = 250) {
-  doc.font("Helvetica-Bold").text(label, x, y, { continued: true });
-  const textWidth = doc.widthOfString(label);
-  const startX = x + textWidth + 5;
-  const endX = startX + underlineWidth;
-
-  // Draw dotted line (closer to baseline)
-  doc.moveTo(startX, y + 10)
-     .lineTo(endX, y + 10)
-     .dash(2, { space: 2 })
-     .stroke();
-
-  // Reset dash
-  doc.undash();
-
-  // Write value (on top of line if available)
-  if (value) {
-    doc.font("Helvetica").text(value, startX + 2, y);
-  }
+// Helper: draw label + value (no lines)
+function drawField(doc: PDFKit.PDFDocument, label: string, value: string, y: number, startX: number = 50) {
+  doc.font("Helvetica-Bold").fontSize(12).text(label, startX, y, { continued: true });
+  doc.font("Helvetica").fontSize(12).text(value || ""); // just show value, no lines
 }
 
 export function createSurgicalCaseSheet(patient: Patient) {
@@ -64,17 +48,17 @@ export function createSurgicalCaseSheet(patient: Patient) {
 
   // ---------- PATIENT DETAILS ----------
   doc.fontSize(11);
-  drawField(doc, "Name of the Patient :", patient.name, 50, y); y += 15;
-  drawField(doc, "Husband's/Father's Name :", patient.fatherName, 50, y); y += 15;
+  drawField(doc, "Name of the Patient :", patient.name, y, 50); y += 15;
+  drawField(doc, "Husband's/Father's Name :", patient.fatherName, y, 50); y += 15;
 
   // Religion & Nationality + Address same line
-  drawField(doc, "Religion & Nationality :", patient.religionNationality, 50, y, 150);
-  drawField(doc, "Address :", patient.address, 300, y, 150);
+  drawField(doc, "Religion & Nationality :", patient.religionNationality, y, 50);
+  drawField(doc, "Address :", patient.address, y, 300);
   y += 15;
 
   // Age + Sex same line
-  drawField(doc, "Age :", patient.age.toString(), 50, y, 50);
-  drawField(doc, "Sex :", patient.sex, 150, y, 50);
+  drawField(doc, "Age :", patient.age.toString(), y, 50);
+  drawField(doc, "Sex :", patient.sex, y, 150);
   y += 20;
 
   // ---------- BLANK SECTIONS ----------
@@ -84,7 +68,7 @@ export function createSurgicalCaseSheet(patient: Patient) {
     "Complaints & Duration", "History of Present Illness"
   ];
   sections.forEach((sec) => {
-    drawField(doc, sec + " :", "", 50, y, 400);
+    drawField(doc, sec + " :", "", y, 50);
     y += 15;
   });
 
@@ -112,13 +96,13 @@ export function createSurgicalCaseSheet(patient: Patient) {
   doc.fontSize(10).font("Helvetica");
   let invY = y + 20;
   investigations.forEach((item) => {
-    drawField(doc, item, "", invStartX, invY, 120);
+    drawField(doc, item, "", invY, invStartX);
     invY += 20;
   });
 
   let examY = y + 20;
   exam.forEach((item) => {
-    drawField(doc, item, "", examStartX, examY, 120);
+    drawField(doc, item, "", examY, examStartX);
     examY += 20;
   });
 
