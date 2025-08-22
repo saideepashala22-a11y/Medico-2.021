@@ -58,7 +58,7 @@ export default function Login() {
           <p className="text-medical-text-muted mt-2">Sign in to your account</p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
             <div>
               <Label htmlFor="username">Username</Label>
               <Input
@@ -67,6 +67,7 @@ export default function Login() {
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 placeholder="Enter username"
+                autoComplete="username"
                 required
               />
             </div>
@@ -79,6 +80,7 @@ export default function Login() {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="Enter password"
+                autoComplete="new-password"
                 required
               />
             </div>
