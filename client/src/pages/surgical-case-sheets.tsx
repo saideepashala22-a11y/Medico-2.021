@@ -501,7 +501,7 @@ export default function SurgicalCaseSheets() {
         </div>
         
         <!-- Bottom Half: Post Operative Instructions -->
-        <div style="border: 2px solid #000; border-top: none; height: 50%; padding: 15px;">
+        <div style="border: 2px solid #000; border-top: 2px solid #000; height: 50%; padding: 15px;">
           <h3 style="font-size: 14px; font-weight: bold; margin: 0 0 30px 0; text-align: left;">POST OPERATIVE INSTRUCTIONS :</h3>
         </div>
         
