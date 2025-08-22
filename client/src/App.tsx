@@ -9,7 +9,8 @@ import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import Lab from "@/pages/lab";
 import LabTests from "@/pages/lab/lab-tests";
-import PatientRegistration from "@/pages/lab/patient-registration";
+import LabPatientRegistration from "@/pages/lab/patient-registration";
+import CentralPatientRegistration from "@/pages/patient-registration";
 import TestSelection from "@/pages/lab/test-selection";
 import EnterResults from "@/pages/lab/enter-results";
 import LabReport from "@/pages/lab/report";
@@ -71,6 +72,12 @@ function Router() {
         </ProtectedRoute>
       </Route>
       
+      <Route path="/patient-registration">
+        <ProtectedRoute>
+          <CentralPatientRegistration />
+        </ProtectedRoute>
+      </Route>
+      
       <Route path="/lab">
         <ProtectedRoute>
           <Lab />
@@ -85,7 +92,7 @@ function Router() {
       
       <Route path="/lab/patient-registration">
         <ProtectedRoute>
-          <PatientRegistration />
+          <LabPatientRegistration />
         </ProtectedRoute>
       </Route>
       <Route path="/lab/test-selection/:patientId">

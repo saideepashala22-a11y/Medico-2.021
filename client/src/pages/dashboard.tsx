@@ -14,7 +14,8 @@ import {
   FileCheck,
   Heart,
   Stethoscope,
-  Scissors
+  Scissors,
+  UserPlus
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -157,7 +158,38 @@ export default function Dashboard() {
 
         {/* Module Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Consultation Module - FIRST */}
+          {/* Patient Registration Module - FIRST */}
+          <Link href="/patient-registration">
+            <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
+              <div className="bg-green-600 p-6">
+                <UserPlus className="text-white text-3xl mb-4" />
+                <h3 className="text-xl font-bold text-white">Patient Registration</h3>
+              </div>
+              <CardContent className="p-6">
+                <p className="text-medical-text-muted mb-4">Central patient registration with unique ID for all modules</p>
+                <ul className="text-sm text-medical-text-muted space-y-2">
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    Unique Patient ID
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    Complete Profile
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    Cross-Module Access
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    Medical History
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Consultation Module - SECOND */}
           <Link href="/consultation">
             <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
               <div className="bg-cyan-600 p-6">

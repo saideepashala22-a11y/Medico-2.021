@@ -6,6 +6,15 @@ This is a comprehensive Hospital Management System built as a full-stack web app
 
 ## Recent Changes (Latest)
 
+**Centralized Patient Registration System (August 2025)**
+- Added new "Patient Registration" module as the first card on dashboard with green theme
+- Created comprehensive patient registration form with unique ID generation for cross-module access
+- Implemented smart auto-fill functionality (salutation auto-suggests gender)
+- Added complete patient profile fields: salutation, name, age/units, gender, contact, email, address, blood group, emergency contacts, referring doctor
+- Integrated existing patient search functionality with real-time filtering by name, ID, or phone
+- Established single patient profile system that works across all hospital modules (lab tests, surgical case sheets, pharmacy, consultations)
+- Enhanced form validation and professional UI design with proper spacing and responsive layout
+
 **Professional Surgical Case Sheet System (August 2025)**
 - Implemented complete surgical case sheet functionality with professional NAKSHATRA HOSPITAL format
 - Added unique case sheet numbering system (SCS + patient ID + counter format like SCS1234-01)
