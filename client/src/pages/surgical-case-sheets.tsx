@@ -503,18 +503,6 @@ export default function SurgicalCaseSheets() {
         <!-- Bottom Half: Post Operative Instructions -->
         <div style="border: 2px solid #000; height: calc(50% - 20px); padding: 15px;">
           <h3 style="font-size: 14px; font-weight: bold; margin: 0 0 30px 0; text-align: left;">POST OPERATIVE INSTRUCTIONS :</h3>
-          
-          <!-- Underlines for instructions -->
-          <div style="margin-bottom: 20px;">
-            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
-            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
-            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
-            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
-            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
-            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
-            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
-            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
-          </div>
         </div>
         
       </div>
