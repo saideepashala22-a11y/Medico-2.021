@@ -475,6 +475,51 @@ export default function SurgicalCaseSheets() {
       </div>
     </div>
   </div>
+
+  <!-- OPERATION & ANAESTHESIA NOTES PAGE -->
+  <div class="page" style="page-break-before: always;">
+    <div class="inner">
+      <div style="margin-top: 20px; height: 750px;">
+        
+        <!-- Top Half: Operation Notes and Anaesthesia Notes -->
+        <div style="display: flex; height: 50%; border: 2px solid #000; margin-bottom: 20px;">
+          <!-- Operation Notes Column -->
+          <div style="flex: 1; border-right: 2px solid #000; padding: 15px; position: relative;">
+            <h3 style="font-size: 14px; font-weight: bold; margin: 0 0 20px 0; text-align: center;">OPERATION NOTES</h3>
+            <div style="position: absolute; bottom: 15px; right: 15px; font-size: 12px;">
+              Signature
+            </div>
+          </div>
+          
+          <!-- Anaesthesia Notes Column -->
+          <div style="flex: 1; padding: 15px; position: relative;">
+            <h3 style="font-size: 14px; font-weight: bold; margin: 0 0 20px 0; text-align: center;">ANAESTHESIA NOTES</h3>
+            <div style="position: absolute; bottom: 15px; right: 15px; font-size: 12px;">
+              Signature
+            </div>
+          </div>
+        </div>
+        
+        <!-- Bottom Half: Post Operative Instructions -->
+        <div style="border: 2px solid #000; height: calc(50% - 20px); padding: 15px;">
+          <h3 style="font-size: 14px; font-weight: bold; margin: 0 0 30px 0; text-align: left;">POST OPERATIVE INSTRUCTIONS :</h3>
+          
+          <!-- Underlines for instructions -->
+          <div style="margin-bottom: 20px;">
+            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
+            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
+            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
+            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
+            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
+            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
+            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
+            <div style="border-bottom: 1px solid #000; margin-bottom: 15px; height: 20px;"></div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
 </body>
 </html>`;
 
