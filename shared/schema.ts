@@ -415,10 +415,11 @@ export type SurgicalCaseSheet = typeof surgicalCaseSheets.$inferSelect;
 
 export const insertPatientsRegistrationSchema = createInsertSchema(patientsRegistration).omit({
   id: true,
+  createdBy: true,
   createdAt: true,
   updatedAt: true,
 }).extend({
-  dateOfBirth: z.coerce.date().optional(),
+  dateOfBirth: z.coerce.date().nullable().optional(),
 });
 
 export type InsertPatientsRegistration = z.infer<typeof insertPatientsRegistrationSchema>;

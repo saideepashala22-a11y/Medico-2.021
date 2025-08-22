@@ -290,20 +290,20 @@ export default function PatientRegistration() {
       const registrationData = {
         mruNumber: formData.mruNumber,
         visitId: formData.visitId,
-        salutation: formData.salutation || undefined,
+        salutation: formData.salutation || null,
         fullName: formData.fullName,
-        age: parseInt(formData.age),
-        ageUnit: formData.ageUnit,
+        age: parseInt(formData.age) || 0,
+        ageUnit: formData.ageUnit || 'years',
         gender: formData.gender,
-        dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth) : undefined,
+        dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth) : null,
         contactPhone: formData.contactPhone,
-        email: formData.email || undefined,
-        address: formData.address || undefined,
-        bloodGroup: formData.bloodGroup || undefined,
-        emergencyContactName: formData.emergencyContactName || undefined,
-        emergencyContactPhone: formData.emergencyContactPhone || undefined,
-        medicalHistory: formData.medicalHistory || undefined,
-        referringDoctor: formData.referringDoctor || undefined,
+        email: formData.email || null,
+        address: formData.address || null,
+        bloodGroup: formData.bloodGroup || null,
+        emergencyContactName: formData.emergencyContactName || null,
+        emergencyContactPhone: formData.emergencyContactPhone || null,
+        medicalHistory: formData.medicalHistory || null,
+        referringDoctor: formData.referringDoctor || null,
       };
 
       const response = await fetch('/api/patients-registration', {
@@ -317,7 +317,11 @@ export default function PatientRegistration() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to register patient');
+        console.error('Validation error details:', error);
+        const errorMessage = error.errors ? 
+          error.errors.map((e: any) => `${e.path.join('.')}: ${e.message}`).join('; ') :
+          error.message || 'Failed to register patient';
+        throw new Error(errorMessage);
       }
 
       const newPatient = await response.json();
