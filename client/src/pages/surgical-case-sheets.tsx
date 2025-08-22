@@ -569,55 +569,54 @@ export default function SurgicalCaseSheets() {
       printWindow.document.close();
     }
 
-    // Also trigger PDF download from the opened window
-    if (printWindow) {
-      // Add a small delay to ensure content is loaded, then trigger download
-      setTimeout(() => {
-        try {
-          // Add download functionality to the opened window
-          const downloadScript = printWindow.document.createElement('script');
-          downloadScript.src = 'https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js';
-          downloadScript.onload = function() {
-            const { jsPDF } = printWindow.window.jsPDF;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            
-            // Get the HTML content from the opened window
-            const element = printWindow.document.body;
-            
-            pdf.html(element, {
-              callback: function (doc) {
-                doc.save(`Surgical-Case-Sheet-${caseSheetNumber}.pdf`);
-              },
-              margin: [5, 5, 5, 5],
-              autoPaging: 'text',
-              html2canvas: { 
-                scale: 0.4,
-                useCORS: true,
-                logging: false
-              },
-              width: 200,
-              windowWidth: 794
-            });
-          };
-          printWindow.document.head.appendChild(downloadScript);
-        } catch (error) {
-          console.error('PDF download error:', error);
-          // Fallback: create a simple PDF with basic content
-          const pdf = new jsPDF('p', 'mm', 'a4');
-          pdf.setFontSize(16);
-          pdf.text('NAKSHATRA HOSPITAL', 105, 20, { align: 'center' });
-          pdf.setFontSize(14);
-          pdf.text('SURGICAL CASE SHEET', 105, 35, { align: 'center' });
-          pdf.setFontSize(10);
-          pdf.text(`Case Sheet No: ${caseSheetNumber}`, 20, 50);
-          pdf.text(`Date: ${currentDate}`, 20, 60);
-          pdf.text(`Patient Name: ${caseSheet.patientName || 'N/A'}`, 20, 75);
-          pdf.text(`Age: ${caseSheet.age || 'N/A'} years`, 20, 85);
-          pdf.text(`Sex: ${caseSheet.sex || 'N/A'}`, 20, 95);
-          pdf.text('Note: For complete formatted case sheet, use browser print function.', 20, 120);
-          pdf.save(`Surgical-Case-Sheet-${caseSheetNumber}.pdf`);
-        }
-      }, 1000);
+    // Also create PDF download using the HTML content
+    try {
+      // Create a temporary div with the HTML content for PDF generation
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = htmlContent;
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      tempDiv.style.top = '0';
+      tempDiv.style.width = '210mm';
+      tempDiv.style.backgroundColor = 'white';
+      document.body.appendChild(tempDiv);
+      
+      // Use the existing jsPDF to create PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      // Convert HTML to PDF
+      pdf.html(tempDiv, {
+        callback: function (doc) {
+          // Download the PDF
+          doc.save(`Surgical-Case-Sheet-${caseSheetNumber}.pdf`);
+          // Clean up
+          document.body.removeChild(tempDiv);
+        },
+        margin: [10, 10, 10, 10],
+        autoPaging: 'text',
+        html2canvas: { 
+          scale: 0.5,
+          useCORS: true,
+          logging: false,
+          backgroundColor: 'white'
+        },
+        width: 190,
+        windowWidth: 794
+      });
+    } catch (error) {
+      console.error('PDF download error:', error);
+      // Show user message that they can print from the opened window
+      if (printWindow) {
+        const noticeDiv = printWindow.document.createElement('div');
+        noticeDiv.style.cssText = 'position: fixed; top: 10px; right: 10px; background: #f44336; color: white; padding: 10px; border-radius: 5px; z-index: 1000;';
+        noticeDiv.innerHTML = 'PDF download failed. Please use Ctrl+P to print this document.';
+        printWindow.document.body.appendChild(noticeDiv);
+        setTimeout(() => {
+          if (printWindow.document.body.contains(noticeDiv)) {
+            printWindow.document.body.removeChild(noticeDiv);
+          }
+        }, 5000);
+      }
     }
   };
 
