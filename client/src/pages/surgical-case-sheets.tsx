@@ -419,7 +419,8 @@ export default function SurgicalCaseSheets() {
           <!-- Right side: Patient -->
           <div style="flex: 1; text-align: right;">
             <div style="font-size: 12px; font-weight: bold; margin-bottom: 20px;">
-              Name of the Patient & Signature
+              Name of the Patient & Signature<br>
+              (రోగి పేరు మరియు సంతకం)
             </div>
             <div style="border-bottom: 1px solid #000; width: 200px; margin-left: auto; margin-bottom: 10px;"></div>
             <div style="font-size: 12px; width: 200px; margin-left: auto; text-align: left;">
