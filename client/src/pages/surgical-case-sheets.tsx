@@ -376,6 +376,49 @@ export default function SurgicalCaseSheets() {
       </section>
     </div>
   </div>
+  
+  <!-- CONSENT FOR SURGERY PAGE -->
+  <div class="page" style="page-break-before: always;">
+    <div class="inner">
+      <div style="margin-top: 40px;">
+        <h2 style="font-size: 16px; font-weight: bold; margin: 0 0 30px 0; text-align: left;">CONSENT FOR SURGERY</h2>
+        
+        <div style="font-size: 12px; line-height: 1.6; margin-bottom: 40px; text-align: left;">
+          I/We unreservedly and in my sense, give my complete consent for admission, Diagnostic procedures, 
+          Transfusions, Anaesthesia, Modification in anaesthesia during Surgery, Operation and Modification in 
+          Surgical procedures during the surgical procedures during depending the survey, depending of patient 
+          condition. No responsibility will be attached to the Surgeon, Anaesthesiologist or Hospital Management.
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 50px;">
+          <!-- Left side: Representatives -->
+          <div style="flex: 1; margin-right: 40px;">
+            <div style="font-size: 12px; font-weight: bold; margin-bottom: 20px;">
+              Name of the Representatives & Signature
+            </div>
+            
+            <div style="margin-bottom: 30px;">
+              <div style="font-size: 12px;">1)</div>
+              <div style="border-bottom: 1px solid #000; width: 200px; margin-top: 10px;"></div>
+            </div>
+            
+            <div style="margin-bottom: 30px;">
+              <div style="font-size: 12px;">2)</div>
+              <div style="border-bottom: 1px solid #000; width: 200px; margin-top: 10px;"></div>
+            </div>
+          </div>
+          
+          <!-- Right side: Patient -->
+          <div style="flex: 1; text-align: right;">
+            <div style="font-size: 12px; font-weight: bold; margin-bottom: 20px;">
+              Name of the Patient & Signature
+            </div>
+            <div style="border-bottom: 1px solid #000; width: 200px; margin-top: 30px; margin-left: auto;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>`;
 
