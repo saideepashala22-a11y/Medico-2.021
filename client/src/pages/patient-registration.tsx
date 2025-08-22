@@ -155,6 +155,36 @@ export default function PatientRegistration() {
     }
   };
 
+  // Handle salutation change
+  const handleSalutationChange = (value: string) => {
+    setFormData(prev => ({ ...prev, salutation: value }));
+    
+    // Auto-select gender based on salutation
+    let autoGender = '';
+    switch (value) {
+      case 'Mr.':
+      case 'Master':
+        autoGender = 'male';
+        break;
+      case 'Mrs.':
+      case 'Ms.':
+      case 'Miss':
+        autoGender = 'female';
+        break;
+      case 'Dr.':
+      case 'Baby':
+        // Keep existing gender or leave empty for user to choose
+        autoGender = formData.gender;
+        break;
+      default:
+        autoGender = formData.gender;
+    }
+    
+    if (autoGender) {
+      setFormData(prev => ({ ...prev, gender: autoGender }));
+    }
+  };
+
   // Handle gender change
   const handleGenderChange = (value: string) => {
     setFormData(prev => ({ ...prev, gender: value }));
@@ -368,7 +398,7 @@ export default function PatientRegistration() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="salutation">Salutation</Label>
-                  <Select value={formData.salutation} onValueChange={(value) => setFormData(prev => ({ ...prev, salutation: value }))}>
+                  <Select value={formData.salutation} onValueChange={handleSalutationChange}>
                     <SelectTrigger className="border-gray-300">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
