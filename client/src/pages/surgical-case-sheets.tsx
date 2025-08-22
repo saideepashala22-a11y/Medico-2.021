@@ -441,11 +441,11 @@ export default function SurgicalCaseSheets() {
   <!-- PROGRESS NOTES PAGE -->
   <div class="page" style="page-break-before: always;">
     <div class="inner">
-      <div style="margin-top: 40px;">
-        <h2 style="font-size: 16px; font-weight: bold; margin: 0 0 30px 0; text-align: center;">PROGRESS NOTES</h2>
+      <div style="margin-top: 20px;">
+        <h2 style="font-size: 16px; font-weight: bold; margin: 0 0 20px 0; text-align: center;">PROGRESS NOTES</h2>
         
         <!-- Progress Notes Table -->
-        <div style="border: 2px solid #000; height: 700px;">
+        <div style="border: 2px solid #000; height: 750px;">
           <!-- Header Row -->
           <div style="display: flex; border-bottom: 2px solid #000;">
             <div style="flex: 1; border-right: 2px solid #000; padding: 10px; font-size: 12px; font-weight: bold; text-align: center;">
