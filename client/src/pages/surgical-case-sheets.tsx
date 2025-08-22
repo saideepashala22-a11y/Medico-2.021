@@ -142,7 +142,7 @@ export default function SurgicalCaseSheets() {
     createMutation.mutate(submitData);
   };
 
-  // Generate PDF function with professional dotted line formatting
+  // Generate PDF function with professional alignment and fixed coordinates
   const generatePDF = (caseSheet: any) => {
     const doc = new jsPDF();
     
@@ -168,23 +168,28 @@ export default function SurgicalCaseSheets() {
     // Case No (left) and Date (right) on same line
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    doc.text(`No.: ${caseSheetNumber}`, 20, 75);
-    doc.text(`Date: ${new Date().toLocaleDateString('en-IN')}`, 160, 75, { align: 'right' });
+    doc.text(`No.: ${caseSheetNumber}`, 50, 75);
+    doc.text(`Date: ${new Date().toLocaleDateString('en-IN')}`, 160, 75);
+    
+    // Fixed coordinates for perfect alignment (following the strategy)
+    const leftX = 50;    // Left column starts at x=50
+    const rightX = 320;  // Right column starts at x=320 (but we'll use 120 for better fit on A4)
+    const valueX = 140;  // Values aligned at x=140
+    const rightValueX = 170; // Right values at x=170
     
     let y = 95;
     doc.setFontSize(11);
     
-    // Fixed coordinates for perfect alignment
-    const leftX = 20;
-    const rightX = 120;
-    
-    const field = (label: string, value: string, x: number = leftX, lineHeight: number = 15) => {
+    // Helper function for aligned fields
+    const field = (label: string, value: string, x: number = leftX, lineHeight: number = 18) => {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
       doc.text(label, x, y);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(11);
-      doc.text(value || '', x + 160, y); // Fixed position for values
+      // Use safe value positioning to prevent overflow
+      const safeValue = (value || '').substring(0, 30); // Limit text length
+      doc.text(safeValue, valueX, y);
       y += lineHeight;
     };
     
@@ -192,29 +197,33 @@ export default function SurgicalCaseSheets() {
     field('Name of the Patient :', caseSheet.patientName || '');
     field('Husband\'s/Father\'s Name :', caseSheet.husbandFatherName || '');
     
-    // Religion & Address in same line with fixed coordinates
+    // Religion & Address in same line with proper spacing
     doc.setFont('helvetica', 'bold');
     doc.text('Religion & Nationality :', leftX, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(`${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim() || '', leftX + 160, y);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Address :', rightX + 60, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(caseSheet.address || '', rightX + 120, y);
-    y += 15;
+    const religionText = `${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim();
+    doc.text(religionText.substring(0, 15), valueX, y); // Limit length
     
-    // Age & Sex in same line with fixed coordinates
+    doc.setFont('helvetica', 'bold');
+    doc.text('Address :', rightValueX, y);
+    doc.setFont('helvetica', 'normal');
+    const addressText = (caseSheet.address || '').substring(0, 20); // Limit address length
+    doc.text(addressText, rightValueX + 30, y);
+    y += 18;
+    
+    // Age & Sex in same line with proper spacing
     doc.setFont('helvetica', 'bold');
     doc.text('Age :', leftX, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(caseSheet.age?.toString() || '', leftX + 40, y);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Sex :', rightX + 60, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(caseSheet.sex || '', rightX + 90, y);
-    y += 20;
+    doc.text(String(caseSheet.age || ''), leftX + 40, y);
     
-    // Medical sections with dotted lines
+    doc.setFont('helvetica', 'bold');
+    doc.text('Sex :', rightValueX, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(caseSheet.sex || '', rightValueX + 30, y);
+    y += 25;
+    
+    // Medical sections
     const medicalSections = [
       ['Diagnosis :', caseSheet.diagnosis],
       ['Nature of Operation :', caseSheet.natureOfOperation],
@@ -229,12 +238,11 @@ export default function SurgicalCaseSheets() {
       field(label, value || '');
     });
     
-    y += 15;
-    
-    // Two aligned columns with fixed coordinates
     y += 10;
-    const invX = leftX;
-    const examX = rightX + 60;
+    
+    // Two columns for Investigation vs Examination (aligned properly)
+    const invX = leftX;         // Investigation at x=50
+    const examX = 120;          // Examination at x=120 (safer than 320 for A4)
     
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
@@ -242,36 +250,36 @@ export default function SurgicalCaseSheets() {
     doc.text('ON EXAMINATION:', examX, y);
     
     const investigations = [
-      `1) Hb% : ${caseSheet.hb || ''}`,
-      `2) E.S.R. : ${caseSheet.bsa || ''}`,
-      `3) C.T. : ${caseSheet.ct || ''}`,
-      `4) B.T. : ${caseSheet.bt || ''}`,
-      `5) Bl. Grouping : ${caseSheet.bloodGrouping || ''}`,
-      `6) RPL : ${caseSheet.prl || ''}`,
-      `7) R.B.S : ${caseSheet.rbs || ''}`,
-      `8) Urine Sugar : ${caseSheet.urineSugar || ''}`,
-      `9) R.M. :`,
-      `10) X-ray : ${caseSheet.xray || ''}`,
-      `11) E.C.G : ${caseSheet.ecg || ''}`,
-      `12) Blood Urea : ${caseSheet.bloodUrea || ''}`,
-      `13) Serum Creatinine : ${caseSheet.serumCreatinine || ''}`,
-      `14) Serum Bilirubin : ${caseSheet.serumBilirubin || ''}`,
-      `15) HBS A.G : ${caseSheet.hbsag || ''}`
+      '1) Hb%',
+      '2) E.S.R.',
+      '3) C.T.',
+      '4) B.T.',
+      '5) Bl. Grouping',
+      '6) RPL',
+      '7) R.B.S',
+      '8) Urine Sugar',
+      '9) R.M.',
+      '10) X-ray',
+      '11) E.C.G',
+      '12) Blood Urea',
+      '13) Serum Creatinine',
+      '14) Serum Bilirubin',
+      '15) HBS A.G'
     ];
     
     const examinations = [
-      `G.C. : ${caseSheet.generalCondition || ''}`,
-      `Temp. : ${caseSheet.temperature || ''} °F`,
-      `P.R. : ${caseSheet.pulse || ''} /Min`,
-      `B.P. : ${caseSheet.bloodPressure || ''} mmHg`,
-      `R.R. : ${caseSheet.respiratoryRate || ''} /Min`,
-      `Heart : ${caseSheet.heart || ''}`,
-      `Lungs : ${caseSheet.lungs || ''}`,
-      `Abd. : ${caseSheet.abdomen || ''}`,
-      `C.N.S. : ${caseSheet.cns || ''}`
+      'G.C.',
+      'Temp. ......... °F',
+      'P.R. ......... /Min',
+      'B.P. ......... mmHg',
+      'R.R. ......... /Min',
+      'Heart',
+      'Lungs',
+      'Abd.',
+      'C.N.S.'
     ];
     
-    // Print both columns in parallel with fixed positioning
+    // Print both columns in parallel with proper alignment
     const maxRows = Math.max(investigations.length, examinations.length);
     y += 20;
     
@@ -279,15 +287,16 @@ export default function SurgicalCaseSheets() {
       if (i < investigations.length) {
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
-        doc.text(investigations[i], invX, y);
+        doc.text(investigations[i] + ' :', invX, y);
       }
       if (i < examinations.length) {
         doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');  
-        doc.text(examinations[i], examX, y);
+        doc.setFont('helvetica', 'normal');
+        doc.text(examinations[i] + ' :', examX, y);
       }
       y += 15;
       
+      // Check for page break
       if (y > 270) {
         doc.addPage();
         y = 20;
