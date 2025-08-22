@@ -64,19 +64,35 @@ export default function PatientRegistration() {
   const [editingPatient, setEditingPatient] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [age, setAge] = useState<number>(0);
-  const [mruCounter, setMruCounter] = useState(1);
-
-  // Generate MRU number based on current year
-  const generateMRU = (): string => {
+  // Generate unique MRU number based on current year
+  const generateUniqueMRU = (): string => {
     const currentYear = new Date().getFullYear().toString().slice(-2);
-    const counter = String(mruCounter).padStart(4, '0');
-    return `MRU${currentYear}-${counter}`;
+    const existingMRUs = patients.map(p => p.mru);
+    
+    let counter = 1;
+    let newMRU = `MRU${currentYear}-${String(counter).padStart(4, '0')}`;
+    
+    // Keep incrementing until we find a unique MRU
+    while (existingMRUs.includes(newMRU)) {
+      counter++;
+      newMRU = `MRU${currentYear}-${String(counter).padStart(4, '0')}`;
+    }
+    
+    return newMRU;
   };
 
-  // Generate Visit ID
-  const generateVisitId = (): string => {
-    const timestamp = Date.now().toString().slice(-6);
-    return `VID-${timestamp}`;
+  // Generate unique Visit ID
+  const generateUniqueVisitId = (): string => {
+    const existingVisitIds = patients.map(p => p.visitId);
+    
+    let visitId = '';
+    do {
+      const timestamp = Date.now().toString().slice(-6);
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+      visitId = `VID-${timestamp}${random}`;
+    } while (existingVisitIds.includes(visitId));
+    
+    return visitId;
   };
 
   // Calculate age from date of birth
@@ -226,8 +242,8 @@ export default function PatientRegistration() {
 
     const newPatient: PatientData = {
       id: Date.now().toString(),
-      mru: generateMRU(),
-      visitId: generateVisitId(),
+      mru: generateUniqueMRU(),
+      visitId: generateUniqueVisitId(),
       salutation: formData.salutation,
       fullName: formData.fullName,
       dateOfBirth: formData.dateOfBirth,
@@ -252,7 +268,6 @@ export default function PatientRegistration() {
       });
     } else {
       setPatients(prev => [...prev, newPatient]);
-      setMruCounter(prev => prev + 1);
       toast({
         title: 'Success',
         description: `Patient registered successfully with MRU: ${newPatient.mru}`,
@@ -390,13 +405,13 @@ export default function PatientRegistration() {
                 <div>
                   <Label>MRU Number (Auto-generated)</Label>
                   <div className="bg-white p-2 border rounded text-gray-700 font-mono">
-                    {editingPatient ? patients.find(p => p.id === editingPatient)?.mru : generateMRU()}
+                    {editingPatient ? patients.find(p => p.id === editingPatient)?.mru : generateUniqueMRU()}
                   </div>
                 </div>
                 <div>
                   <Label>Visit ID (Auto-generated)</Label>
                   <div className="bg-white p-2 border rounded text-gray-700 font-mono">
-                    {generateVisitId()}
+                    {editingPatient ? patients.find(p => p.id === editingPatient)?.visitId : generateUniqueVisitId()}
                   </div>
                 </div>
               </div>
