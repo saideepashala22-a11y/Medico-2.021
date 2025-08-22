@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surgical Case Sheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .label {
+            font-weight: 600;
+            color: #374151; /* gray-700 */
+        }
+        .value {
+            border-bottom: 1px dotted #9CA3AF; /* gray-400 */
+            padding: 0 4px;
+            min-width: 150px;
+            display: inline-block;
+        }
+        td {
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl bg-white p-8 rounded-lg shadow-lg border border-gray-200">
+        <!-- Header Section -->
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-blue-600">NAKSHATRA HOSPITAL</h1>
+            <p class="text-gray-600">Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.</p>
+            <p class="text-gray-600">Cell: 7093939205</p>
+        </div>
+
+        <!-- Title and Case Number / Date -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold underline text-center">SURGICAL CASE SHEET</h2>
+            <div class="flex justify-between items-center mt-4 text-lg">
+                <p>No.: <span class="font-mono bg-gray-200 px-2 py-1 rounded">SCS2031-72</span></p>
+                <p>Date: <span class="border-b border-dotted border-gray-400 px-4">22/8/2025</span></p>
+            </div>
+        </div>
+
+        <!-- Patient Details Section -->
+        <div class="mb-6 border-b pb-6">
+            <table class="w-full">
+                <tbody>
+                    <tr>
+                        <td class="label w-1/4">Name of the Patient:</td>
+                        <td colspan="3"><span class="value w-full">mr Saideep Ashala</span></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Husband's/Father's Name:</td>
+                        <td colspan="3"><span class="value w-full">sdf</span></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Religion & Nationality:</td>
+                        <td colspan="3"><span class="value w-full">sdf</span></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Age:</td>
+                        <td><span class="value">2</span></td>
+                        <td class="label pl-4">Sex:</td>
+                        <td><span class="value">Male</span></td>
+                    </tr>
+                     <tr>
+                        <td class="label">Address:</td>
+                        <td colspan="3"><span class="value w-full">gdgd sdf</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Medical Details Section -->
+        <div class="mb-6 border-b pb-6">
+             <table class="w-full">
+                <tbody>
+                    <tr>
+                        <td class="label w-1/4">Diagnosis:</td>
+                        <td class="w-3/4"><span class="value">&nbsp;</span></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Nature of Operation:</td>
+                        <td><span class="value">&nbsp;</span></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Date of Admission:</td>
+                        <td><span class="value">&nbsp;</span></td>
+                        <td class="label pl-4">Date of Operation:</td>
+                        <td><span class="value">&nbsp;</span></td>
+                    </tr>
+                     <tr>
+                        <td class="label">Date of Discharge:</td>
+                        <td><span class="value">&nbsp;</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Complaints & History -->
+        <div class="mb-6">
+            <div class="mb-4">
+                <p class="label">Complaints & Duration:</p>
+                <div class="w-full h-16 border-b border-dotted border-gray-400 mt-2"></div>
+            </div>
+            <div>
+                <p class="label">History of Present Illness:</p>
+                <div class="w-full h-24 border-b border-dotted border-gray-400 mt-2"></div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
