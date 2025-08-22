@@ -482,7 +482,7 @@ export default function SurgicalCaseSheets() {
       <div style="margin-top: 20px; height: 750px;">
         
         <!-- Top Half: Operation Notes and Anaesthesia Notes -->
-        <div style="display: flex; height: 50%; border: 2px solid #000; margin-bottom: 20px;">
+        <div style="display: flex; height: 50%; border: 2px solid #000; border-bottom: none;">
           <!-- Operation Notes Column -->
           <div style="flex: 1; border-right: 2px solid #000; padding: 15px; position: relative;">
             <h3 style="font-size: 14px; font-weight: bold; margin: 0 0 20px 0; text-align: center;">OPERATION NOTES</h3>
@@ -501,7 +501,7 @@ export default function SurgicalCaseSheets() {
         </div>
         
         <!-- Bottom Half: Post Operative Instructions -->
-        <div style="border: 2px solid #000; height: calc(50% - 20px); padding: 15px;">
+        <div style="border: 2px solid #000; border-top: none; height: 50%; padding: 15px;">
           <h3 style="font-size: 14px; font-weight: bold; margin: 0 0 30px 0; text-align: left;">POST OPERATIVE INSTRUCTIONS :</h3>
         </div>
         
