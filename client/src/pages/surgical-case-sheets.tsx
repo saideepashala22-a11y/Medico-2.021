@@ -239,6 +239,21 @@ export default function SurgicalCaseSheets() {
           ${caseSheet.address ? `<span class="filled">${caseSheet.address}</span>` : '<span class="underline"></span>'}
         </div>
 
+        <div class="label">Vlg :</div>
+        <div class="value">
+          ${caseSheet.village ? `<span class="filled">${caseSheet.village}</span>` : '<span class="underline"></span>'}
+        </div>
+
+        <div class="label">Mdl :</div>
+        <div class="value">
+          ${caseSheet.mandal ? `<span class="filled">${caseSheet.mandal}</span>` : '<span class="underline"></span>'}
+        </div>
+
+        <div class="label">Dist :</div>
+        <div class="value">
+          ${caseSheet.district ? `<span class="filled">${caseSheet.district}</span>` : '<span class="underline"></span>'}
+        </div>
+
         <div class="label">Age :</div>
         <div class="value inline">
           ${caseSheet.age ? `<span class="filled">${caseSheet.age}</span>` : '<span class="underline" style="max-width:60px"></span>'}
