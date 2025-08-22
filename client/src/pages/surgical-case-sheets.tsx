@@ -437,6 +437,44 @@ export default function SurgicalCaseSheets() {
       </div>
     </div>
   </div>
+
+  <!-- PROGRESS NOTES PAGE -->
+  <div class="page" style="page-break-before: always;">
+    <div class="inner">
+      <div style="margin-top: 40px;">
+        <h2 style="font-size: 16px; font-weight: bold; margin: 0 0 30px 0; text-align: center;">PROGRESS NOTES</h2>
+        
+        <!-- Progress Notes Table -->
+        <div style="border: 2px solid #000; height: 600px;">
+          <!-- Header Row -->
+          <div style="display: flex; border-bottom: 2px solid #000;">
+            <div style="flex: 1; border-right: 2px solid #000; padding: 10px; font-size: 12px; font-weight: bold; text-align: center;">
+              Date/Time
+            </div>
+            <div style="flex: 3; border-right: 2px solid #000; padding: 10px; font-size: 12px; font-weight: bold; text-align: center;">
+              Condition of Patient
+            </div>
+            <div style="flex: 2; padding: 10px; font-size: 12px; font-weight: bold; text-align: center;">
+              
+            </div>
+          </div>
+          
+          <!-- Content Area -->
+          <div style="display: flex; height: calc(100% - 50px);">
+            <div style="flex: 1; border-right: 2px solid #000; padding: 10px;">
+              
+            </div>
+            <div style="flex: 3; border-right: 2px solid #000; padding: 10px;">
+              
+            </div>
+            <div style="flex: 2; padding: 10px;">
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>`;
 
