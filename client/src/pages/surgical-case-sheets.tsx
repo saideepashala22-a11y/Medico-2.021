@@ -142,7 +142,7 @@ export default function SurgicalCaseSheets() {
     createMutation.mutate(submitData);
   };
 
-  // Generate PDF function matching the exact NAKSHATRA HOSPITAL format
+  // Generate PDF function matching the exact format shown
   const generatePDF = (caseSheet: any) => {
     const doc = new jsPDF();
     
@@ -150,7 +150,7 @@ export default function SurgicalCaseSheets() {
     const patientIdShort = caseSheet.patientId?.slice(-4) || Math.floor(Math.random() * 9999).toString().padStart(4, '0');
     const caseSheetNumber = `SCS${patientIdShort}-${String(Math.floor(Math.random() * 99) + 1).padStart(2, '0')}`;
     
-    // --- HEADER matching exact format ---
+    // --- HEADER ---
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
     doc.text('NAKSHATRA HOSPITAL', 105, 25, { align: 'center' });
@@ -158,154 +158,129 @@ export default function SurgicalCaseSheets() {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text('Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.', 105, 35, { align: 'center' });
-    doc.text('Cell: 7093939205', 105, 45, { align: 'center' });
+    doc.text('Cell: 7093939205', 105, 50, { align: 'center' });
     
-    // Title with underline
-    doc.setFontSize(14);
+    // Title 
+    doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
-    doc.text('SURGICAL CASE SHEET', 105, 60, { align: 'center' });
-    doc.line(70, 63, 140, 63); // underline
+    doc.text('SURGICAL CASE SHEET', 105, 70, { align: 'center' });
     
-    // Case No. and Date (exact positioning like the form)
+    // Case Sheet No and Date positioned on the right
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    doc.text('No.:', 20, 80);
-    doc.text('Date:', 170, 80);
-    doc.text(new Date().toLocaleDateString('en-IN'), 185, 80);
+    doc.text(`Case Sheet No: ${caseSheetNumber}`, 120, 90);
+    doc.text(`Date: ${new Date().toLocaleDateString('en-IN')}`, 150, 105);
     
-    let y = 100;
+    let y = 125;
     
-    // --- Patient Information Section (exact format) ---
+    // --- Patient Information Section ---
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(11);
     
-    // Name of the Patient with long line
+    // Name of the Patient
     doc.text('Name of the Patient :', 20, y);
-    doc.text(caseSheet.patientName || '', 80, y);
-    doc.line(75, y + 2, 190, y + 2); // dotted line effect
+    doc.text(caseSheet.patientName || '', 100, y);
     y += 20;
     
     // Husband's/Father's Name  
     doc.text('Husband\'s/Father\'s Name :', 20, y);
-    doc.text(caseSheet.husbandFatherName || '', 90, y);
-    doc.line(85, y + 2, 190, y + 2);
+    doc.text('____________________________', 110, y);
     y += 20;
     
-    // Religion & Nationality and Address on same line (like the form)
+    // Religion & Nationality 
     doc.text('Religion & Nationality :', 20, y);
-    doc.text(`${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim(), 75, y);
-    doc.line(70, y + 2, 110, y + 2);
-    
-    doc.text('Address :', 115, y);
-    doc.text(caseSheet.address || '', 135, y);
-    doc.line(130, y + 2, 190, y + 2);
+    doc.text(`${caseSheet.religion || ''} ${caseSheet.nationality || ''}`.trim(), 100, y);
     y += 20;
     
-    // Age and Sex on same line (exact spacing like form)
-    doc.text('Age :', 140, y);
-    doc.text(String(caseSheet.age || ''), 155, y);
-    doc.line(150, y + 2, 170, y + 2);
-    
-    doc.text('Sex :', 175, y);
-    doc.text(caseSheet.sex || '', 185, y);
-    doc.line(180, y + 2, 190, y + 2);
+    // Address
+    doc.text('Address :', 20, y);
+    doc.text('____________________________', 100, y);
     y += 20;
     
-    // Village, Mandal, District line (like in the form)
-    doc.text('(Vill) :', 20, y);
-    doc.text(caseSheet.village || '', 40, y);
-    doc.line(35, y + 2, 75, y + 2);
+    // Age and Sex on same line
+    doc.text('Age :', 20, y);
+    doc.text(String(caseSheet.age || ''), 50, y);
+    doc.text('Sex :', 100, y);
+    doc.text(caseSheet.sex || '', 130, y);
+    y += 30;
     
-    doc.text('(Mdl) :', 80, y);
-    doc.text('', 100, y);
-    doc.line(95, y + 2, 125, y + 2);
-    
-    doc.text('(Dist) :', 130, y);
-    doc.text(caseSheet.district || '', 150, y);
-    doc.line(145, y + 2, 190, y + 2);
-    y += 25;
-    
-    // Medical sections (matching form layout)
+    // Medical sections
     doc.text('Diagnosis :', 20, y);
-    doc.text(caseSheet.diagnosis || '', 50, y);
-    doc.line(45, y + 2, 110, y + 2);
-    
-    doc.text('L.M.P :', 115, y);
-    doc.line(130, y + 2, 190, y + 2);
+    doc.text('____________________________', 100, y);
     y += 20;
     
     doc.text('Nature of Operation :', 20, y);
-    doc.text(caseSheet.natureOfOperation || '', 70, y);
-    doc.line(65, y + 2, 110, y + 2);
-    
-    doc.text('E.D.D :', 115, y);
-    doc.line(130, y + 2, 190, y + 2);
+    doc.text('____________________________', 100, y);
     y += 20;
     
     doc.text('Date of Admission :', 20, y);
-    doc.line(60, y + 2, 110, y + 2);
-    y += 15;
+    doc.text('____________________________', 100, y);
+    y += 20;
     
     doc.text('Date of Operation :', 20, y);
-    doc.line(60, y + 2, 110, y + 2);
-    y += 15;
+    doc.text('____________________________', 100, y);
+    y += 20;
     
     doc.text('Date of Discharge :', 20, y);
-    doc.line(60, y + 2, 110, y + 2);
-    
-    doc.text('I.P No. :', 130, y);
-    doc.line(150, y + 2, 190, y + 2);
+    doc.text('____________________________', 100, y);
     y += 20;
     
     doc.text('Complaints & Duration :', 20, y);
-    doc.line(20, y + 5, 190, y + 5);
-    y += 15;
+    doc.text('____________________________', 100, y);
+    y += 20;
     
     doc.text('History of Present Illness :', 20, y);
-    doc.line(20, y + 5, 190, y + 5);
-    y += 25;
+    doc.text('____________________________', 100, y);
+    y += 30;
     
-    // --- INVESTIGATION and ON EXAMINATION (exact two-column format) ---
+    // --- INVESTIGATION ---
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
     doc.text('INVESTIGATION:', 20, y);
-    doc.text('ON EXAMINATION:', 110, y);
     y += 15;
     
     const investigations = [
-      '1) HB%', '2) E.S.R', '3) C.T', '4) B.T', '5) Bl. Grouping',
-      '6) RRL', '7) R.B.S', '8) Urine Sugar', '9) R.I.V', '10) X-ray',
+      '1) Hb%', '2) E.S.R.', '3) C.T.', '4) B.T.', '5) Bl. Grouping',
+      '6) RPL', '7) R.B.S', '8) Urine Sugar', '9) R.M.', '10) X-ray',
       '11) E.C.G', '12) Blood Urea', '13) Serum Creatinine',
       '14) Serum Bilirubin', '15) HBS A.G'
-    ];
-    
-    const examinations = [
-      'G.C.', 'Temp.', 'P.R.', 'B.P.', 'R.R.',
-      'Heart', 'Lungs', 'Abd.', 'C.N.S.'
     ];
     
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     
-    const maxRows = Math.max(investigations.length, examinations.length);
+    investigations.forEach((item) => {
+      doc.text(item + ' : _____________________', 20, y);
+      y += 15;
+    });
     
-    for (let i = 0; i < maxRows; i++) {
-      if (i < investigations.length) {
-        doc.text(investigations[i] + ' :', 20, y);
-        doc.line(45, y + 2, 95, y + 2); // dotted line for values
-      }
-      if (i < examinations.length) {
-        doc.text(examinations[i] + ' :', 110, y);
-        doc.line(130, y + 2, 190, y + 2); // dotted line for values
-      }
-      y += 12;
-      
-      // Page break if needed
-      if (y > 270) {
-        doc.addPage();
-        y = 20;
-      }
-    }
+    y += 10;
+    
+    // --- ON EXAMINATION ---
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('ON EXAMINATION:', 20, y);
+    y += 15;
+    
+    const examinations = [
+      'G.C. : _____________________',
+      'Temp. : _____ °F',
+      'P.R. : _____ /Min',
+      'B.P. : _____ mmHG',
+      'R.R. : _____ /Min',
+      'Heart : _____________________',
+      'Lungs : _____________________',
+      'Abd. : _____________________',
+      'C.N.S. : _____________________'
+    ];
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    
+    examinations.forEach((item) => {
+      doc.text(item, 20, y);
+      y += 15;
+    });
     
     // Save the PDF
     doc.save(`surgical-case-sheet-${caseSheetNumber}.pdf`);
