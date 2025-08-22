@@ -1080,7 +1080,7 @@ export default function SurgicalCaseSheets() {
                           className="bg-red-600 hover:bg-red-700 text-white"
                         >
                           <Download className="h-3 w-3 mr-1" />
-                          PDF
+                          Download
                         </Button>
                       </div>
                     </CardContent>
