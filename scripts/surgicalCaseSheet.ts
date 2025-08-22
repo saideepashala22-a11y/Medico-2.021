@@ -24,9 +24,9 @@ function drawField(doc: PDFKit.PDFDocument, label: string, value: string, x: num
   const startX = x + textWidth + 5;
   const endX = startX + underlineWidth;
 
-  // Draw dotted line
-  doc.moveTo(startX, y + 12)
-     .lineTo(endX, y + 12)
+  // Draw dotted line (closer to baseline)
+  doc.moveTo(startX, y + 10)
+     .lineTo(endX, y + 10)
      .dash(2, { space: 2 })
      .stroke();
 
@@ -64,18 +64,18 @@ export function createSurgicalCaseSheet(patient: Patient) {
 
   // ---------- PATIENT DETAILS ----------
   doc.fontSize(11);
-  drawField(doc, "Name of the Patient :", patient.name, 50, y); y += 25;
-  drawField(doc, "Husband's/Father's Name :", patient.fatherName, 50, y); y += 25;
+  drawField(doc, "Name of the Patient :", patient.name, 50, y); y += 15;
+  drawField(doc, "Husband's/Father's Name :", patient.fatherName, 50, y); y += 15;
 
   // Religion & Nationality + Address same line
   drawField(doc, "Religion & Nationality :", patient.religionNationality, 50, y, 150);
   drawField(doc, "Address :", patient.address, 300, y, 150);
-  y += 25;
+  y += 15;
 
   // Age + Sex same line
   drawField(doc, "Age :", patient.age.toString(), 50, y, 50);
   drawField(doc, "Sex :", patient.sex, 150, y, 50);
-  y += 40;
+  y += 20;
 
   // ---------- BLANK SECTIONS ----------
   const sections = [
@@ -85,7 +85,7 @@ export function createSurgicalCaseSheet(patient: Patient) {
   ];
   sections.forEach((sec) => {
     drawField(doc, sec + " :", "", 50, y, 400);
-    y += 25;
+    y += 15;
   });
 
   // ---------- INVESTIGATIONS & EXAM SIDE BY SIDE ----------

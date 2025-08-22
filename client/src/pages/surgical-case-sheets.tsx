@@ -182,10 +182,10 @@ export default function SurgicalCaseSheets() {
       const startX = x + labelWidth + 2;
       const endX = startX + underlineWidth;
       
-      // Draw dotted line using repeated dots
+      // Draw dotted line using repeated dots (closer to baseline)
       const dotSpacing = 2;
       for (let dotX = startX; dotX < endX; dotX += dotSpacing) {
-        doc.circle(dotX, yPos + 3, 0.2, 'F');
+        doc.circle(dotX, yPos + 2, 0.2, 'F');
       }
       
       // Write value if available
@@ -195,7 +195,7 @@ export default function SurgicalCaseSheets() {
       }
     };
     
-    // Patient Information with dotted lines
+    // Patient Information with dotted lines (compact spacing)
     drawField('Name of the Patient :', caseSheet.patientName || '', 20, y, 120);
     y += 15;
     
@@ -210,7 +210,7 @@ export default function SurgicalCaseSheets() {
     // Age and Sex on same line  
     drawField('Age :', caseSheet.age?.toString() || '', 20, y, 30);
     drawField('Sex :', caseSheet.sex || '', 80, y, 30);
-    y += 25;
+    y += 20;
     
     // Medical sections with dotted lines
     const medicalSections = [
