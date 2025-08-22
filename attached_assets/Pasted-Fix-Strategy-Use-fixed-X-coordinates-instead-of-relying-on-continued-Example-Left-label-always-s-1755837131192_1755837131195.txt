@@ -1,0 +1,153 @@
+Fix Strategy
+
+Use fixed X coordinates instead of relying on continued.
+
+Example: Left label always starts at x=50.
+
+Right column always starts at x=320.
+This keeps things neatly aligned.
+
+Grid for Patient Info
+
+Example:
+
+Name of the Patient      :  vamshi
+Husband’s/Father’s Name  :  Rathnala
+Religion & Nationality   :  23       Address : ________
+Age  : 23   Sex : Male
+
+
+Two Columns for Investigation vs Examination
+
+Investigation always at x=50.
+
+Examination always at x=320.
+Both lists should print line by line in parallel, instead of one after the other.
+
+✅ Corrected Code for Alignment
+import PDFDocument from "pdfkit";
+import fs from "fs";
+
+interface Patient {
+  id: string;
+  name: string;
+  fatherName: string;
+  religionNationality: string;
+  address: string;
+  age: number;
+  sex: string;
+}
+
+export function createSurgicalCaseSheet(patient: Patient) {
+  const doc = new PDFDocument({ margin: 50 });
+  const filePath = `surgical-case-sheet-SCS${patient.id}.pdf`;
+  doc.pipe(fs.createWriteStream(filePath));
+
+  // --- HEADER ---
+  doc.fontSize(18).font("Helvetica-Bold").text("NAKSHATRA HOSPITAL", { align: "center" });
+  doc.fontSize(10).font("Helvetica").text("Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.", { align: "center" });
+  doc.text("Cell: 7093939205", { align: "center" });
+
+  doc.moveDown();
+  doc.fontSize(14).font("Helvetica-Bold").text("SURGICAL CASE SHEET", { align: "center", underline: true });
+
+  // --- Case Info ---
+  doc.moveDown();
+  doc.fontSize(11);
+  doc.text(`No.: SCS${patient.id}`, 50, doc.y, { continued: true });
+  doc.text(`Date: ${new Date().toLocaleDateString("en-IN")}`, { align: "right" });
+
+  doc.moveDown();
+
+  // --- Patient Info (aligned grid) ---
+  const leftX = 50;
+  const rightX = 320;
+  let y = doc.y + 5;
+
+  function field(label: string, value: string, x = leftX, lineHeight = 18) {
+    doc.font("Helvetica-Bold").fontSize(11).text(label, x, y, { continued: true });
+    doc.font("Helvetica").text(value || "");
+    y += lineHeight;
+  }
+
+  field("Name of the Patient :", patient.name);
+  field("Husband's/Father's Name :", patient.fatherName);
+
+  // Religion + Address in same line
+  doc.font("Helvetica-Bold").text("Religion & Nationality :", leftX, y, { continued: true });
+  doc.font("Helvetica").text(patient.religionNationality || "", { continued: true });
+  doc.font("Helvetica-Bold").text("   Address :", rightX, y, { continued: true });
+  doc.font("Helvetica").text(patient.address || "");
+  y += 18;
+
+  // Age + Sex in same line
+  doc.font("Helvetica-Bold").text("Age :", leftX, y, { continued: true });
+  doc.font("Helvetica").text(String(patient.age), { continued: true });
+  doc.font("Helvetica-Bold").text("   Sex :", rightX, y, { continued: true });
+  doc.font("Helvetica").text(patient.sex);
+  y += 25;
+
+  // --- Medical Info ---
+  const sections = [
+    "Diagnosis", "Nature of Operation", "Date of Admission",
+    "Date of Operation", "Date of Discharge",
+    "Complaints & Duration", "History of Present Illness"
+  ];
+  sections.forEach(sec => {
+    doc.font("Helvetica-Bold").text(sec + " :", leftX, y);
+    y += 18;
+  });
+
+  // --- Two Columns (aligned) ---
+  y += 10;
+  doc.fontSize(12).font("Helvetica-Bold").text("INVESTIGATION:", leftX, y);
+  doc.text("ON EXAMINATION:", rightX, y);
+
+  const investigations = [
+    "1) Hb%", "2) E.S.R.", "3) C.T.", "4) B.T.", "5) Bl. Grouping",
+    "6) RPL", "7) R.B.S", "8) Urine Sugar", "9) R.M.", "10) X-ray",
+    "11) E.C.G", "12) Blood Urea", "13) Serum Creatinine",
+    "14) Serum Bilirubin", "15) HBS A.G"
+  ];
+
+  const exam = [
+    "G.C.", "Temp. °F", "P.R. /Min",
+    "B.P. mmHg", "R.R. /Min",
+    "Heart", "Lungs", "Abd.", "C.N.S."
+  ];
+
+  const maxRows = Math.max(investigations.length, exam.length);
+  y += 20;
+
+  for (let i = 0; i < maxRows; i++) {
+    if (i < investigations.length) {
+      doc.font("Helvetica").fontSize(10).text(investigations[i] + " :", leftX, y);
+    }
+    if (i < exam.length) {
+      doc.font("Helvetica").fontSize(10).text(exam[i] + " :", rightX, y);
+    }
+    y += 15;
+  }
+
+  // END
+  doc.end();
+  console.log(`✅ PDF generated: ${filePath}`);
+}
+
+// Example
+createSurgicalCaseSheet({
+  id: "1443-89",
+  name: "vamshi",
+  fatherName: "Rathnala",
+  religionNationality: "23",
+  address: "",
+  age: 23,
+  sex: "male"
+});
+
+🔹 What’s Fixed
+
+✅ Patient info → each label/value pair aligned properly in rows.
+✅ Religion & Address + Age & Sex → share one line neatly.
+✅ Investigations vs On Examination → both lists aligned in two neat columns, same page.
+✅ No names “flying away” — fixed X coordinates keep everything aligned.
