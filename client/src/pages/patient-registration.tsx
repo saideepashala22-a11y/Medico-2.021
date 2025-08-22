@@ -32,7 +32,7 @@ interface PatientData {
   dateOfBirth: string;
   age: number;
   gender: string;
-  contactNumber: string;
+  contactPhone: string;
   email: string;
   address: string;
   emergencyContactName: string;
@@ -46,18 +46,36 @@ export default function PatientRegistration() {
   const { user } = useAuth();
   const { toast } = useToast();
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Generate unique identifiers
+  const generateMRUNumber = () => {
+    const year = new Date().getFullYear().toString().slice(-2);
+    const counter = String(Date.now()).slice(-4);
+    return `MRU${year}-${counter}`;
+  };
+
+  const generateVisitId = () => {
+    const counter = String(Date.now()).slice(-3);
+    return `VISIT-${counter}`;
+  };
+
   const [formData, setFormData] = useState({
+    mruNumber: generateMRUNumber(),
+    visitId: generateVisitId(),
     salutation: '',
     fullName: '',
+    age: '',
+    ageUnit: 'years',
     dateOfBirth: '',
     gender: '',
-    contactNumber: '',
+    contactPhone: '',
     email: '',
     address: '',
     emergencyContactName: '',
     emergencyContactPhone: '',
     bloodGroup: '',
-    medicalHistory: ''
+    medicalHistory: '',
+    referringDoctor: ''
   });
 
   const [patients, setPatients] = useState<PatientData[]>([]);
@@ -225,7 +243,7 @@ export default function PatientRegistration() {
       return false;
     }
 
-    if (formData.contactNumber && !/^\d{10}$/.test(formData.contactNumber)) {
+    if (formData.contactPhone && !/^\d{10}$/.test(formData.contactPhone)) {
       toast({
         title: 'Error',
         description: 'Contact number must be exactly 10 digits',
@@ -256,60 +274,93 @@ export default function PatientRegistration() {
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) return;
 
-    const newPatient: PatientData = {
-      id: Date.now().toString(),
-      mru: generateUniqueMRU(),
-      visitId: generateUniqueVisitId(),
-      salutation: formData.salutation,
-      fullName: formData.fullName,
-      dateOfBirth: formData.dateOfBirth,
-      age: age,
-      gender: formData.gender,
-      contactNumber: formData.contactNumber,
-      email: formData.email,
-      address: formData.address,
-      emergencyContactName: formData.emergencyContactName,
-      emergencyContactPhone: formData.emergencyContactPhone,
-      bloodGroup: formData.bloodGroup,
-      medicalHistory: formData.medicalHistory,
-      registrationDate: new Date().toISOString().split('T')[0]
-    };
+    setIsSubmitting(true);
 
-    if (editingPatient) {
-      setPatients(prev => prev.map(p => p.id === editingPatient ? { ...newPatient, id: editingPatient, mru: patients.find(pt => pt.id === editingPatient)?.mru || newPatient.mru } : p));
-      setEditingPatient(null);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const registrationData = {
+        mruNumber: formData.mruNumber,
+        visitId: formData.visitId,
+        salutation: formData.salutation || undefined,
+        fullName: formData.fullName,
+        age: parseInt(formData.age),
+        ageUnit: formData.ageUnit,
+        gender: formData.gender,
+        dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth) : undefined,
+        contactPhone: formData.contactPhone,
+        email: formData.email || undefined,
+        address: formData.address || undefined,
+        bloodGroup: formData.bloodGroup || undefined,
+        emergencyContactName: formData.emergencyContactName || undefined,
+        emergencyContactPhone: formData.emergencyContactPhone || undefined,
+        medicalHistory: formData.medicalHistory || undefined,
+        referringDoctor: formData.referringDoctor || undefined,
+      };
+
+      const response = await fetch('/api/patients-registration', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(registrationData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to register patient');
+      }
+
+      const newPatient = await response.json();
+
       toast({
         title: 'Success',
-        description: 'Patient updated successfully',
+        description: `Patient registered successfully with MRU: ${formData.mruNumber}`,
       });
-    } else {
-      setPatients(prev => [...prev, newPatient]);
+
+      // Reset form after successful submission
+      const newMruNumber = generateMRUNumber();
+      const newVisitId = generateVisitId();
+      
+      setFormData({
+        mruNumber: newMruNumber,
+        visitId: newVisitId,
+        salutation: '',
+        fullName: '',
+        age: '',
+        ageUnit: 'years',
+        gender: '',
+        dateOfBirth: '',
+        contactPhone: '',
+        email: '',
+        address: '',
+        bloodGroup: '',
+        emergencyContactName: '',
+        emergencyContactPhone: '',
+        medicalHistory: '',
+        referringDoctor: '',
+      });
+      
+      console.log('Patient registered successfully:', newPatient);
+    } catch (error) {
+      console.error('Registration error:', error);
       toast({
-        title: 'Success',
-        description: `Patient registered successfully with MRU: ${newPatient.mru}`,
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to register patient',
+        variant: 'destructive',
       });
+    } finally {
+      setIsSubmitting(false);
     }
-
-    // Reset form
-    setFormData({
-      salutation: '',
-      fullName: '',
-      dateOfBirth: '',
-      gender: '',
-      contactNumber: '',
-      email: '',
-      address: '',
-      emergencyContactName: '',
-      emergencyContactPhone: '',
-      bloodGroup: '',
-      medicalHistory: ''
-    });
-    setAge(0);
   };
 
   // Handle edit patient
@@ -319,7 +370,7 @@ export default function PatientRegistration() {
       fullName: patient.fullName,
       dateOfBirth: patient.dateOfBirth,
       gender: patient.gender,
-      contactNumber: patient.contactNumber,
+      contactPhone: patient.contactPhone,
       email: patient.email,
       address: patient.address,
       emergencyContactName: patient.emergencyContactName,
@@ -344,7 +395,7 @@ export default function PatientRegistration() {
   const filteredPatients = patients.filter(patient =>
     patient.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.mru.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.contactNumber.includes(searchTerm) ||
+    patient.contactPhone.includes(searchTerm) ||
     patient.visitId.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -491,11 +542,11 @@ export default function PatientRegistration() {
               {/* Contact Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="contactNumber">Contact Number</Label>
+                  <Label htmlFor="contactPhone">Contact Number *</Label>
                   <Input
-                    id="contactNumber"
-                    value={formData.contactNumber}
-                    onChange={(e) => setFormData(prev => ({ ...prev, contactNumber: e.target.value.replace(/\D/g, '').slice(0, 10) }))}
+                    id="contactPhone"
+                    value={formData.contactPhone}
+                    onChange={(e) => setFormData(prev => ({ ...prev, contactPhone: e.target.value.replace(/\D/g, '').slice(0, 10) }))}
                     placeholder="10-digit phone number"
                     className="border-gray-300"
                     maxLength={10}
@@ -580,9 +631,13 @@ export default function PatientRegistration() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg">
-                <Save className="h-4 w-4 mr-2" />
-                {editingPatient ? 'Update Patient' : 'Register Patient'}
+              <Button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white shadow-lg"
+              >
+                <UserPlus className="h-4 w-4 mr-2" />
+                {isSubmitting ? 'Registering...' : 'Register Patient'}
               </Button>
             </form>
           </CardContent>
@@ -643,7 +698,7 @@ export default function PatientRegistration() {
                           {patient.age} yrs, {patient.gender}
                         </td>
                         <td className="border border-gray-300 px-4 py-3 text-sm">
-                          <div>{patient.contactNumber}</div>
+                          <div>{patient.contactPhone}</div>
                           <div className="text-xs text-gray-500">
                             Emerg: {patient.emergencyContactPhone}
                           </div>

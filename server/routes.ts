@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema, insertConsultationSchema, insertLabTestDefinitionSchema, insertSurgicalCaseSheetSchema } from "@shared/schema";
+import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema, insertConsultationSchema, insertLabTestDefinitionSchema, insertSurgicalCaseSheetSchema, insertPatientsRegistrationSchema } from "@shared/schema";
 import { z } from "zod";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
@@ -537,6 +537,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const caseSheets = await storage.getRecentSurgicalCaseSheets();
       res.json(caseSheets);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Patients Registration endpoints
+  app.post('/api/patients-registration', authenticateToken, async (req: any, res) => {
+    try {
+      const validatedData = insertPatientsRegistrationSchema.parse(req.body);
+      const registrationData = {
+        ...validatedData,
+        createdBy: req.user.id
+      };
+      
+      const registration = await storage.createPatientsRegistration(registrationData);
+      res.status(201).json(registration);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Validation error', errors: error.errors });
+      }
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.get('/api/patients-registration', authenticateToken, async (req: any, res) => {
+    try {
+      const registrations = await storage.getAllPatientsRegistrations();
+      res.json(registrations);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.get('/api/patients-registration/:id', authenticateToken, async (req: any, res) => {
+    try {
+      const registration = await storage.getPatientsRegistration(req.params.id);
+      if (!registration) {
+        return res.status(404).json({ message: 'Patient registration not found' });
+      }
+      res.json(registration);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Search patients registration by MRU number, name, or phone
+  app.get('/api/patients-registration/search/:query', authenticateToken, async (req: any, res) => {
+    try {
+      const registrations = await storage.searchPatientsRegistrations(req.params.query);
+      res.json(registrations);
     } catch (error) {
       res.status(500).json({ message: 'Server error' });
     }

@@ -115,6 +115,30 @@ export const patientProfiles = pgTable("patient_profiles", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Comprehensive Patient Registration Table
+export const patientsRegistration = pgTable("patients_registration", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  mruNumber: text("mru_number").notNull().unique(), // MRU25-0001 format
+  visitId: text("visit_id").notNull().unique(), // VISIT-001 format
+  salutation: text("salutation"), // Mr., Mrs., Ms., Dr., Master, Miss, Baby
+  fullName: text("full_name").notNull(),
+  age: integer("age").notNull(),
+  ageUnit: text("age_unit").notNull().default("years"), // years, months, days
+  gender: text("gender").notNull(), // Male, Female, Other
+  dateOfBirth: timestamp("date_of_birth"),
+  contactPhone: text("contact_phone").notNull(),
+  email: text("email"),
+  address: text("address"),
+  bloodGroup: text("blood_group"), // A+, A-, B+, B-, AB+, AB-, O+, O-, Unknown
+  emergencyContactName: text("emergency_contact_name"),
+  emergencyContactPhone: text("emergency_contact_phone"),
+  medicalHistory: text("medical_history"), // allergies, conditions, etc.
+  referringDoctor: text("referring_doctor"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   labTests: many(labTests),
@@ -122,6 +146,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   dischargeSummaries: many(dischargeSummaries),
   medicalHistoryEntries: many(medicalHistory),
   labTestDefinitions: many(labTestDefinitions),
+  patientsRegistration: many(patientsRegistration),
 }));
 
 export const patientsRelations = relations(patients, ({ many, one }) => ({
@@ -232,6 +257,13 @@ export const insertLabTestDefinitionSchema = createInsertSchema(labTestDefinitio
 export const labTestDefinitionsRelations = relations(labTestDefinitions, ({ one }) => ({
   createdBy: one(users, {
     fields: [labTestDefinitions.createdBy],
+    references: [users.id],
+  }),
+}));
+
+export const patientsRegistrationRelations = relations(patientsRegistration, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [patientsRegistration.createdBy],
     references: [users.id],
   }),
 }));
@@ -380,3 +412,14 @@ export const insertSurgicalCaseSheetSchema = createInsertSchema(surgicalCaseShee
 
 export type InsertSurgicalCaseSheet = z.infer<typeof insertSurgicalCaseSheetSchema>;
 export type SurgicalCaseSheet = typeof surgicalCaseSheets.$inferSelect;
+
+export const insertPatientsRegistrationSchema = createInsertSchema(patientsRegistration).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  dateOfBirth: z.coerce.date().optional(),
+});
+
+export type InsertPatientsRegistration = z.infer<typeof insertPatientsRegistrationSchema>;
+export type PatientsRegistration = typeof patientsRegistration.$inferSelect;

@@ -1,10 +1,10 @@
 import { 
-  users, patients, labTests, prescriptions, dischargeSummaries, medicalHistory, patientProfiles, consultations, labTestDefinitions, surgicalCaseSheets,
+  users, patients, labTests, prescriptions, dischargeSummaries, medicalHistory, patientProfiles, consultations, labTestDefinitions, surgicalCaseSheets, patientsRegistration,
   type User, type InsertUser, type Patient, type InsertPatient,
   type LabTest, type InsertLabTest, type Prescription, type InsertPrescription,
   type DischargeSummary, type InsertDischargeSummary, type MedicalHistory, type InsertMedicalHistory,
   type PatientProfile, type InsertPatientProfile, type Consultation, type InsertConsultation,
-  type SurgicalCaseSheet, type InsertSurgicalCaseSheet,
+  type SurgicalCaseSheet, type InsertSurgicalCaseSheet, type PatientsRegistration, type InsertPatientsRegistration,
   insertLabTestDefinitionSchema
 } from "@shared/schema";
 import { db } from "./db";
@@ -74,6 +74,12 @@ export interface IStorage {
   createSurgicalCaseSheet(caseSheet: InsertSurgicalCaseSheet): Promise<SurgicalCaseSheet>;
   updateSurgicalCaseSheet(id: string, updates: Partial<SurgicalCaseSheet>): Promise<SurgicalCaseSheet>;
   getRecentSurgicalCaseSheets(): Promise<(SurgicalCaseSheet & { patient: Patient })[]>;
+  
+  // Patients Registration
+  getPatientsRegistration(id: string): Promise<PatientsRegistration | undefined>;
+  getAllPatientsRegistrations(): Promise<PatientsRegistration[]>;
+  createPatientsRegistration(registration: InsertPatientsRegistration): Promise<PatientsRegistration>;
+  searchPatientsRegistrations(query: string): Promise<PatientsRegistration[]>;
   
   // Stats
   getStats(): Promise<{
@@ -597,6 +603,35 @@ export class DatabaseStorage implements IStorage {
     .innerJoin(patients, eq(surgicalCaseSheets.patientId, patients.id))
     .orderBy(desc(surgicalCaseSheets.createdAt))
     .limit(10);
+  }
+
+  // Patients Registration methods
+  async getPatientsRegistration(id: string): Promise<PatientsRegistration | undefined> {
+    const [registration] = await db.select().from(patientsRegistration).where(eq(patientsRegistration.id, id));
+    return registration;
+  }
+
+  async getAllPatientsRegistrations(): Promise<PatientsRegistration[]> {
+    return await db.select().from(patientsRegistration).orderBy(desc(patientsRegistration.createdAt));
+  }
+
+  async createPatientsRegistration(registration: InsertPatientsRegistration): Promise<PatientsRegistration> {
+    const [newRegistration] = await db.insert(patientsRegistration)
+      .values(registration)
+      .returning();
+    return newRegistration;
+  }
+
+  async searchPatientsRegistrations(query: string): Promise<PatientsRegistration[]> {
+    return await db.select().from(patientsRegistration)
+      .where(
+        or(
+          ilike(patientsRegistration.mruNumber, `%${query}%`),
+          ilike(patientsRegistration.fullName, `%${query}%`),
+          ilike(patientsRegistration.contactPhone, `%${query}%`)
+        )
+      )
+      .orderBy(desc(patientsRegistration.createdAt));
   }
 }
 
