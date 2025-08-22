@@ -569,100 +569,55 @@ export default function SurgicalCaseSheets() {
       printWindow.document.close();
     }
 
-    // Also create and download actual PDF file
-    try {
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      let yPos = 20;
-      
-      // Add hospital header
-      pdf.setFontSize(16);
-      pdf.setFont(undefined, 'bold');
-      pdf.text('NAKSHATRA HOSPITAL', 105, yPos, { align: 'center' });
-      yPos += 7;
-      
-      pdf.setFontSize(10);
-      pdf.setFont(undefined, 'normal');
-      pdf.text('Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.', 105, yPos, { align: 'center' });
-      yPos += 5;
-      pdf.text('Cell: 7093939205', 105, yPos, { align: 'center' });
-      yPos += 15;
-      
-      // Add title
-      pdf.setFontSize(14);
-      pdf.setFont(undefined, 'bold');
-      pdf.text('SURGICAL CASE SHEET', 105, yPos, { align: 'center' });
-      yPos += 10;
-      
-      // Add case sheet info
-      pdf.setFontSize(10);
-      pdf.setFont(undefined, 'normal');
-      pdf.text(`Case Sheet No: ${caseSheetNumber}`, 20, yPos);
-      pdf.text(`Date: ${currentDate}`, 150, yPos);
-      yPos += 15;
-      
-      // Add patient information
-      pdf.setFont(undefined, 'bold');
-      pdf.text('PATIENT INFORMATION:', 20, yPos);
-      yPos += 8;
-      
-      pdf.setFont(undefined, 'normal');
-      const patientInfo = [
-        `Name: ${caseSheet.patientName || ''}`,
-        `Age: ${caseSheet.age || ''} years`,
-        `Sex: ${caseSheet.sex || ''}`,
-        `Address: ${caseSheet.address || ''}`,
-        `Village: ${caseSheet.village || ''}`,
-        `District: ${caseSheet.district || ''}`,
-        `Religion: ${caseSheet.religion || ''}`,
-        `Nationality: ${caseSheet.nationality || ''}`,
-        `Husband/Father Name: ${caseSheet.husbandFatherName || ''}`,
-        `Diagnosis: ${caseSheet.diagnosis || ''}`,
-        `Nature of Operation: ${caseSheet.natureOfOperation || ''}`,
-        `Complaints & Duration: ${caseSheet.complaintsAndDuration || ''}`,
-        `History of Present Illness: ${caseSheet.historyOfPresentIllness || ''}`
-      ];
-      
-      patientInfo.forEach((info) => {
-        if (yPos > 270) {
-          pdf.addPage();
-          yPos = 20;
+    // Also trigger PDF download from the opened window
+    if (printWindow) {
+      // Add a small delay to ensure content is loaded, then trigger download
+      setTimeout(() => {
+        try {
+          // Add download functionality to the opened window
+          const downloadScript = printWindow.document.createElement('script');
+          downloadScript.src = 'https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js';
+          downloadScript.onload = function() {
+            const { jsPDF } = printWindow.window.jsPDF;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            
+            // Get the HTML content from the opened window
+            const element = printWindow.document.body;
+            
+            pdf.html(element, {
+              callback: function (doc) {
+                doc.save(`Surgical-Case-Sheet-${caseSheetNumber}.pdf`);
+              },
+              margin: [5, 5, 5, 5],
+              autoPaging: 'text',
+              html2canvas: { 
+                scale: 0.4,
+                useCORS: true,
+                logging: false
+              },
+              width: 200,
+              windowWidth: 794
+            });
+          };
+          printWindow.document.head.appendChild(downloadScript);
+        } catch (error) {
+          console.error('PDF download error:', error);
+          // Fallback: create a simple PDF with basic content
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          pdf.setFontSize(16);
+          pdf.text('NAKSHATRA HOSPITAL', 105, 20, { align: 'center' });
+          pdf.setFontSize(14);
+          pdf.text('SURGICAL CASE SHEET', 105, 35, { align: 'center' });
+          pdf.setFontSize(10);
+          pdf.text(`Case Sheet No: ${caseSheetNumber}`, 20, 50);
+          pdf.text(`Date: ${currentDate}`, 20, 60);
+          pdf.text(`Patient Name: ${caseSheet.patientName || 'N/A'}`, 20, 75);
+          pdf.text(`Age: ${caseSheet.age || 'N/A'} years`, 20, 85);
+          pdf.text(`Sex: ${caseSheet.sex || 'N/A'}`, 20, 95);
+          pdf.text('Note: For complete formatted case sheet, use browser print function.', 20, 120);
+          pdf.save(`Surgical-Case-Sheet-${caseSheetNumber}.pdf`);
         }
-        pdf.text(info, 20, yPos);
-        yPos += 6;
-      });
-      
-      // Add note about complete case sheet
-      pdf.addPage();
-      yPos = 20;
-      pdf.setFont(undefined, 'bold');
-      pdf.text('COMPLETE SURGICAL CASE SHEET', 105, yPos, { align: 'center' });
-      yPos += 15;
-      
-      pdf.setFont(undefined, 'normal');
-      pdf.text('This is a summary of the surgical case sheet.', 20, yPos);
-      yPos += 8;
-      pdf.text('The complete 5-page document includes:', 20, yPos);
-      yPos += 8;
-      pdf.text('• Patient Demographics and Information', 25, yPos);
-      yPos += 6;
-      pdf.text('• Consent for Surgery & Pre-operative Preparation', 25, yPos);
-      yPos += 6;
-      pdf.text('• Progress Notes with detailed tracking', 25, yPos);
-      yPos += 6;
-      pdf.text('• Operation, Anaesthesia & Post-operative Instructions', 25, yPos);
-      yPos += 6;
-      pdf.text('• Nursing Notes with vital signs monitoring table', 25, yPos);
-      yPos += 15;
-      
-      pdf.text('For the complete formatted case sheet, please use the print view', 20, yPos);
-      pdf.text('that opens in the new browser window.', 20, yPos + 6);
-      
-      // Download the PDF
-      pdf.save(`Surgical-Case-Sheet-${caseSheetNumber}.pdf`);
-      
-    } catch (error) {
-      console.error('PDF download error:', error);
-      // If PDF download fails, user can still print from the opened window
+      }, 1000);
     }
   };
 
