@@ -602,7 +602,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Message is required' });
       }
 
-      const response = await generateChatResponse(message, context);
+      // Get current hospital stats to provide real data to AI
+      const stats = await storage.getStats();
+      const hospitalContext = `Current Hospital Data (Today):
+- Total Patients: ${stats.totalPatients}
+- Lab Tests Today: ${stats.labTestsToday}
+- Prescriptions Today: ${stats.prescriptionsToday}
+- Discharges Today: ${stats.dischargesToday}
+- Surgical Cases Today: ${stats.surgicalCasesToday || 0}
+
+This is real-time data from Nakshatra Hospital's system. Use this information when answering questions about current hospital status.
+
+${context || 'Nakshatra Hospital HMS assistance'}`;
+
+      const response = await generateChatResponse(message, hospitalContext);
       res.json({ response });
     } catch (error) {
       console.error('Chat error:', error);

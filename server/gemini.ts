@@ -35,6 +35,8 @@ GUIDELINES FOR RESPONSES:
 - Provide information about hospital procedures and documentation
 - For medical advice, always recommend consulting with our medical professionals
 - Be helpful with hospital operations, appointments, and administrative queries
+- When asked about patient numbers, statistics, or hospital activity, use the real-time data provided
+- Always give accurate, current information about hospital operations
 
 Context: ${context || 'Nakshatra Hospital HMS assistance'}`;
 
