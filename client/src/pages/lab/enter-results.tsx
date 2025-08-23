@@ -40,11 +40,9 @@ export default function EnterResults() {
     queryKey: ['/api/lab-tests', testId],
   });
 
-  // Fetch patient details
-  const { data: patient, isLoading: patientLoading } = useQuery<any>({
-    queryKey: ['/api/patients', labTest?.patientId],
-    enabled: !!labTest?.patientId,
-  });
+  // Get patient data from lab test (includes patient info from join)
+  const patient = labTest?.patient;
+  const patientLoading = false;
 
   // Initialize results based on selected tests
   useEffect(() => {
@@ -288,22 +286,22 @@ export default function EnterResults() {
           <CardContent>
             <div className="grid grid-cols-4 gap-6">
               <div>
-                <p className="text-sm text-gray-600">Patient ID</p>
-                <p className="font-semibold">{patient.patientId}</p>
+                <p className="text-sm text-gray-600">MRU Number</p>
+                <p className="font-semibold">{patient?.mruNumber}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Name</p>
-                <p className="font-semibold">{patient.salutation} {patient.name}</p>
+                <p className="font-semibold">{patient?.salutation} {patient?.fullName}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Age & Gender</p>
-                <p className="font-semibold">{patient.age} {patient.ageUnit}, {patient.gender}</p>
+                <p className="font-semibold">{patient?.age} {patient?.ageUnit}, {patient?.gender}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Contact</p>
                 <p className="font-semibold flex items-center">
                   <Phone className="h-4 w-4 mr-1" />
-                  {patient.phone}
+                  {patient?.contactPhone}
                 </p>
               </div>
             </div>
