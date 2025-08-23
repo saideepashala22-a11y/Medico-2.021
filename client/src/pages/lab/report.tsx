@@ -439,9 +439,9 @@ export default function LabReport() {
         </Card>
 
         {/* Test Results */}
-        <div className="space-y-4">
-          {Object.keys(parsedResults).length > 0 ? (
-            testTypes.map((testType) => {
+        {Object.keys(parsedResults).length > 0 && (
+          <div className="space-y-4">
+            {testTypes.map((testType) => {
               const testName = testType.testName;
               const testResults = parsedResults[testName];
               
@@ -470,25 +470,9 @@ export default function LabReport() {
                   </CardContent>
                 </Card>
               );
-            })
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <TestTube className="mr-2 h-5 w-5" />
-                  Test Results
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <TestTube className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                  <p className="text-gray-500 text-lg">Test results are pending entry.</p>
-                  <p className="text-gray-400 text-sm mt-2">Results will be available once the lab analysis is complete.</p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+            })}
+          </div>
+        )}
 
         {/* Doctor's Notes */}
         {labTest.doctorNotes && (
