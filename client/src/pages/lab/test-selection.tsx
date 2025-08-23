@@ -22,6 +22,7 @@ export default function TestSelection() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTests, setSelectedTests] = useState<string[]>([]);
   const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [customPrices, setCustomPrices] = useState<Record<string, number>>({});
 
   // Fetch patient details
   const { data: patient, isLoading: patientLoading } = useQuery<any>({
@@ -96,9 +97,10 @@ export default function TestSelection() {
     if (!testDefinitions) return 0;
     return selectedTests.reduce((total, testId) => {
       const test = testDefinitions.find(t => t.id === testId);
-      return total + (test ? parseFloat(test.cost) : 0);
+      const price = customPrices[testId] || (test ? parseFloat(test.cost) : 0);
+      return total + price;
     }, 0);
-  }, [selectedTests, testDefinitions]);
+  }, [selectedTests, testDefinitions, customPrices]);
 
   // Create lab test order mutation
   const createLabTestMutation = useMutation({
@@ -125,6 +127,19 @@ export default function TestSelection() {
         ? prev.filter(id => id !== testId)
         : [...prev, testId]
     );
+  };
+
+  // Handle price update
+  const handlePriceUpdate = (testId: string, newPrice: number) => {
+    setCustomPrices(prev => ({
+      ...prev,
+      [testId]: newPrice
+    }));
+  };
+
+  // Get display price for a test
+  const getDisplayPrice = (testId: string, originalPrice: number) => {
+    return customPrices[testId] || originalPrice;
   };
 
   const handleProceedToResults = () => {
@@ -350,7 +365,22 @@ export default function TestSelection() {
                               <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
                                 {test.department}
                               </Badge>
-                              <span className="font-bold text-medical-primary">₹{parseFloat(test.cost).toFixed(2)}</span>
+                              <div className="flex items-center space-x-1">
+                                <span className="text-sm text-gray-600">₹</span>
+                                <input
+                                  type="number"
+                                  value={getDisplayPrice(test.id, parseFloat(test.cost))}
+                                  onChange={(e) => {
+                                    e.stopPropagation();
+                                    const newPrice = parseFloat(e.target.value) || 0;
+                                    handlePriceUpdate(test.id, newPrice);
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="w-20 px-2 py-1 text-sm font-bold text-medical-primary border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-medical-primary focus:border-transparent"
+                                  step="0.01"
+                                  min="0"
+                                />
+                              </div>
                             </div>
                           </div>
                           {test.description && (
@@ -399,7 +429,7 @@ export default function TestSelection() {
                         return test ? (
                           <div key={testId} className="flex justify-between items-center text-sm">
                             <span className="flex-1 truncate">{test.testName}</span>
-                            <span className="font-medium">₹{parseFloat(test.cost).toFixed(2)}</span>
+                            <span className="font-medium">₹{getDisplayPrice(testId, parseFloat(test.cost)).toFixed(2)}</span>
                           </div>
                         ) : null;
                       })}
