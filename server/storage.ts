@@ -79,7 +79,7 @@ export interface IStorage {
   // Patients Registration
   getPatientsRegistration(id: string): Promise<PatientsRegistration | undefined>;
   getAllPatientsRegistrations(): Promise<PatientsRegistration[]>;
-  createPatientsRegistration(registration: InsertPatientsRegistration): Promise<PatientsRegistration>;
+  createPatientsRegistration(registration: InsertPatientsRegistration & { createdBy: string }): Promise<PatientsRegistration>;
   updatePatientsRegistration(id: string, updates: Partial<InsertPatientsRegistration>): Promise<PatientsRegistration | undefined>;
   searchPatientsRegistrations(query: string): Promise<PatientsRegistration[]>;
   getRecentPatientsRegistrations(limit?: number): Promise<PatientsRegistration[]>;
@@ -89,7 +89,7 @@ export interface IStorage {
   getAllMedicines(): Promise<MedicineInventory[]>;
   getActiveMedicines(): Promise<MedicineInventory[]>;
   getMedicine(id: string): Promise<MedicineInventory | undefined>;
-  createMedicine(medicine: InsertMedicineInventory): Promise<MedicineInventory>;
+  createMedicine(medicine: InsertMedicineInventory & { createdBy: string }): Promise<MedicineInventory>;
   updateMedicine(id: string, updates: Partial<MedicineInventory>): Promise<MedicineInventory>;
   deleteMedicine(id: string): Promise<void>;
   searchMedicines(query: string): Promise<MedicineInventory[]>;
@@ -764,9 +764,9 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(patientsRegistration).orderBy(desc(patientsRegistration.createdAt));
   }
 
-  async createPatientsRegistration(registration: InsertPatientsRegistration): Promise<PatientsRegistration> {
+  async createPatientsRegistration(registration: InsertPatientsRegistration & { createdBy: string }): Promise<PatientsRegistration> {
     const [newRegistration] = await db.insert(patientsRegistration)
-      .values(registration)
+      .values([registration])
       .returning();
     return newRegistration;
   }
@@ -842,9 +842,9 @@ export class DatabaseStorage implements IStorage {
     return medicine || undefined;
   }
 
-  async createMedicine(medicine: InsertMedicineInventory): Promise<MedicineInventory> {
+  async createMedicine(medicine: InsertMedicineInventory & { createdBy: string }): Promise<MedicineInventory> {
     const [created] = await db.insert(medicineInventory)
-      .values(medicine)
+      .values([medicine])
       .returning();
     return created;
   }

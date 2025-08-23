@@ -745,7 +745,7 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
     }
   });
 
-  app.post('/api/medicines', authenticateToken, async (req, res) => {
+  app.post('/api/medicines', authenticateToken, async (req: any, res) => {
     try {
       const medicineData = insertMedicineInventorySchema.parse(req.body);
       const medicine = await storage.createMedicine({
@@ -762,7 +762,7 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
     }
   });
 
-  app.put('/api/medicines/:id', authenticateToken, async (req, res) => {
+  app.put('/api/medicines/:id', authenticateToken, async (req: any, res) => {
     try {
       const { id } = req.params;
       const updates = insertMedicineInventorySchema.partial().parse(req.body);
@@ -777,7 +777,7 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
     }
   });
 
-  app.delete('/api/medicines/:id', authenticateToken, async (req, res) => {
+  app.delete('/api/medicines/:id', authenticateToken, async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteMedicine(id);
