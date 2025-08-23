@@ -135,11 +135,11 @@ export default function Pharmacy() {
   };
 
   const getTax = () => {
-    return getSubtotal() * 0.05; // 5% tax
+    return 0; // No GST/tax as per requirement
   };
 
   const getTotal = () => {
-    return getSubtotal() + getTax();
+    return getSubtotal(); // No tax added, total equals subtotal
   };
 
   const handleSavePrescription = () => {
