@@ -67,7 +67,7 @@ export function generatePharmacyBillingPDF(data: PharmacyBillingData) {
   pdf.text('123 Medical Street, Healthcare City', margin + 3, yPos + 15);
   pdf.text('Phone: +91 98765 43210', margin + 3, yPos + 21);
   pdf.text('Email: pharmacy@nakshatra.com', margin + 3, yPos + 27);
-  pdf.text('GSTIN: 29ABCDE1234F1Z5', margin + 3, yPos + 33);
+  pdf.text(`Bill No: ${data.invoiceNumber}`, margin + 3, yPos + 33);
   pdf.text('D.L. No.: DL-29-12345', margin + 3, yPos + 39);
   
   // Right side - Patient details
