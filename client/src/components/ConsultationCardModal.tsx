@@ -34,195 +34,111 @@ export function ConsultationCardModal({ isOpen, onClose, patientInfo }: Consulta
       const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 15;
       
-      // Professional Header Design
-      // Main header background - Medical green gradient effect
-      pdf.setFillColor(16, 97, 143); // Professional medical blue
-      pdf.rect(0, 0, pageWidth, 50, 'F');
+      // Calculate sections: 20% for patient details, 80% for consultation
+      const patientSectionHeight = pageHeight * 0.2; // 20% of page
+      const consultationStartY = patientSectionHeight + 10;
       
-      // White accent stripe
-      pdf.setFillColor(255, 255, 255);
-      pdf.rect(0, 45, pageWidth, 3, 'F');
+      // Professional Header Design - Compact
+      pdf.setFillColor(16, 97, 143);
+      pdf.rect(0, 0, pageWidth, 30, 'F');
       
-      // Hospital Name - Large, Professional
+      // Hospital Name
       pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(26);
+      pdf.setFontSize(20);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('NAKSHATRA HOSPITAL', pageWidth / 2, 22, { align: 'center' });
+      pdf.text('NAKSHATRA HOSPITAL', pageWidth / 2, 15, { align: 'center' });
       
-      // Subtitle
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text('Advanced Healthcare • Compassionate Care • Excellence in Medicine', pageWidth / 2, 32, { align: 'center' });
-      
-      // Document Type
-      pdf.setFontSize(14);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('PATIENT CONSULTATION CARD', pageWidth / 2, 42, { align: 'center' });
-      
-      // Professional Border Frame
-      pdf.setDrawColor(16, 97, 143);
-      pdf.setLineWidth(0.8);
-      pdf.rect(margin - 5, 55, pageWidth - 2 * (margin - 5), pageHeight - 70, 'S');
-      
-      // Reset text color for content
-      pdf.setTextColor(0, 0, 0);
-      
-      // Card Header Info Section
-      let yPos = 65;
-      pdf.setFillColor(248, 249, 250); // Light gray background
-      pdf.rect(margin, yPos, pageWidth - 2 * margin, 25, 'F');
-      pdf.setDrawColor(200, 200, 200);
-      pdf.rect(margin, yPos, pageWidth - 2 * margin, 25, 'S');
-      
-      // Card Header Text
-      yPos += 8;
       pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(16, 97, 143);
-      pdf.text(`CARD NO: ${patientInfo.mruNumber}`, margin + 5, yPos);
-      pdf.text(`VISIT ID: ${patientInfo.visitId}`, pageWidth - margin - 35, yPos);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('Patient Consultation Card', pageWidth / 2, 25, { align: 'center' });
       
-      yPos += 8;
-      pdf.text(`DATE: ${new Date(patientInfo.registrationDate).toLocaleDateString('en-IN')}`, margin + 5, yPos);
-      pdf.text(`TIME: ${new Date().toLocaleTimeString('en-IN', { hour12: true })}`, pageWidth - margin - 35, yPos);
-      
-      // Patient Information Section
-      yPos += 25;
+      // Patient Information Section (20% of page)
+      let yPos = 40;
       pdf.setTextColor(0, 0, 0);
-      pdf.setFontSize(16);
+      pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
       pdf.text('PATIENT INFORMATION', margin, yPos);
       
-      // Decorative line under section header
-      pdf.setDrawColor(16, 97, 143);
-      pdf.setLineWidth(1);
-      pdf.line(margin, yPos + 3, margin + 60, yPos + 3);
+      yPos += 8;
       
-      yPos += 15;
-      
-      // Patient details in professional box layout
+      // Compact patient details in 3 columns
       const details = [
-        { label: 'PATIENT NAME', value: patientInfo.fullName.toUpperCase(), width: 80 },
-        { label: 'MRU NUMBER', value: patientInfo.mruNumber, width: 40 },
-        { label: 'AGE / GENDER', value: `${patientInfo.age} Years / ${patientInfo.gender.toUpperCase()}`, width: 50 },
-        { label: 'BLOOD GROUP', value: (patientInfo.bloodGroup || 'NOT SPECIFIED').toUpperCase(), width: 35 },
-        { label: 'PHONE NUMBER', value: patientInfo.contactPhone, width: 80 },
-        { label: 'VISIT ID', value: patientInfo.visitId, width: 40 }
+        { label: 'NAME', value: patientInfo.fullName.toUpperCase() },
+        { label: 'MRU', value: patientInfo.mruNumber },
+        { label: 'VISIT ID', value: patientInfo.visitId },
+        { label: 'AGE/GENDER', value: `${patientInfo.age}Y / ${patientInfo.gender.toUpperCase()}` },
+        { label: 'BLOOD GROUP', value: (patientInfo.bloodGroup || 'N/A').toUpperCase() },
+        { label: 'PHONE', value: patientInfo.contactPhone }
       ];
       
-      // Create professional information boxes
-      let xPos = margin;
-      let currentRow = 0;
-      const boxHeight = 18;
-      const boxSpacing = 5;
+      // Draw compact info boxes in 3 columns
+      const colWidth = (pageWidth - 2 * margin) / 3;
+      const rowHeight = 15;
       
       details.forEach((detail, index) => {
-        if (index % 2 === 0 && index > 0) {
-          currentRow++;
-          xPos = margin;
-          yPos += boxHeight + boxSpacing;
-        } else if (index % 2 === 1) {
-          xPos = pageWidth / 2 + 5;
-        }
+        const col = index % 3;
+        const row = Math.floor(index / 3);
+        const xPos = margin + (col * colWidth);
+        const yPosBox = yPos + (row * rowHeight);
         
-        // Draw info box
-        pdf.setFillColor(252, 252, 252);
-        pdf.rect(xPos, yPos, detail.width, boxHeight, 'F');
-        pdf.setDrawColor(220, 220, 220);
-        pdf.rect(xPos, yPos, detail.width, boxHeight, 'S');
+        // Box background
+        pdf.setFillColor(248, 249, 250);
+        pdf.rect(xPos, yPosBox, colWidth - 2, rowHeight - 2, 'F');
+        pdf.setDrawColor(200, 200, 200);
+        pdf.rect(xPos, yPosBox, colWidth - 2, rowHeight - 2, 'S');
         
-        // Label
-        pdf.setFontSize(8);
+        // Label and value
+        pdf.setFontSize(7);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(100, 100, 100);
-        pdf.text(detail.label, xPos + 2, yPos + 6);
+        pdf.text(detail.label + ':', xPos + 2, yPosBox + 6);
         
-        // Value
-        pdf.setFontSize(11);
+        pdf.setFontSize(9);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(0, 0, 0);
-        pdf.text(detail.value, xPos + 2, yPos + 14);
+        pdf.text(detail.value, xPos + 2, yPosBox + 12);
       });
       
-      // Medical Consultation Form Section
-      yPos += 40;
-      pdf.setFontSize(16);
+      // Consultation Form Section (80% of remaining space)
+      yPos = consultationStartY;
+      pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(0, 0, 0);
+      pdf.setTextColor(16, 97, 143);
       pdf.text('MEDICAL CONSULTATION FORM', margin, yPos);
       
       // Decorative line
       pdf.setDrawColor(16, 97, 143);
       pdf.setLineWidth(1);
-      pdf.line(margin, yPos + 3, margin + 80, yPos + 3);
+      pdf.line(margin, yPos + 3, pageWidth - margin, yPos + 3);
       
-      yPos += 15;
+      yPos += 12;
       
-      // Professional consultation form fields
+      // Compact consultation sections to fit in remaining 80%
+      const availableHeight = pageHeight - yPos - 30; // Reserve 30px for footer
       const consultationSections = [
-        {
-          title: 'CHIEF COMPLAINT',
-          lines: 2,
-          spacing: 8
-        },
-        {
-          title: 'HISTORY OF PRESENT ILLNESS',
-          lines: 4,
-          spacing: 8
-        },
-        {
-          title: 'PHYSICAL EXAMINATION',
-          lines: 4,
-          spacing: 8
-        },
-        {
-          title: 'CLINICAL FINDINGS',
-          lines: 3,
-          spacing: 8
-        },
-        {
-          title: 'PROVISIONAL DIAGNOSIS',
-          lines: 2,
-          spacing: 8
-        },
-        {
-          title: 'TREATMENT PLAN & PRESCRIPTIONS',
-          lines: 4,
-          spacing: 8
-        }
+        { title: 'CHIEF COMPLAINT', lines: 2 },
+        { title: 'HISTORY & EXAMINATION', lines: 3 },
+        { title: 'CLINICAL FINDINGS', lines: 2 },
+        { title: 'DIAGNOSIS', lines: 2 },
+        { title: 'TREATMENT & PRESCRIPTIONS', lines: 3 }
       ];
       
+      const lineSpacing = Math.min(8, availableHeight / (consultationSections.reduce((acc, section) => acc + section.lines + 1, 0)));
+      
       consultationSections.forEach((section) => {
-        if (yPos > pageHeight - 60) { // Check if we need a new page
-          pdf.addPage();
-          yPos = 30;
-          
-          // Add header on new page
-          pdf.setFillColor(16, 97, 143);
-          pdf.rect(0, 0, pageWidth, 25, 'F');
-          pdf.setTextColor(255, 255, 255);
-          pdf.setFontSize(14);
-          pdf.setFont('helvetica', 'bold');
-          pdf.text('NAKSHATRA HOSPITAL - CONSULTATION CARD (CONTINUED)', pageWidth / 2, 16, { align: 'center' });
-          
-          yPos = 35;
-          pdf.setTextColor(0, 0, 0);
-        }
-        
         // Section title
-        pdf.setFontSize(12);
+        pdf.setFontSize(10);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(16, 97, 143);
         pdf.text(section.title + ':', margin, yPos);
         
-        yPos += 8;
+        yPos += 6;
         
-        // Professional dotted lines for writing
+        // Writing lines
         for (let i = 0; i < section.lines; i++) {
-          // Create dotted line effect
           pdf.setDrawColor(180, 180, 180);
           pdf.setLineWidth(0.3);
-          const lineY = yPos + (i * section.spacing);
+          const lineY = yPos + (i * lineSpacing);
           
           // Draw dotted line
           for (let x = margin; x < pageWidth - margin; x += 2) {
@@ -230,55 +146,43 @@ export function ConsultationCardModal({ isOpen, onClose, patientInfo }: Consulta
           }
         }
         
-        yPos += (section.lines * section.spacing) + 10;
+        yPos += (section.lines * lineSpacing) + 5;
       });
       
-      // Signature Section
-      if (yPos > pageHeight - 50) {
-        pdf.addPage();
-        yPos = 30;
-      }
-      
-      yPos += 10;
+      // Signature section at bottom
+      const bottomY = pageHeight - 35;
       const signatureBoxWidth = (pageWidth - 3 * margin) / 2;
       
-      // Doctor Signature Box
+      // Doctor signature
       pdf.setDrawColor(16, 97, 143);
       pdf.setLineWidth(0.5);
-      pdf.rect(margin, yPos, signatureBoxWidth, 30, 'S');
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(16, 97, 143);
-      pdf.text('DOCTOR SIGNATURE & STAMP', margin + 2, yPos + 8);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(100, 100, 100);
-      pdf.text('Date: _______________', margin + 2, yPos + 25);
-      
-      // Follow-up Box
-      const rightBoxX = margin + signatureBoxWidth + 10;
-      pdf.rect(rightBoxX, yPos, signatureBoxWidth, 30, 'S');
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(16, 97, 143);
-      pdf.text('NEXT APPOINTMENT', rightBoxX + 2, yPos + 8);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(100, 100, 100);
-      pdf.text('Date: _______________', rightBoxX + 2, yPos + 18);
-      pdf.text('Time: _______________', rightBoxX + 2, yPos + 25);
-      
-      // Professional Footer
-      const footerY = pageHeight - 20;
-      pdf.setFillColor(248, 249, 250);
-      pdf.rect(0, footerY - 8, pageWidth, 15, 'F');
-      pdf.setDrawColor(200, 200, 200);
-      pdf.line(0, footerY - 8, pageWidth, footerY - 8);
-      
+      pdf.rect(margin, bottomY, signatureBoxWidth, 25, 'S');
       pdf.setFontSize(8);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(16, 97, 143);
+      pdf.text('DOCTOR SIGNATURE & STAMP', margin + 2, bottomY + 6);
       pdf.setFont('helvetica', 'normal');
       pdf.setTextColor(100, 100, 100);
-      pdf.text('Generated by Nakshatra Hospital Management System', pageWidth / 2, footerY - 2, { align: 'center' });
-      pdf.text(`Generated on: ${new Date().toLocaleDateString('en-IN')} at ${new Date().toLocaleTimeString('en-IN')}`, pageWidth / 2, footerY + 4, { align: 'center' });
+      pdf.text('Date: ____________', margin + 2, bottomY + 20);
       
-      // Save the PDF with professional naming
+      // Next appointment
+      const rightBoxX = margin + signatureBoxWidth + 10;
+      pdf.rect(rightBoxX, bottomY, signatureBoxWidth, 25, 'S');
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(16, 97, 143);
+      pdf.text('NEXT APPOINTMENT', rightBoxX + 2, bottomY + 6);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(100, 100, 100);
+      pdf.text('Date: ____________', rightBoxX + 2, bottomY + 14);
+      pdf.text('Time: ____________', rightBoxX + 2, bottomY + 20);
+      
+      // Footer
+      pdf.setFontSize(7);
+      pdf.setFont('helvetica', 'italic');
+      pdf.setTextColor(150, 150, 150);
+      pdf.text(`Generated: ${new Date().toLocaleDateString('en-IN')} | Nakshatra Hospital Management System`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+      
+      // Save the PDF
       pdf.save(`Nakshatra_Hospital_Consultation_Card_${patientInfo.mruNumber}_${new Date().toISOString().split('T')[0]}.pdf`);
       
     } catch (error) {
