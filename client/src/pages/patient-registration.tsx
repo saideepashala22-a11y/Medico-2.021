@@ -105,7 +105,28 @@ export default function PatientRegistration() {
         if (response.ok) {
           const patientsData = await response.json();
           console.log('Fetched patients:', patientsData);
-          setPatients(patientsData);
+          
+          // Map the database fields to frontend interface
+          const mappedPatients = patientsData.map((patient: any) => ({
+            id: patient.id,
+            mru: patient.mruNumber,
+            visitId: patient.visitId,
+            salutation: patient.salutation || '',
+            fullName: patient.fullName,
+            dateOfBirth: patient.dateOfBirth,
+            age: patient.age,
+            gender: patient.gender,
+            contactPhone: patient.contactPhone,
+            email: patient.email || '',
+            address: patient.address || '',
+            emergencyContactName: patient.emergencyContactName || '',
+            emergencyContactPhone: patient.emergencyContactPhone || '',
+            bloodGroup: patient.bloodGroup || '',
+            medicalHistory: patient.medicalHistory || '',
+            registrationDate: patient.createdAt, // Map createdAt to registrationDate
+          }));
+          
+          setPatients(mappedPatients);
         }
       } catch (error) {
         console.error('Error fetching patients:', error);
