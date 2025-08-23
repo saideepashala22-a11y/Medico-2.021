@@ -99,21 +99,7 @@ export function ConsultationCardModal({ isOpen, onClose, patientInfo }: Consulta
         pdf.text(detail.value, xPos + 2, yPosBox + 12);
       });
       
-      // Consultation Form Section (80% of remaining space)
-      yPos = consultationStartY;
-      pdf.setFontSize(14);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(16, 97, 143);
-      pdf.text('MEDICAL CONSULTATION FORM', margin, yPos);
-      
-      // Decorative line
-      pdf.setDrawColor(16, 97, 143);
-      pdf.setLineWidth(1);
-      pdf.line(margin, yPos + 3, pageWidth - margin, yPos + 3);
-      
-      yPos += 12;
-      
-      // Clean consultation form without predefined sections
+      // Clean consultation form section starts here
       
       // Signature section at bottom
       const bottomY = pageHeight - 35;
