@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema, insertConsultationSchema, insertLabTestDefinitionSchema, insertSurgicalCaseSheetSchema, insertPatientsRegistrationSchema } from "@shared/schema";
+import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema, insertConsultationSchema, insertLabTestDefinitionSchema, insertSurgicalCaseSheetSchema, insertPatientsRegistrationSchema, insertMedicineInventorySchema } from "@shared/schema";
 import { z } from "zod";
 import { generateChatResponse, generateMedicalAssistance } from "./gemini";
 
@@ -669,6 +669,84 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
       res.json(stats);
     } catch (error) {
       res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Medicine Inventory routes
+  app.get('/api/medicines', authenticateToken, async (req, res) => {
+    try {
+      const medicines = await storage.getAllMedicines();
+      res.json(medicines);
+    } catch (error) {
+      console.error('Error fetching medicines:', error);
+      res.status(500).json({ message: 'Failed to fetch medicines' });
+    }
+  });
+
+  app.get('/api/medicines/active', authenticateToken, async (req, res) => {
+    try {
+      const medicines = await storage.getActiveMedicines();
+      res.json(medicines);
+    } catch (error) {
+      console.error('Error fetching active medicines:', error);
+      res.status(500).json({ message: 'Failed to fetch active medicines' });
+    }
+  });
+
+  app.get('/api/medicines/search', authenticateToken, async (req, res) => {
+    try {
+      const { q } = req.query;
+      if (!q || typeof q !== 'string') {
+        return res.json([]);
+      }
+      const medicines = await storage.searchMedicines(q);
+      res.json(medicines);
+    } catch (error) {
+      console.error('Error searching medicines:', error);
+      res.status(500).json({ message: 'Failed to search medicines' });
+    }
+  });
+
+  app.post('/api/medicines', authenticateToken, async (req, res) => {
+    try {
+      const medicineData = insertMedicineInventorySchema.parse(req.body);
+      const medicine = await storage.createMedicine({
+        ...medicineData,
+        createdBy: req.user.id,
+      });
+      res.status(201).json(medicine);
+    } catch (error) {
+      console.error('Error creating medicine:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Validation error', errors: error.errors });
+      }
+      res.status(500).json({ message: 'Failed to create medicine' });
+    }
+  });
+
+  app.put('/api/medicines/:id', authenticateToken, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = insertMedicineInventorySchema.partial().parse(req.body);
+      const medicine = await storage.updateMedicine(id, updates);
+      res.json(medicine);
+    } catch (error) {
+      console.error('Error updating medicine:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Validation error', errors: error.errors });
+      }
+      res.status(500).json({ message: 'Failed to update medicine' });
+    }
+  });
+
+  app.delete('/api/medicines/:id', authenticateToken, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteMedicine(id);
+      res.json({ message: 'Medicine deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting medicine:', error);
+      res.status(500).json({ message: 'Failed to delete medicine' });
     }
   });
 

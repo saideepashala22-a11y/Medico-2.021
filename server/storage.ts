@@ -1,10 +1,11 @@
 import { 
-  users, patients, labTests, prescriptions, dischargeSummaries, medicalHistory, patientProfiles, consultations, labTestDefinitions, surgicalCaseSheets, patientsRegistration,
+  users, patients, labTests, prescriptions, dischargeSummaries, medicalHistory, patientProfiles, consultations, labTestDefinitions, surgicalCaseSheets, patientsRegistration, medicineInventory,
   type User, type InsertUser, type Patient, type InsertPatient,
   type LabTest, type InsertLabTest, type Prescription, type InsertPrescription,
   type DischargeSummary, type InsertDischargeSummary, type MedicalHistory, type InsertMedicalHistory,
   type PatientProfile, type InsertPatientProfile, type Consultation, type InsertConsultation,
   type SurgicalCaseSheet, type InsertSurgicalCaseSheet, type PatientsRegistration, type InsertPatientsRegistration,
+  type MedicineInventory, type InsertMedicineInventory,
   insertLabTestDefinitionSchema
 } from "@shared/schema";
 import { db } from "./db";
@@ -80,6 +81,15 @@ export interface IStorage {
   getAllPatientsRegistrations(): Promise<PatientsRegistration[]>;
   createPatientsRegistration(registration: InsertPatientsRegistration): Promise<PatientsRegistration>;
   searchPatientsRegistrations(query: string): Promise<PatientsRegistration[]>;
+  
+  // Medicine Inventory
+  getAllMedicines(): Promise<MedicineInventory[]>;
+  getActiveMedicines(): Promise<MedicineInventory[]>;
+  getMedicine(id: string): Promise<MedicineInventory | undefined>;
+  createMedicine(medicine: InsertMedicineInventory): Promise<MedicineInventory>;
+  updateMedicine(id: string, updates: Partial<MedicineInventory>): Promise<MedicineInventory>;
+  deleteMedicine(id: string): Promise<void>;
+  searchMedicines(query: string): Promise<MedicineInventory[]>;
   
   // Stats
   getStats(): Promise<{
@@ -768,6 +778,61 @@ export class DatabaseStorage implements IStorage {
         )
       )
       .orderBy(desc(patientsRegistration.createdAt));
+  }
+  
+  // Medicine Inventory Implementation
+  async getAllMedicines(): Promise<MedicineInventory[]> {
+    return await db.select()
+      .from(medicineInventory)
+      .orderBy(desc(medicineInventory.createdAt));
+  }
+
+  async getActiveMedicines(): Promise<MedicineInventory[]> {
+    return await db.select()
+      .from(medicineInventory)
+      .where(eq(medicineInventory.isActive, true))
+      .orderBy(medicineInventory.medicineName);
+  }
+
+  async getMedicine(id: string): Promise<MedicineInventory | undefined> {
+    const [medicine] = await db.select()
+      .from(medicineInventory)
+      .where(eq(medicineInventory.id, id));
+    return medicine || undefined;
+  }
+
+  async createMedicine(medicine: InsertMedicineInventory): Promise<MedicineInventory> {
+    const [created] = await db.insert(medicineInventory)
+      .values(medicine)
+      .returning();
+    return created;
+  }
+
+  async updateMedicine(id: string, updates: Partial<MedicineInventory>): Promise<MedicineInventory> {
+    const [updated] = await db.update(medicineInventory)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(medicineInventory.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteMedicine(id: string): Promise<void> {
+    await db.update(medicineInventory)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(eq(medicineInventory.id, id));
+  }
+
+  async searchMedicines(query: string): Promise<MedicineInventory[]> {
+    return await db.select()
+      .from(medicineInventory)
+      .where(
+        or(
+          ilike(medicineInventory.medicineName, `%${query}%`),
+          ilike(medicineInventory.batchNumber, `%${query}%`),
+          ilike(medicineInventory.category, `%${query}%`)
+        )
+      )
+      .orderBy(medicineInventory.medicineName);
   }
 }
 

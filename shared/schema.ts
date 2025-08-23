@@ -94,6 +94,23 @@ export const medicalHistory = pgTable("medical_history", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Medicine Inventory Table
+export const medicineInventory = pgTable("medicine_inventory", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  medicineName: text("medicine_name").notNull(),
+  batchNumber: text("batch_number").notNull(),
+  quantity: integer("quantity").notNull().default(0),
+  mrp: decimal("mrp", { precision: 10, scale: 2 }).notNull(),
+  expiryDate: timestamp("expiry_date"),
+  manufacturer: text("manufacturer"),
+  category: text("category"), // 'tablets', 'syrup', 'injection', etc.
+  description: text("description"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Extended Patient Information
 export const patientProfiles = pgTable("patient_profiles", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -424,3 +441,16 @@ export const insertPatientsRegistrationSchema = createInsertSchema(patientsRegis
 
 export type InsertPatientsRegistration = z.infer<typeof insertPatientsRegistrationSchema>;
 export type PatientsRegistration = typeof patientsRegistration.$inferSelect;
+
+// Medicine Inventory schema
+export const insertMedicineInventorySchema = createInsertSchema(medicineInventory).omit({
+  id: true,
+  createdBy: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  expiryDate: z.coerce.date().nullable().optional(),
+});
+
+export type InsertMedicineInventory = z.infer<typeof insertMedicineInventorySchema>;
+export type MedicineInventory = typeof medicineInventory.$inferSelect;

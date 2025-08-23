@@ -13,6 +13,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { Link } from 'wouter';
 import { ArrowLeft, Pill, Plus, Printer, Search, Trash2, Loader2 } from 'lucide-react';
 import { generatePrescriptionPDF } from '@/components/pdf-generator';
+import { PharmacyInventoryModal } from '@/components/PharmacyInventoryModal';
 
 const availableMedicines = [
   { id: 'paracetamol_500', name: 'Paracetamol 500mg', price: 5 },
@@ -40,6 +41,7 @@ export default function Pharmacy() {
   const [patientSearch, setPatientSearch] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
   const [medicines, setMedicines] = useState<MedicineItem[]>([]);
+  const [showInventoryModal, setShowInventoryModal] = useState(false);
 
   const { data: searchResults } = useQuery({
     queryKey: ['/api/patients/search', patientSearch],
@@ -216,7 +218,17 @@ export default function Pharmacy() {
           {/* Patient Lookup & Prescription */}
           <Card>
             <CardHeader>
-              <CardTitle>Patient & Prescription</CardTitle>
+              <CardTitle className="flex items-center justify-between">
+                <span>Patient & Prescription</span>
+                <Button 
+                  onClick={() => setShowInventoryModal(true)} 
+                  className="bg-medical-primary hover:bg-medical-primary-dark"
+                  data-testid="pharmacy-management-button"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Pharmacy Management
+                </Button>
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Patient Search */}
@@ -514,6 +526,12 @@ export default function Pharmacy() {
           </Card>
         </div>
       </div>
+
+      {/* Pharmacy Inventory Management Modal */}
+      <PharmacyInventoryModal
+        isOpen={showInventoryModal}
+        onClose={() => setShowInventoryModal(false)}
+      />
     </div>
   );
 }
