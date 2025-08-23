@@ -52,6 +52,13 @@ export function ConsultationCardModal({ isOpen, onClose, patientInfo }: Consulta
       pdf.setFont('helvetica', 'normal');
       pdf.text('Patient Consultation Card', pageWidth / 2, 25, { align: 'center' });
       
+      // Current date in top right white area
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      const currentDate = new Date().toLocaleDateString('en-IN');
+      pdf.text(`Date: ${currentDate}`, pageWidth - margin, 35, { align: 'right' });
+      
       // Patient Information Section (20% of page)
       let yPos = 40;
       pdf.setTextColor(0, 0, 0);
