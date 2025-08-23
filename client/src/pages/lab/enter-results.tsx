@@ -311,92 +311,99 @@ export default function EnterResults() {
         {!showReview ? (
           /* Results Entry Form */
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">Enter Test Results</h2>
+                <p className="text-gray-600">Enter the values for each selected test</p>
+              </div>
+
+              {validationErrors.length > 0 && (
+                <Alert className="border-red-200 bg-red-50">
+                  <AlertTriangle className="h-4 w-4 text-red-600" />
+                  <AlertDescription className="text-red-800">
+                    <ul className="list-disc list-inside space-y-1">
+                      {validationErrors.map((error, index) => (
+                        <li key={index}>{error}</li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              )}
+              
+              {/* Individual test cards */}
+              {results.map((result, index) => (
+                <Card key={index}>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">{result.testName}</CardTitle>
+                      <Badge 
+                        className={
+                          result.status === 'normal' ? 'bg-green-100 text-green-800' :
+                          result.status === 'high' ? 'bg-yellow-100 text-yellow-800' :
+                          result.status === 'low' ? 'bg-blue-100 text-blue-800' :
+                          'bg-red-100 text-red-800'
+                        }
+                      >
+                        {result.status.charAt(0).toUpperCase() + result.status.slice(1)}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <Label htmlFor={`value-${index}`}>Result Value *</Label>
+                        <Input
+                          id={`value-${index}`}
+                          type="number"
+                          step="0.01"
+                          value={result.value}
+                          onChange={(e) => updateResult(index, 'value', e.target.value)}
+                          placeholder="Enter value"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor={`unit-${index}`}>Unit</Label>
+                        <Input
+                          id={`unit-${index}`}
+                          value={result.unit}
+                          onChange={(e) => updateResult(index, 'unit', e.target.value)}
+                          placeholder="units"
+                        />
+                      </div>
+                      <div>
+                        <Label>Normal Range</Label>
+                        <p className="text-sm text-gray-600 pt-2">Consult reference values</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+
+              {/* Additional information card */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Enter Test Results</CardTitle>
-                  <p className="text-gray-600">Enter the values for each selected test</p>
+                  <CardTitle>Additional Information</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  {validationErrors.length > 0 && (
-                    <Alert className="border-red-200 bg-red-50">
-                      <AlertTriangle className="h-4 w-4 text-red-600" />
-                      <AlertDescription className="text-red-800">
-                        <ul className="list-disc list-inside space-y-1">
-                          {validationErrors.map((error, index) => (
-                            <li key={index}>{error}</li>
-                          ))}
-                        </ul>
-                      </AlertDescription>
-                    </Alert>
-                  )}
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="technician">Performed By *</Label>
+                    <Input
+                      id="technician"
+                      value={technician}
+                      onChange={(e) => setTechnician(e.target.value)}
+                      placeholder="Lab technician name"
+                    />
+                  </div>
                   
-                  {results.map((result, index) => (
-                    <div key={index} className="border rounded-lg p-4 space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-semibold text-gray-900">{result.testName}</h3>
-                        <Badge 
-                          className={
-                            result.status === 'normal' ? 'bg-green-100 text-green-800' :
-                            result.status === 'high' ? 'bg-yellow-100 text-yellow-800' :
-                            result.status === 'low' ? 'bg-blue-100 text-blue-800' :
-                            'bg-red-100 text-red-800'
-                          }
-                        >
-                          {result.status.charAt(0).toUpperCase() + result.status.slice(1)}
-                        </Badge>
-                      </div>
-                      
-                      <div className="grid grid-cols-3 gap-4">
-                        <div>
-                          <Label htmlFor={`value-${index}`}>Result Value *</Label>
-                          <Input
-                            id={`value-${index}`}
-                            type="number"
-                            step="0.01"
-                            value={result.value}
-                            onChange={(e) => updateResult(index, 'value', e.target.value)}
-                            placeholder="Enter value"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor={`unit-${index}`}>Unit</Label>
-                          <Input
-                            id={`unit-${index}`}
-                            value={result.unit}
-                            onChange={(e) => updateResult(index, 'unit', e.target.value)}
-                            placeholder="Unit"
-                          />
-                        </div>
-                        <div>
-                          <Label>Normal Range</Label>
-                          <p className="text-sm text-gray-600 pt-2">{result.normalRange}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="technician">Performed By *</Label>
-                      <Input
-                        id="technician"
-                        value={technician}
-                        onChange={(e) => setTechnician(e.target.value)}
-                        placeholder="Lab technician name"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="notes">Additional Notes</Label>
-                      <Textarea
-                        id="notes"
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        placeholder="Any additional observations or notes"
-                        rows={3}
-                      />
-                    </div>
+                  <div>
+                    <Label htmlFor="notes">Additional Notes</Label>
+                    <Textarea
+                      id="notes"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="Any additional observations or notes"
+                      rows={3}
+                    />
                   </div>
                 </CardContent>
               </Card>
