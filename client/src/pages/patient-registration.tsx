@@ -535,99 +535,74 @@ export default function PatientRegistration() {
       const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 15;
       
-      let yPos = 20;
+      // Calculate sections: 20% for patient details, 80% for consultation
+      const patientSectionHeight = pageHeight * 0.2;
+      const consultationStartY = patientSectionHeight + 10;
       
-      // Header - Doctor and Hospital Info (following reference format)
-      pdf.setTextColor(0, 0, 0);
-      pdf.setFontSize(16);
+      // Professional Header Design - Compact
+      pdf.setFillColor(16, 97, 143);
+      pdf.rect(0, 0, pageWidth, 30, 'F');
+      
+      // Hospital Name
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(20);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('NAKSHATRA HOSPITAL', margin, yPos);
+      pdf.text('NAKSHATRA HOSPITAL', pageWidth / 2, 15, { align: 'center' });
       
-      yPos += 8;
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text('Consultation Card', margin, yPos);
-      
-      // Current date on right (like reference)
-      pdf.setFontSize(11);
-      const currentDate = new Date().toLocaleDateString('en-IN');
-      pdf.text(`Date      ${currentDate}`, pageWidth - margin, 20, { align: 'right' });
-      
-      yPos += 15;
-      
-      // Patient Information Layout (like reference)
-      pdf.setFontSize(11);
-      pdf.setFont('helvetica', 'normal');
-      
-      // Left side - Name, Age, Gender (following reference layout)
-      pdf.text(`Name      ${patient.fullName}`, margin, yPos);
-      pdf.text(`Pat Id ${patient.mru}`, pageWidth - margin, yPos, { align: 'right' });
-      
-      yPos += 12;
-      pdf.text(`Age       ${patient.age}`, margin, yPos);
-      
-      yPos += 8;
-      pdf.text(`Gender    ${patient.gender}`, margin, yPos);
-      pdf.text(`Phone     ${patient.contactPhone}`, pageWidth - margin, yPos, { align: 'right' });
-      
-      yPos += 8;
-      pdf.text(`Blood Group ${patient.bloodGroup || 'N/A'}`, margin, yPos);
-      pdf.text(`Visit ID  ${patient.visitId}`, pageWidth - margin, yPos, { align: 'right' });
-      
-      yPos += 20;
-      
-      // Medical Sections (following reference format)
-      
-      // Chief Complaint
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Chief Complaint', margin, yPos);
-      yPos += 8;
-      pdf.setDrawColor(200, 200, 200);
-      pdf.line(margin, yPos, pageWidth - margin, yPos);
-      yPos += 20;
-      
-      // Clinical Examination
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Clinical Examination', margin, yPos);
-      yPos += 8;
-      pdf.line(margin, yPos, pageWidth - margin, yPos);
-      yPos += 20;
-      
-      // Diagnosis
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Diagnosis', margin, yPos);
-      yPos += 8;
-      pdf.line(margin, yPos, pageWidth - margin, yPos);
-      yPos += 20;
-      
-      // Treatment Plan
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Treatment Plan', margin, yPos);
-      yPos += 8;
-      pdf.line(margin, yPos, pageWidth - margin, yPos);
-      yPos += 20;
-      
-      // Prescriptions Table Header (like reference)
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Prescriptions', margin, yPos);
-      yPos += 12;
-      
-      // Table headers
       pdf.setFontSize(10);
-      pdf.text('S.No.', margin, yPos);
-      pdf.text('Medicine Name', margin + 25, yPos);
-      pdf.text('Dosage', margin + 90, yPos);
-      pdf.text('Instructions', margin + 130, yPos);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('Patient Consultation Card', pageWidth / 2, 25, { align: 'center' });
       
-      yPos += 6;
-      pdf.line(margin, yPos, pageWidth - margin, yPos);
-      yPos += 20;
+      // Current date in top right white area
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      const currentDate = new Date().toLocaleDateString('en-IN');
+      pdf.text(`Date: ${currentDate}`, pageWidth - margin, 35, { align: 'right' });
       
-      // Follow Up
+      // Patient Information Section
+      let yPos = 40;
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Follow Up', margin, yPos);
+      pdf.text('PATIENT INFORMATION', margin, yPos);
+      
       yPos += 8;
-      pdf.line(margin, yPos, pageWidth - margin, yPos);
+      
+      // Patient details
+      const details = [
+        { label: 'NAME', value: patient.fullName.toUpperCase() },
+        { label: 'MRU', value: patient.mru },
+        { label: 'VISIT ID', value: patient.visitId },
+        { label: 'AGE/GENDER', value: `${patient.age}Y / ${patient.gender.toUpperCase()}` },
+        { label: 'BLOOD GROUP', value: (patient.bloodGroup || 'N/A').toUpperCase() },
+        { label: 'PHONE', value: patient.contactPhone }
+      ];
+      
+      // Clean professional layout without boxes
+      const colWidth = (pageWidth - 2 * margin) / 3;
+      const rowHeight = 18;
+      
+      details.forEach((detail, index) => {
+        const col = index % 3;
+        const row = Math.floor(index / 3);
+        const xPos = margin + (col * colWidth);
+        const yPosText = yPos + (row * rowHeight);
+        
+        // Label
+        pdf.setFontSize(8);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(detail.label + ':', xPos, yPosText);
+        
+        // Value
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(0, 0, 0);
+        pdf.text(detail.value, xPos, yPosText + 8);
+      });
+      
+      // Clean consultation form section starts here
       
       // Signature section at bottom
       const bottomY = pageHeight - 35;
