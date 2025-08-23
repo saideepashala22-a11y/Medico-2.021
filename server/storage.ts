@@ -45,6 +45,7 @@ export interface IStorage {
   getPrescriptionsByPatient(patientId: string): Promise<Prescription[]>;
   createPrescription(prescription: InsertPrescription): Promise<Prescription>;
   getRecentPrescriptions(): Promise<(Prescription & { patient: Patient })[]>;
+  searchPrescriptionsByBillNumber(billNumber: string): Promise<(Prescription & { patient: any })[]>;
   
   // Discharge Summaries
   getDischargeSummary(id: string): Promise<DischargeSummary | undefined>;
@@ -308,6 +309,26 @@ export class DatabaseStorage implements IStorage {
     .innerJoin(patientsRegistration, eq(prescriptions.patientId, patientsRegistration.id))
     .orderBy(desc(prescriptions.createdAt))
     .limit(3);
+  }
+
+  async searchPrescriptionsByBillNumber(billNumber: string): Promise<(Prescription & { patient: any })[]> {
+    return await db.select({
+      id: prescriptions.id,
+      billNumber: prescriptions.billNumber,
+      patientId: prescriptions.patientId,
+      medicines: prescriptions.medicines,
+      subtotal: prescriptions.subtotal,
+      tax: prescriptions.tax,
+      total: prescriptions.total,
+      createdBy: prescriptions.createdBy,
+      createdAt: prescriptions.createdAt,
+      patient: patientsRegistration,
+    })
+    .from(prescriptions)
+    .innerJoin(patientsRegistration, eq(prescriptions.patientId, patientsRegistration.id))
+    .where(ilike(prescriptions.billNumber, `%${billNumber}%`))
+    .orderBy(desc(prescriptions.createdAt))
+    .limit(10);
   }
 
   async getDischargeSummary(id: string): Promise<DischargeSummary | undefined> {

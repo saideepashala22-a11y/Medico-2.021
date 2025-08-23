@@ -372,6 +372,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/prescriptions/search', authenticateToken, async (req: any, res) => {
+    try {
+      const { billNumber } = req.query;
+      if (!billNumber) {
+        return res.status(400).json({ message: 'Bill number is required' });
+      }
+      const prescriptions = await storage.searchPrescriptionsByBillNumber(billNumber as string);
+      res.json(prescriptions);
+    } catch (error) {
+      console.error('Error searching prescriptions:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
   app.get('/api/prescriptions/:id', authenticateToken, async (req: any, res) => {
     try {
       const prescription = await storage.getPrescription(req.params.id);

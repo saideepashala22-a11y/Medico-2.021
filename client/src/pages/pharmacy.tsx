@@ -37,8 +37,10 @@ export default function Pharmacy() {
   const [showInventoryModal, setShowInventoryModal] = useState(false);
   const [showPatientDropdown, setShowPatientDropdown] = useState(false);
   const [viewingPrescription, setViewingPrescription] = useState<any>(null);
+  const [billSearch, setBillSearch] = useState('');
+  const [billSearchResults, setBillSearchResults] = useState<any[]>([]);
 
-  const { data: searchResults } = useQuery({
+  const { data: patientSearchResults } = useQuery({
     queryKey: ['/api/patients/search', patientSearch],
     queryFn: async () => {
       const response = await fetch(`/api/patients/search?q=${encodeURIComponent(patientSearch)}`, {
@@ -51,9 +53,26 @@ export default function Pharmacy() {
     enabled: showPatientDropdown, // Only enabled when dropdown should show
   });
 
+  // Search for prescriptions by bill number
+  const { data: billSearchData } = useQuery({
+    queryKey: ['/api/prescriptions/search', billSearch],
+    queryFn: async () => {
+      const response = await fetch(`/api/prescriptions/search?billNumber=${encodeURIComponent(billSearch)}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      return response.json();
+    },
+    enabled: billSearch.length > 0, // Only search when user types something
+  });
+
   const { data: recentPrescriptions, isLoading: prescriptionsLoading } = useQuery({
     queryKey: ['/api/prescriptions/recent'],
   });
+
+  // Use search results if search is active, otherwise show recent prescriptions
+  const displayedPrescriptions = billSearch.length > 0 ? billSearchData : recentPrescriptions;
 
   // Fetch available medicines from inventory
   const { data: availableMedicines } = useQuery({
@@ -341,9 +360,9 @@ export default function Pharmacy() {
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                 </div>
                 
-                {showPatientDropdown && searchResults && searchResults.length > 0 && (
+                {showPatientDropdown && patientSearchResults && patientSearchResults.length > 0 && (
                   <div className="mt-2 border rounded-lg bg-white shadow-sm max-h-60 overflow-y-auto">
-                    {searchResults.map((patient: any) => (
+                    {patientSearchResults.map((patient: any) => (
                       <div
                         key={patient.id}
                         className="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
@@ -361,7 +380,7 @@ export default function Pharmacy() {
                   </div>
                 )}
                 
-                {showPatientDropdown && patientSearch && searchResults && searchResults.length === 0 && (
+                {showPatientDropdown && patientSearch && patientSearchResults && patientSearchResults.length === 0 && (
                   <div className="mt-2 border rounded-lg bg-white shadow-sm p-3 text-gray-500 text-center">
                     No patients found matching "{patientSearch}"
                   </div>
@@ -536,8 +555,18 @@ export default function Pharmacy() {
         {/* Recent Prescriptions */}
         <div className="mt-8">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <CardTitle>Recent Prescriptions</CardTitle>
+              <div className="relative w-72">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search by bill number (e.g., PH-2025-001)"
+                  value={billSearch}
+                  onChange={(e) => setBillSearch(e.target.value)}
+                  className="pl-10"
+                  data-testid="bill-search-input"
+                />
+              </div>
             </CardHeader>
             <CardContent>
               {prescriptionsLoading ? (
@@ -557,14 +586,14 @@ export default function Pharmacy() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {(recentPrescriptions as any[])?.length === 0 ? (
+                    {(displayedPrescriptions as any[])?.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={6} className="text-center py-8 text-gray-500">
-                          No prescriptions found
+                          {billSearch.length > 0 ? 'No prescriptions found matching your search' : 'No prescriptions found'}
                         </TableCell>
                       </TableRow>
                     ) : (
-                      (recentPrescriptions as any[])?.map((prescription: any) => (
+                      (displayedPrescriptions as any[])?.map((prescription: any) => (
                         <TableRow key={prescription.id}>
                           <TableCell>
                             <div>
