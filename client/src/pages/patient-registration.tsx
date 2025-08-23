@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Link } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
+import { ConsultationCardModal } from '@/components/ConsultationCardModal';
 import { 
   ArrowLeft, 
   UserPlus, 
@@ -82,6 +83,8 @@ export default function PatientRegistration() {
   const [editingPatient, setEditingPatient] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [age, setAge] = useState<number>(0);
+  const [showConsultationModal, setShowConsultationModal] = useState(false);
+  const [registeredPatientInfo, setRegisteredPatientInfo] = useState<any>(null);
   // Generate unique MRU number based on current year
   const generateUniqueMRU = (): string => {
     const currentYear = new Date().getFullYear().toString().slice(-2);
@@ -326,10 +329,20 @@ export default function PatientRegistration() {
 
       const newPatient = await response.json();
 
-      toast({
-        title: 'Success',
-        description: `Patient registered successfully with MRU: ${formData.mruNumber}`,
+      // Store patient info for consultation card modal
+      setRegisteredPatientInfo({
+        mruNumber: formData.mruNumber,
+        visitId: formData.visitId,
+        fullName: formData.fullName,
+        age: parseInt(formData.age) || 0,
+        gender: formData.gender,
+        contactPhone: formData.contactPhone,
+        bloodGroup: formData.bloodGroup,
+        registrationDate: new Date().toISOString(),
       });
+
+      // Show consultation card modal instead of just toast
+      setShowConsultationModal(true);
 
       // Reset form after successful submission
       const newMruNumber = generateMRUNumber();
@@ -754,6 +767,23 @@ export default function PatientRegistration() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Consultation Card Download Modal */}
+      {showConsultationModal && registeredPatientInfo && (
+        <ConsultationCardModal
+          isOpen={showConsultationModal}
+          onClose={() => {
+            setShowConsultationModal(false);
+            setRegisteredPatientInfo(null);
+            // Show success toast after modal is closed
+            toast({
+              title: 'Success',
+              description: `Patient registered successfully with MRU: ${registeredPatientInfo.mruNumber}`,
+            });
+          }}
+          patientInfo={registeredPatientInfo}
+        />
+      )}
     </div>
   );
 }
