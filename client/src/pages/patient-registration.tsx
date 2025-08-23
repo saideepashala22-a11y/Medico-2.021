@@ -647,6 +647,7 @@ export default function PatientRegistration() {
       toast({
         title: 'Success',
         description: `Consultation card downloaded for ${patient.fullName}`,
+        duration: 2000, // Auto-dismiss after 2 seconds
       });
       
     } catch (error) {
