@@ -74,10 +74,10 @@ export default function Pharmacy() {
       return response.json();
     },
     onSuccess: () => {
-      // Force refresh of medicine data immediately
+      // Force immediate refresh of all medicine data
       queryClient.invalidateQueries({ queryKey: ['/api/prescriptions/recent'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/medicines/active'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/medicines'] }); // Also refresh full medicines list
+      queryClient.refetchQueries({ queryKey: ['/api/medicines/active'] }); // Force immediate refetch
+      queryClient.refetchQueries({ queryKey: ['/api/medicines'] }); // Force immediate refetch for modal
       
       toast({
         title: 'Success',

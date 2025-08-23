@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -63,10 +63,19 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
   });
 
   // Fetch all medicines
-  const { data: medicines, isLoading } = useQuery({
+  const { data: medicines, isLoading, refetch } = useQuery({
     queryKey: ['/api/medicines'],
     enabled: isOpen,
+    refetchOnWindowFocus: true,
+    staleTime: 0, // Always refetch when needed
   });
+
+  // Refetch medicines when modal opens to ensure fresh data
+  useEffect(() => {
+    if (isOpen) {
+      refetch();
+    }
+  }, [isOpen, refetch]);
 
   // Create medicine mutation
   const createMedicineMutation = useMutation({
