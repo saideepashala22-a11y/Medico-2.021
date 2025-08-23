@@ -304,16 +304,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const prescriptions = await storage.getRecentPrescriptions();
       const billNumber = `PH-${year}-${String(prescriptions.length + 1).padStart(3, '0')}`;
 
-      // Convert string amounts to numbers for decimal validation
-      const processedBody = {
-        ...req.body,
-        subtotal: parseFloat(req.body.subtotal),
-        tax: parseFloat(req.body.tax),
-        total: parseFloat(req.body.total),
-      };
-
       const prescriptionData = insertPrescriptionSchema.parse({
-        ...processedBody,
+        ...req.body,
         billNumber,
         createdBy: req.user.id,
       });
