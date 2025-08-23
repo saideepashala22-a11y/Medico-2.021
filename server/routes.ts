@@ -304,8 +304,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const prescriptions = await storage.getRecentPrescriptions();
       const billNumber = `PH-${year}-${String(prescriptions.length + 1).padStart(3, '0')}`;
 
-      const prescriptionData = insertPrescriptionSchema.parse({
+      // Convert string amounts to numbers for decimal validation
+      const processedBody = {
         ...req.body,
+        subtotal: parseFloat(req.body.subtotal),
+        tax: parseFloat(req.body.tax),
+        total: parseFloat(req.body.total),
+      };
+
+      const prescriptionData = insertPrescriptionSchema.parse({
+        ...processedBody,
         billNumber,
         createdBy: req.user.id,
       });
@@ -313,6 +321,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const prescription = await storage.createPrescription(prescriptionData);
       res.status(201).json(prescription);
     } catch (error) {
+      console.error('Prescription creation error:', error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: 'Invalid input', errors: error.errors });
       }

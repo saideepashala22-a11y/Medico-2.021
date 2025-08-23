@@ -40,7 +40,7 @@ export const labTests = pgTable("lab_tests", {
 export const prescriptions = pgTable("prescriptions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   billNumber: text("bill_number").notNull().unique(),
-  patientId: varchar("patient_id").notNull().references(() => patients.id),
+  patientId: varchar("patient_id").notNull().references(() => patientsRegistration.id),
   medicines: jsonb("medicines").notNull(), // array of medicine objects
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   tax: decimal("tax", { precision: 10, scale: 2 }).notNull(),

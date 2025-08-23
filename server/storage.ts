@@ -291,7 +291,7 @@ export class DatabaseStorage implements IStorage {
     return newPrescription;
   }
 
-  async getRecentPrescriptions(): Promise<(Prescription & { patient: Patient })[]> {
+  async getRecentPrescriptions(): Promise<(Prescription & { patient: any })[]> {
     return await db.select({
       id: prescriptions.id,
       billNumber: prescriptions.billNumber,
@@ -302,10 +302,10 @@ export class DatabaseStorage implements IStorage {
       total: prescriptions.total,
       createdBy: prescriptions.createdBy,
       createdAt: prescriptions.createdAt,
-      patient: patients,
+      patient: patientsRegistration,
     })
     .from(prescriptions)
-    .innerJoin(patients, eq(prescriptions.patientId, patients.id))
+    .innerJoin(patientsRegistration, eq(prescriptions.patientId, patientsRegistration.id))
     .orderBy(desc(prescriptions.createdAt))
     .limit(10);
   }
