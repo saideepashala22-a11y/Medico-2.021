@@ -60,12 +60,17 @@ export function generatePrescriptionPDF(patient: Patient, prescription: Prescrip
   doc.text(`Date: ${new Date(prescription.createdAt).toLocaleDateString()}`, 120, 50);
   
   // Patient Info
-  doc.text(`Patient: ${patient.name}`, 20, 70);
-  doc.text(`Patient ID: ${patient.patientId}`, 20, 80);
+  doc.text(`Patient: ${(patient as any).fullName || patient.name}`, 20, 70);
+  doc.text(`Patient ID: ${(patient as any).mruNumber || patient.patientId}`, 20, 80);
+  doc.text(`Mobile: ${(patient as any).contactPhone || patient.contact || 'N/A'}`, 20, 90);
+  if ((patient as any).referringDoctor) {
+    doc.text(`Doctor: ${(patient as any).referringDoctor}`, 20, 100);
+  }
   
   // Medicine List
-  doc.text('Medicines:', 20, 100);
-  let yPos = 110;
+  let startY = (patient as any).referringDoctor ? 120 : 110;
+  doc.text('Medicines:', 20, startY);
+  let yPos = startY + 10;
   
   const medicines = prescription.medicines as any[];
   medicines.forEach(medicine => {
