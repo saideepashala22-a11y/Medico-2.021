@@ -593,10 +593,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/patients-registration/:id', authenticateToken, async (req: any, res) => {
     try {
       const validatedData = insertPatientsRegistrationSchema.parse(req.body);
-      const updatedRegistration = await storage.updatePatientsRegistration(req.params.id, {
-        ...validatedData,
-        createdBy: req.user.id
-      });
+      const updatedRegistration = await storage.updatePatientsRegistration(req.params.id, validatedData);
       if (!updatedRegistration) {
         return res.status(404).json({ message: 'Patient registration not found' });
       }
