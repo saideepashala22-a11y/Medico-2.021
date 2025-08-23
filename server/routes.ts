@@ -342,9 +342,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // All stock checks passed, deduct quantities and create prescription
+      console.log('Deducting quantities for medicines:', medicinesArray.map(m => ({ id: m.medicineId, name: m.name, qty: m.quantity })));
+      
       await Promise.all(
         medicinesArray.map(async (medicine: any) => {
-          await storage.updateMedicineQuantity(medicine.medicineId, -medicine.quantity);
+          console.log(`Deducting ${medicine.quantity} from medicine ${medicine.medicineId} (${medicine.name})`);
+          const result = await storage.updateMedicineQuantity(medicine.medicineId, -medicine.quantity);
+          console.log(`Updated medicine result:`, result);
         })
       );
       
