@@ -156,8 +156,8 @@ export default function TestSelection() {
         id: test.id,
         testName: test.testName,
         department: test.department,
-        cost: parseFloat(test.cost)
-      })), // Send as JSONB array matching schema
+        cost: getDisplayPrice(test.id, parseFloat(test.cost))
+      })), // Send as JSONB array matching schema with custom prices
       status: 'pending',
       totalCost: totalCost.toString() // Convert to string for decimal field
     };

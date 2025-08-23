@@ -27,7 +27,7 @@ export const patients = pgTable("patients", {
 
 export const labTests = pgTable("lab_tests", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  patientId: varchar("patient_id").notNull().references(() => patients.id),
+  patientId: varchar("patient_id").notNull().references(() => patientsRegistration.id),
   testTypes: jsonb("test_types").notNull(), // array of selected test types
   results: jsonb("results"), // test results data
   doctorNotes: text("doctor_notes"),
@@ -196,9 +196,9 @@ export const medicalHistoryRelations = relations(medicalHistory, ({ one }) => ({
 }));
 
 export const labTestsRelations = relations(labTests, ({ one }) => ({
-  patient: one(patients, {
+  patient: one(patientsRegistration, {
     fields: [labTests.patientId],
-    references: [patients.id],
+    references: [patientsRegistration.id],
   }),
   createdBy: one(users, {
     fields: [labTests.createdBy],
@@ -207,9 +207,9 @@ export const labTestsRelations = relations(labTests, ({ one }) => ({
 }));
 
 export const prescriptionsRelations = relations(prescriptions, ({ one }) => ({
-  patient: one(patients, {
+  patient: one(patientsRegistration, {
     fields: [prescriptions.patientId],
-    references: [patients.id],
+    references: [patientsRegistration.id],
   }),
   createdBy: one(users, {
     fields: [prescriptions.createdBy],
