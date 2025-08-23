@@ -210,7 +210,7 @@ export default function LabReport() {
 
                 // Result value (bold for emphasis)
                 doc.setFont("helvetica", "bold");
-                doc.text(String(testResult.value), 80, yPos + 2);
+                doc.text(String(testResult.value), 90, yPos + 2);
                 doc.setFont("helvetica", "normal");
 
                 // Unit
