@@ -219,6 +219,14 @@ export default function LabReport() {
       
       // Add separation line before signature
       yPos += 25;
+      console.log('🔍 Position before signature:', yPos, 'Page height:', pageHeight);
+      
+      // Check if we need a new page for signature
+      if (yPos > pageHeight - 100) {
+        doc.addPage();
+        yPos = 30; // Start from top of new page
+      }
+      
       doc.setLineWidth(0.3);
       doc.line(15, yPos, pageWidth - 15, yPos);
       
