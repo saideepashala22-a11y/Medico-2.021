@@ -198,7 +198,7 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
       medicineName: formData.medicineName,
       batchNumber: formData.batchNumber,
       quantity: parseInt(formData.quantity),
-      mrp: parseFloat(formData.mrp),
+      mrp: formData.mrp, // Keep as string
       expiryDate: formData.expiryDate || undefined,
       manufacturer: formData.manufacturer || undefined,
       category: formData.category || undefined,
