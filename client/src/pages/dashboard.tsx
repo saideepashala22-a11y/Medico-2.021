@@ -14,7 +14,6 @@ import {
   TestTube,
   FileCheck,
   Heart,
-  Stethoscope,
   Scissors,
   UserPlus
 } from 'lucide-react';
@@ -92,21 +91,6 @@ export default function Dashboard() {
             </CardContent>
           </Card>
           
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Stethoscope className="h-8 w-8 text-cyan-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-medical-text-muted">Consultations Today</p>
-                  <p className="text-2xl font-bold text-medical-text">
-                    {isLoading ? '...' : (stats as any)?.consultationsToday || 0}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
           
           <Card>
             <CardContent className="pt-6">
@@ -184,37 +168,6 @@ export default function Dashboard() {
                   <li className="flex items-center">
                     <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                     Medical History
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </Link>
-
-          {/* Consultation Module - SECOND */}
-          <Link href="/consultation">
-            <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
-              <div className="bg-cyan-600 p-6">
-                <Stethoscope className="text-white text-3xl mb-4" />
-                <h3 className="text-xl font-bold text-white">Consultation</h3>
-              </div>
-              <CardContent className="p-6">
-                <p className="text-medical-text-muted mb-4">Doctor consultations, patient notes, and reports</p>
-                <ul className="text-sm text-medical-text-muted space-y-2">
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-medical-primary rounded-full mr-2"></div>
-                    Patient Search
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-medical-secondary rounded-full mr-2"></div>
-                    Consultation Records
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-cyan-600 rounded-full mr-2"></div>
-                    Prescription Management
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-2 h-2 bg-medical-accent rounded-full mr-2"></div>
-                    PDF Reports
                   </li>
                 </ul>
               </CardContent>
