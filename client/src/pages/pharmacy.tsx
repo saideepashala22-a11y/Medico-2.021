@@ -74,8 +74,11 @@ export default function Pharmacy() {
       return response.json();
     },
     onSuccess: () => {
+      // Force refresh of medicine data immediately
       queryClient.invalidateQueries({ queryKey: ['/api/prescriptions/recent'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/medicines/active'] }); // Refresh medicine quantities
+      queryClient.invalidateQueries({ queryKey: ['/api/medicines/active'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/medicines'] }); // Also refresh full medicines list
+      
       toast({
         title: 'Success',
         description: 'Prescription saved successfully',

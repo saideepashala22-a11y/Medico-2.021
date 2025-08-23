@@ -893,6 +893,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateMedicineQuantity(id: string, quantityChange: number): Promise<MedicineInventory> {
+    console.log(`[DEBUG] updateMedicineQuantity called with id: ${id}, quantityChange: ${quantityChange}`);
+    
     const [updated] = await db.update(medicineInventory)
       .set({ 
         quantity: sql`quantity + ${quantityChange}`,
@@ -900,6 +902,8 @@ export class DatabaseStorage implements IStorage {
       })
       .where(eq(medicineInventory.id, id))
       .returning();
+    
+    console.log(`[DEBUG] Updated medicine:`, updated);
     return updated;
   }
 
