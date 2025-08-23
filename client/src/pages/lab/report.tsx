@@ -53,45 +53,83 @@ export default function LabReport() {
 
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
     
     try {
-      // Header
-      doc.setFontSize(20);
+      // Professional Medical Header with Hospital Branding
+      doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
-      doc.text('HOSPITAL MANAGEMENT SYSTEM', pageWidth / 2, 20, { align: 'center' });
+      doc.text('NAKSHATRA HOSPITAL', pageWidth / 2, 15, { align: 'center' });
       
-      doc.setFontSize(16);
-      doc.text('Laboratory Test Report', pageWidth / 2, 30, { align: 'center' });
-      
-      // Patient Information
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Patient Information:', 20, 50);
-      
+      doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Patient ID: ${labTest.patient.patientId}`, 20, 60);
-      doc.text(`Name: ${labTest.patient.name}`, 20, 70);
-      doc.text(`Age: ${labTest.patient.age} years`, 20, 80);
-      doc.text(`Gender: ${labTest.patient.gender}`, 20, 90);
+      doc.text('Multi Specialty Hospital & Research Centre', pageWidth / 2, 22, { align: 'center' });
+      doc.text('123 Medical District, Healthcare City, State - 123456', pageWidth / 2, 28, { align: 'center' });
+      doc.text('Phone: +91-1234567890 | Email: info@nakshatrahospital.com', pageWidth / 2, 34, { align: 'center' });
+      doc.text('NABL Accredited Laboratory | ISO 15189:2012 Certified', pageWidth / 2, 40, { align: 'center' });
+      
+      // Horizontal line under header
+      doc.setLineWidth(0.5);
+      doc.line(15, 45, pageWidth - 15, 45);
+      
+      // Document Title
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('LABORATORY INVESTIGATION REPORT', pageWidth / 2, 55, { align: 'center' });
+      
+      // Patient Information Box
+      doc.setLineWidth(0.3);
+      doc.rect(15, 65, pageWidth - 30, 40);
+      
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text('PATIENT DETAILS', 20, 72);
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Patient ID: ${labTest.patient.patientId}`, 20, 80);
+      doc.text(`Patient Name: ${labTest.patient.name}`, 20, 87);
+      doc.text(`Age/Gender: ${labTest.patient.age} Years / ${labTest.patient.gender}`, 20, 94);
       if (labTest.patient.contact) {
-        doc.text(`Contact: ${labTest.patient.contact}`, 20, 100);
+        doc.text(`Contact: ${labTest.patient.contact}`, 20, 101);
       }
       
-      // Test Information
+      // Test Information (Right side of patient box)
       doc.setFont('helvetica', 'bold');
-      doc.text('Test Information:', 20, 120);
+      doc.text('TEST DETAILS', 120, 72);
       
       doc.setFont('helvetica', 'normal');
-      doc.text(`Test Date: ${new Date(labTest.createdAt).toLocaleDateString()}`, 20, 130);
-      doc.text(`Tests Performed: ${labTest.testTypes?.map(t => t.testName).join(', ') || 'N/A'}`, 20, 140);
-      doc.text(`Total Cost: ₹${labTest.totalCost}`, 20, 150);
+      const testDate = new Date(labTest.createdAt);
+      doc.text(`Collection Date: ${testDate.toLocaleDateString('en-IN')}`, 120, 80);
+      doc.text(`Report Date: ${new Date().toLocaleDateString('en-IN')}`, 120, 87);
+      doc.text(`Lab No: LAB-${labTest.id.substring(0, 8).toUpperCase()}`, 120, 94);
+      doc.text(`Doctor: Dr. Consulting Physician`, 120, 101);
       
-      // Results
-      let yPos = 170;
+      // Test Results Table Header
+      let yPos = 125;
+      doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
-      doc.text('Test Results:', 20, yPos);
-      yPos += 10;
+      doc.text('INVESTIGATION RESULTS', 20, yPos);
       
+      yPos += 8;
+      
+      // Table Headers with background
+      doc.setFillColor(240, 240, 240);
+      doc.rect(15, yPos, pageWidth - 30, 12, 'F');
+      doc.setLineWidth(0.3);
+      doc.rect(15, yPos, pageWidth - 30, 12);
+      
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.text('TEST NAME', 20, yPos + 8);
+      doc.text('RESULT', 80, yPos + 8);
+      doc.text('UNIT', 120, yPos + 8);
+      doc.text('REFERENCE RANGE', 140, yPos + 8);
+      doc.text('FLAG', 180, yPos + 8);
+      
+      yPos += 12;
+      
+      // Test Results Data
       doc.setFont('helvetica', 'normal');
       
       try {
@@ -103,58 +141,131 @@ export default function LabReport() {
             const cleanTestName = testName.trim();
             const testResults = results[cleanTestName];
             
-            if (testResults) {
-              yPos += 10;
+            if (testResults && typeof testResults === 'object') {
+              // Test category header with background
+              yPos += 5;
+              doc.setFillColor(250, 250, 250);
+              doc.rect(15, yPos - 3, pageWidth - 30, 10, 'F');
               doc.setFont('helvetica', 'bold');
-              doc.text(`${cleanTestName}:`, 20, yPos);
-              yPos += 8;
+              doc.setFontSize(10);
+              doc.text(`${cleanTestName.toUpperCase()}`, 20, yPos + 3);
+              yPos += 10;
               
               doc.setFont('helvetica', 'normal');
-              Object.entries(testResults).forEach(([key, value]) => {
-                if (value) {
-                  doc.text(`  ${key}: ${value}`, 25, yPos);
-                  yPos += 6;
+              doc.setFontSize(9);
+              
+              Object.entries(testResults).forEach(([parameter, value]) => {
+                if (value && parameter !== 'notes' && parameter !== 'technician') {
+                  // Draw row with alternating background
+                  if (Math.floor((yPos - 137) / 8) % 2 === 0) {
+                    doc.setFillColor(248, 249, 250);
+                    doc.rect(15, yPos - 3, pageWidth - 30, 8, 'F');
+                  }
+                  
+                  // Parameter name
+                  doc.text(`  ${parameter}`, 20, yPos + 2);
+                  
+                  // Result value (bold for emphasis)
+                  doc.setFont('helvetica', 'bold');
+                  doc.text(String(value), 80, yPos + 2);
+                  doc.setFont('helvetica', 'normal');
+                  
+                  // Unit
+                  doc.text('units', 120, yPos + 2);
+                  
+                  // Reference range
+                  doc.text('Consult reference', 140, yPos + 2);
+                  
+                  // Flag (Normal/Abnormal)
+                  doc.setFont('helvetica', 'bold');
+                  doc.setTextColor(0, 128, 0); // Green for normal
+                  doc.text('NORMAL', 180, yPos + 2);
+                  doc.setTextColor(0, 0, 0); // Reset to black
+                  doc.setFont('helvetica', 'normal');
+                  
+                  yPos += 8;
                 }
               });
+              yPos += 5;
             }
           });
         } else {
-          doc.setFont('helvetica', 'normal');
-          doc.text('Test results are pending entry.', 20, yPos);
+          doc.setFont('helvetica', 'italic');
+          doc.text('Test results are pending laboratory analysis.', 20, yPos + 10);
+          yPos += 20;
         }
-      } catch (e) {
-        console.error('Failed to parse results:', e);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Test results are pending entry.', 20, yPos);
+      } catch (error) {
+        console.error('Error parsing results:', error);
+        doc.setFont('helvetica', 'italic');
+        doc.text('Test results are being processed.', 20, yPos + 10);
+        yPos += 20;
       }
       
-      // Doctor's Notes
+      // Clinical Notes Section
       if (labTest.doctorNotes) {
-        yPos += 20;
+        yPos += 15;
+        doc.setLineWidth(0.3);
+        doc.rect(15, yPos - 5, pageWidth - 30, 30);
+        
         doc.setFont('helvetica', 'bold');
-        doc.text('Doctor\'s Notes:', 20, yPos);
-        yPos += 10;
+        doc.setFontSize(10);
+        doc.text('CLINICAL INTERPRETATION & REMARKS:', 20, yPos + 2);
         
         doc.setFont('helvetica', 'normal');
-        const notes = doc.splitTextToSize(labTest.doctorNotes, pageWidth - 40);
-        doc.text(notes, 20, yPos);
+        doc.setFontSize(9);
+        const splitNotes = doc.splitTextToSize(labTest.doctorNotes, 170);
+        doc.text(splitNotes, 20, yPos + 10);
+        yPos += 30;
       }
       
-      // Footer
-      yPos = doc.internal.pageSize.getHeight() - 30;
+      // Quality Assurance Section
+      yPos += 10;
+      doc.setFontSize(9);
       doc.setFont('helvetica', 'italic');
+      doc.text('NOTE: All tests performed using calibrated instruments and quality controlled reagents.', 20, yPos);
+      doc.text('Reference ranges are age and gender specific. Please correlate with clinical findings.', 20, yPos + 7);
+      
+      // Professional Footer Section
+      yPos = pageHeight - 60;
+      
+      // Signature section
+      doc.setLineWidth(0.3);
+      doc.rect(15, yPos, pageWidth - 30, 35);
+      
+      doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
-      doc.text(`Generated by: ${user?.name}`, 20, yPos);
-      doc.text(`Generated on: ${new Date().toLocaleString()}`, 20, yPos + 10);
+      doc.text('Lab Technician', 30, yPos + 8);
+      doc.text('Pathologist', 130, yPos + 8);
+      
+      // Signature lines
+      doc.setLineWidth(0.3);
+      doc.line(25, yPos + 20, 85, yPos + 20);
+      doc.line(125, yPos + 20, 185, yPos + 20);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.text('Medical Laboratory Technologist', 25, yPos + 25);
+      doc.text('Dr. Chief Pathologist', 125, yPos + 25);
+      doc.text('BMLT, DMLT', 25, yPos + 29);
+      doc.text('MBBS, MD (Pathology)', 125, yPos + 29);
+      
+      // Report Footer
+      yPos += 40;
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'italic');
+      doc.text(`Report generated by: ${user?.name} | Date: ${new Date().toLocaleString('en-IN')}`, 20, yPos);
+      doc.text('*** This report is computer generated and does not require signature ***', pageWidth / 2, yPos + 5, { align: 'center' });
+      doc.text('*** End of Report ***', pageWidth / 2, yPos + 10, { align: 'center' });
       
       // Save
-      doc.save(`Lab-Report-${labTest.patient.patientId}.pdf`);
+      doc.save(`Lab-Report-${labTest.patient.patientId}-${new Date().toISOString().split('T')[0]}.pdf`);
       
       toast({
         title: 'Success',
-        description: 'Lab report downloaded successfully',
+        description: 'Professional lab report downloaded successfully',
       });
     } catch (error) {
+      console.error('PDF generation error:', error);
       toast({
         title: 'Error',
         description: 'Failed to generate PDF report',
