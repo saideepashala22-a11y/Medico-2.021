@@ -222,6 +222,7 @@ export default function Pharmacy() {
     toast({
       title: 'Success',
       description: 'GST invoice downloaded successfully',
+      duration: 1000, // 1 second
     });
   };
 
@@ -261,6 +262,7 @@ export default function Pharmacy() {
     toast({
       title: 'Success',
       description: 'Prescription downloaded successfully',
+      duration: 1000, // 1 second
     });
   };
 
