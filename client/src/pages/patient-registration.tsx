@@ -602,8 +602,8 @@ export default function PatientRegistration() {
         pdf.text(detail.value, xPos, yPosText + 8);
       });
       
-      // Add separator line for medicine writing area (moved down an inch)
-      yPos += 72; // 72 points = 1 inch
+      // Add separator line for medicine writing area
+      yPos += 40; // Reduced spacing
       pdf.setDrawColor(0, 0, 0);
       pdf.setLineWidth(1);
       pdf.line(margin, yPos, pageWidth - margin, yPos);
