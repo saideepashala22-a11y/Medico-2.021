@@ -604,14 +604,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get current hospital stats to provide real data to AI
       const stats = await storage.getStats();
-      const hospitalContext = `Current Hospital Data (Today):
-- Total Patients: ${stats.totalPatients}
-- Lab Tests Today: ${stats.labTestsToday}
-- Prescriptions Today: ${stats.prescriptionsToday}
-- Discharges Today: ${stats.dischargesToday}
+      const hospitalContext = `IMPORTANT - CURRENT HOSPITAL DATA (Use these exact numbers when asked):
+- Total Patients Registered: ${stats.totalPatients}
+- Lab Tests Completed Today: ${stats.labTestsToday}
+- Prescriptions Issued Today: ${stats.prescriptionsToday}
+- Patient Discharges Today: ${stats.dischargesToday}
 - Surgical Cases Today: ${stats.surgicalCasesToday || 0}
 
-This is real-time data from Nakshatra Hospital's system. Use this information when answering questions about current hospital status.
+INSTRUCTION: When users ask about patient numbers or hospital statistics, provide these exact numbers directly. Do not explain how to find the data - give the specific numbers above.
 
 ${context || 'Nakshatra Hospital HMS assistance'}`;
 
