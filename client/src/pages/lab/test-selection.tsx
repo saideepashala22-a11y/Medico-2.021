@@ -23,7 +23,6 @@ export default function TestSelection() {
   const [selectedTests, setSelectedTests] = useState<string[]>([]);
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [customPrices, setCustomPrices] = useState<Record<string, number>>({});
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   // Fetch patient details
   const { data: patient, isLoading: patientLoading } = useQuery<any>({
@@ -50,8 +49,8 @@ export default function TestSelection() {
   const filteredTests = useMemo(() => {
     if (!testDefinitions) return [];
     
-    // Only show tests when user starts typing AND search is focused
-    if (!searchTerm || searchTerm.length === 0 || !isSearchFocused) {
+    // Only show tests when user starts typing
+    if (!searchTerm || searchTerm.length === 0) {
       return [];
     }
     
@@ -84,7 +83,7 @@ export default function TestSelection() {
       
       return a.testName.localeCompare(b.testName);
     });
-  }, [testDefinitions, searchTerm, selectedDepartment, isSearchFocused]);
+  }, [testDefinitions, searchTerm, selectedDepartment]);
 
   // Get unique departments
   const departments = useMemo(() => {
@@ -301,8 +300,6 @@ export default function TestSelection() {
                         placeholder="Search tests (try typing 'a', 'b', 'c'...)"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        onFocus={() => setIsSearchFocused(true)}
-                        onBlur={() => setIsSearchFocused(false)}
                         className="pl-10"
                       />
                     </div>
@@ -321,8 +318,8 @@ export default function TestSelection() {
                   {/* Search Results Info */}
                   <div className="flex items-center justify-between text-sm text-gray-600">
                     <span>
-                      {!searchTerm || !isSearchFocused ? (
-                        "Click in search box and type to find tests from 253 available tests"
+                      {!searchTerm ? (
+                        "Type to search from 253 available tests"
                       ) : (
                         <>
                           {filteredTests.length} tests found
@@ -395,11 +392,11 @@ export default function TestSelection() {
                   ) : (
                     <div className="text-center py-12">
                       <TestTube className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                      {!searchTerm || !isSearchFocused ? (
+                      {!searchTerm ? (
                         <>
-                          <h3 className="text-lg font-medium text-gray-900 mb-2">Click in search box to start</h3>
+                          <h3 className="text-lg font-medium text-gray-900 mb-2">Start typing to search tests</h3>
                           <p className="text-gray-600">
-                            Click in the search box above and type a letter (like 'c' for CBC) or test name to find from our 253 available tests
+                            Type a letter (like 'c' for CBC) or test name to find from our 253 available tests
                           </p>
                         </>
                       ) : (
