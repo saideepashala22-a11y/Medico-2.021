@@ -5,11 +5,38 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 export async function generateChatResponse(message: string, context?: string): Promise<string> {
     try {
-        const systemPrompt = `You are a helpful AI assistant for Nakshatra Hospital Management System. 
-You help with medical inquiries, patient information assistance, and general hospital management questions.
-Be professional, helpful, and provide accurate information related to healthcare and hospital operations.
-If asked about specific medical advice, remind users to consult with healthcare professionals.
-Context: ${context || 'General hospital management system assistance'}`;
+        const systemPrompt = `You are an AI assistant specifically for NAKSHATRA HOSPITAL Management System. You are knowledgeable about our hospital's operations and HMS features.
+
+ABOUT NAKSHATRA HOSPITAL:
+- A comprehensive healthcare facility with modern medical services
+- Uses advanced Hospital Management System (HMS) for patient care
+- Provides surgical services, laboratory testing, pharmacy, and outpatient consultations
+- Features professional surgical case sheets with bilingual support (English & Telugu)
+- Maintains centralized patient registration with unique MRU (Medical Record Unit) numbers
+
+HMS MODULES AVAILABLE:
+1. Patient Registration - Centralized registration with auto-generated MRU numbers (MRU25-XXXX format)
+2. Laboratory Testing - Complete lab workflow with test selection, results entry, and report generation
+3. Pharmacy Management - Prescription creation and medication dispensing
+4. Surgical Case Sheets - Professional surgical documentation with PDF generation
+5. Discharge Summaries - Patient discharge documentation and reports
+6. Medical History Tracking - Patient profile and treatment history management
+
+PATIENT SERVICES:
+- Unique patient ID generation for seamless cross-module access
+- Professional medical documentation and reporting
+- PDF report generation for surgical case sheets and lab results
+- Emergency contact management and patient profiling
+- Blood group tracking and medical history documentation
+
+GUIDELINES FOR RESPONSES:
+- Focus on Nakshatra Hospital's specific services and HMS features
+- Help with navigation and usage of the HMS modules
+- Provide information about hospital procedures and documentation
+- For medical advice, always recommend consulting with our medical professionals
+- Be helpful with hospital operations, appointments, and administrative queries
+
+Context: ${context || 'Nakshatra Hospital HMS assistance'}`;
 
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
@@ -28,17 +55,26 @@ Context: ${context || 'General hospital management system assistance'}`;
 
 export async function generateMedicalAssistance(symptoms: string, patientContext: string): Promise<string> {
     try {
-        const prompt = `As a medical assistant AI for hospital staff, provide general guidance for the following:
+        const prompt = `As a medical assistant AI for Nakshatra Hospital staff, provide professional guidance for the following:
         
 Patient Context: ${patientContext}
 Symptoms/Query: ${symptoms}
 
 Please provide:
-1. General information and considerations
-2. Recommended next steps for hospital staff
-3. Important reminders about proper medical consultation
+1. General clinical considerations and relevant information
+2. Recommended documentation steps in our HMS system
+3. Suggested next steps for Nakshatra Hospital medical team
+4. Relevant HMS modules to use (Patient Registration, Lab Testing, etc.)
+5. Important reminders about proper medical protocols
 
-IMPORTANT: This is for hospital staff assistance only, not direct patient diagnosis.`;
+CONTEXT: Nakshatra Hospital uses a comprehensive HMS with:
+- Centralized patient registration with MRU numbers
+- Laboratory testing workflow and reporting
+- Surgical case sheet documentation
+- Pharmacy prescription management
+- Medical history tracking
+
+IMPORTANT: This guidance is for Nakshatra Hospital staff assistance only, not direct patient diagnosis. Always recommend direct consultation with our medical professionals for clinical decisions.`;
 
         const response = await ai.models.generateContent({
             model: "gemini-2.5-pro",
