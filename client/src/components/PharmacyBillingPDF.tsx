@@ -31,8 +31,8 @@ function generateBarcodeImage(text: string): string {
   const canvas = document.createElement('canvas');
   JsBarcode(canvas, text, {
     format: "CODE128",
-    width: 2,
-    height: 40,
+    width: 1.5, // Reduced width for market standard
+    height: 30, // Reduced height for market standard
     displayValue: false, // Remove text display
     margin: 0,
     background: "#ffffff",
@@ -229,9 +229,9 @@ export function generatePharmacyBillingPDF(data: PharmacyBillingData) {
   const barcodeData = data.invoiceNumber;
   const barcodeImage = generateBarcodeImage(barcodeData);
   
-  // Add barcode without background
-  const barcodeAreaHeight = 40;
-  const barcodeAreaWidth = 120;
+  // Add barcode without background (market standard size)
+  const barcodeAreaHeight = 25; // Smaller height
+  const barcodeAreaWidth = 80; // Smaller width
   const barcodeX = margin + 10; // Left aligned with some margin
   
   // Add barcode image (no background, no border)
@@ -242,7 +242,7 @@ export function generatePharmacyBillingPDF(data: PharmacyBillingData) {
     // Fallback: Add simple text
     pdf.setFontSize(10);
     pdf.setFont('helvetica', 'normal');
-    pdf.text(`Barcode: ${barcodeData}`, barcodeX, yPos + 20);
+    pdf.text(`Barcode: ${barcodeData}`, barcodeX, yPos + 15);
   }
   
   // ========== FOOTER INFORMATION ==========
