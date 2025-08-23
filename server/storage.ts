@@ -81,6 +81,7 @@ export interface IStorage {
   getAllPatientsRegistrations(): Promise<PatientsRegistration[]>;
   createPatientsRegistration(registration: InsertPatientsRegistration): Promise<PatientsRegistration>;
   searchPatientsRegistrations(query: string): Promise<PatientsRegistration[]>;
+  getRecentPatientsRegistrations(limit?: number): Promise<PatientsRegistration[]>;
   
   // Medicine Inventory
   getAllMedicines(): Promise<MedicineInventory[]>;
@@ -777,7 +778,14 @@ export class DatabaseStorage implements IStorage {
           ilike(patientsRegistration.contactPhone, `%${query}%`)
         )
       )
-      .orderBy(desc(patientsRegistration.createdAt));
+      .orderBy(desc(patientsRegistration.createdAt))
+      .limit(10);
+  }
+
+  async getRecentPatientsRegistrations(limit: number = 5): Promise<PatientsRegistration[]> {
+    return await db.select().from(patientsRegistration)
+      .orderBy(desc(patientsRegistration.createdAt))
+      .limit(limit);
   }
   
   // Medicine Inventory Implementation

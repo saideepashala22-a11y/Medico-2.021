@@ -121,12 +121,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/patients/search', authenticateToken, async (req: any, res) => {
     try {
       const { q } = req.query;
-      if (!q) {
-        return res.json([]);
+      let patients;
+      
+      if (!q || q.trim() === '') {
+        // If no search query, return first 5 patients
+        patients = await storage.getRecentPatientsRegistrations(5);
+      } else {
+        // Search with any length query
+        patients = await storage.searchPatientsRegistrations(q as string);
       }
-      const patients = await storage.searchPatientsRegistrations(q as string);
+      
       res.json(patients);
     } catch (error) {
+      console.error('Patient search error:', error);
       res.status(500).json({ message: 'Server error' });
     }
   });

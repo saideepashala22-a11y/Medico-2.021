@@ -46,7 +46,6 @@ export default function Pharmacy() {
   const { data: searchResults } = useQuery({
     queryKey: ['/api/patients/search', patientSearch],
     queryFn: async () => {
-      if (!patientSearch.trim()) return [];
       const response = await fetch(`/api/patients/search?q=${encodeURIComponent(patientSearch)}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -54,7 +53,7 @@ export default function Pharmacy() {
       });
       return response.json();
     },
-    enabled: patientSearch.length > 2,
+    enabled: true, // Always enabled
   });
 
   const { data: recentPrescriptions, isLoading: prescriptionsLoading } = useQuery({
@@ -245,7 +244,7 @@ export default function Pharmacy() {
                 </div>
                 
                 {searchResults && searchResults.length > 0 && (
-                  <div className="mt-2 border rounded-lg bg-white shadow-sm">
+                  <div className="mt-2 border rounded-lg bg-white shadow-sm max-h-60 overflow-y-auto">
                     {searchResults.map((patient: any) => (
                       <div
                         key={patient.id}
@@ -256,9 +255,15 @@ export default function Pharmacy() {
                         }}
                       >
                         <div className="font-medium">{patient.fullName}</div>
-                        <div className="text-sm text-gray-500">{patient.mruNumber} • Age: {patient.age} {patient.ageUnit}</div>
+                        <div className="text-sm text-gray-500">{patient.mruNumber} • Age: {patient.age} {patient.ageUnit} • {patient.contactPhone}</div>
                       </div>
                     ))}
+                  </div>
+                )}
+                
+                {patientSearch && searchResults && searchResults.length === 0 && (
+                  <div className="mt-2 border rounded-lg bg-white shadow-sm p-3 text-gray-500 text-center">
+                    No patients found matching "{patientSearch}"
                   </div>
                 )}
               </div>
