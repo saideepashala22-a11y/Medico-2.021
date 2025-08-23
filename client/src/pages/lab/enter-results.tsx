@@ -311,73 +311,79 @@ export default function EnterResults() {
         {!showReview ? (
           /* Results Entry Form */
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-6">
-              <div className="mb-6">
+            <div className="lg:col-span-2">
+              <div className="mb-8">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">Enter Test Results</h2>
                 <p className="text-gray-600">Enter the values for each selected test</p>
               </div>
 
               {validationErrors.length > 0 && (
-                <Alert className="border-red-200 bg-red-50">
-                  <AlertTriangle className="h-4 w-4 text-red-600" />
-                  <AlertDescription className="text-red-800">
-                    <ul className="list-disc list-inside space-y-1">
-                      {validationErrors.map((error, index) => (
-                        <li key={index}>{error}</li>
-                      ))}
-                    </ul>
-                  </AlertDescription>
-                </Alert>
+                <div className="mb-8">
+                  <Alert className="border-red-200 bg-red-50">
+                    <AlertTriangle className="h-4 w-4 text-red-600" />
+                    <AlertDescription className="text-red-800">
+                      <ul className="list-disc list-inside space-y-1">
+                        {validationErrors.map((error, index) => (
+                          <li key={index}>{error}</li>
+                        ))}
+                      </ul>
+                    </AlertDescription>
+                  </Alert>
+                </div>
               )}
               
-              {/* Individual test cards */}
-              {results.map((result, index) => (
-                <Card key={index}>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">{result.testName}</CardTitle>
-                      <Badge 
-                        className={
-                          result.status === 'normal' ? 'bg-green-100 text-green-800' :
-                          result.status === 'high' ? 'bg-yellow-100 text-yellow-800' :
-                          result.status === 'low' ? 'bg-blue-100 text-blue-800' :
-                          'bg-red-100 text-red-800'
-                        }
-                      >
-                        {result.status.charAt(0).toUpperCase() + result.status.slice(1)}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <Label htmlFor={`value-${index}`}>Result Value *</Label>
-                        <Input
-                          id={`value-${index}`}
-                          type="number"
-                          step="0.01"
-                          value={result.value}
-                          onChange={(e) => updateResult(index, 'value', e.target.value)}
-                          placeholder="Enter value"
-                        />
+              {/* Individual test cards with clear separation */}
+              <div className="space-y-8">
+                {results.map((result, index) => (
+                  <Card key={index} className="shadow-md border-2 border-gray-200 bg-white">
+                    <CardHeader className="bg-gray-50 border-b border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg font-semibold text-gray-900">{result.testName}</CardTitle>
+                        <Badge 
+                          className={
+                            result.status === 'normal' ? 'bg-green-100 text-green-800' :
+                            result.status === 'high' ? 'bg-yellow-100 text-yellow-800' :
+                            result.status === 'low' ? 'bg-blue-100 text-blue-800' :
+                            'bg-red-100 text-red-800'
+                          }
+                        >
+                          {result.status.charAt(0).toUpperCase() + result.status.slice(1)}
+                        </Badge>
                       </div>
-                      <div>
-                        <Label htmlFor={`unit-${index}`}>Unit</Label>
-                        <Input
-                          id={`unit-${index}`}
-                          value={result.unit}
-                          onChange={(e) => updateResult(index, 'unit', e.target.value)}
-                          placeholder="units"
-                        />
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor={`value-${index}`}>Result Value *</Label>
+                          <Input
+                            id={`value-${index}`}
+                            type="number"
+                            step="0.01"
+                            value={result.value}
+                            onChange={(e) => updateResult(index, 'value', e.target.value)}
+                            placeholder="Enter value"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor={`unit-${index}`}>Unit</Label>
+                          <Input
+                            id={`unit-${index}`}
+                            value={result.unit}
+                            onChange={(e) => updateResult(index, 'unit', e.target.value)}
+                            placeholder="units"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label>Normal Range</Label>
+                          <p className="text-sm text-gray-600 pt-3">Consult reference values</p>
+                        </div>
                       </div>
-                      <div>
-                        <Label>Normal Range</Label>
-                        <p className="text-sm text-gray-600 pt-2">Consult reference values</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
 
               {/* Additional information card */}
               <Card>
