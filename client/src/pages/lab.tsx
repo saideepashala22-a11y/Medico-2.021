@@ -1,17 +1,34 @@
+import { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
-import { ArrowLeft, TestTube, Plus, FileText, User, Calendar, Clipboard, FlaskConical } from 'lucide-react';
+import { ArrowLeft, TestTube, Plus, FileText, User, Calendar, Clipboard, FlaskConical, Search } from 'lucide-react';
 
 export default function Lab() {
   const { user } = useAuth();
+  const [showPatientSearch, setShowPatientSearch] = useState(false);
 
   const { data: recentTests, isLoading: testsLoading } = useQuery<any[]>({
     queryKey: ['/api/lab-tests/recent'],
+  });
+
+  // Fetch recent 3 patients
+  const { data: recentPatients } = useQuery({
+    queryKey: ['/api/patients-registration/recent'],
+    queryFn: async () => {
+      const response = await fetch('/api/patients-registration/recent', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      return response.json();
+    },
+    enabled: showPatientSearch, // Only fetch when search is shown
   });
 
   return (
@@ -76,6 +93,63 @@ export default function Lab() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 text-center">Generate and download lab test reports</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Patient Search Bar */}
+        <div className="mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Quick Patient Search</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search recent patients or click to see recent 3..."
+                  className="pl-10"
+                  onFocus={() => setShowPatientSearch(true)}
+                  onBlur={() => setTimeout(() => setShowPatientSearch(false), 150)}
+                  data-testid="patient-search-input"
+                />
+                
+                {showPatientSearch && recentPatients && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    {recentPatients.length === 0 ? (
+                      <div className="p-3 text-sm text-gray-500">No recent patients found</div>
+                    ) : (
+                      <>
+                        <div className="p-2 bg-gray-50 border-b">
+                          <p className="text-xs text-gray-600 font-medium">Recent 3 Patients</p>
+                        </div>
+                        {recentPatients.slice(0, 3).map((patient: any) => (
+                          <Link key={patient.id} href={`/lab/patient-registration?patientId=${patient.id}`}>
+                            <div className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="font-medium text-gray-900">
+                                    {patient.salutation} {patient.fullName}
+                                  </p>
+                                  <p className="text-sm text-gray-500">{patient.mruNumber}</p>
+                                  <p className="text-xs text-gray-400">
+                                    {patient.contactPhone} • Age: {patient.age} {patient.ageUnit}
+                                  </p>
+                                </div>
+                                <div className="text-right">
+                                  <Badge variant="outline" className="text-xs">
+                                    {patient.bloodGroup || 'Unknown'}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>

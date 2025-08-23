@@ -726,6 +726,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get recent patients
+  app.get('/api/patients-registration/recent', authenticateToken, async (req: any, res) => {
+    try {
+      const recentPatients = await storage.getRecentPatientsRegistrations(3);
+      res.json(recentPatients);
+    } catch (error) {
+      console.error('Error fetching recent patients:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
   // Search patients registration by MRU number, name, or phone (MUST BE BEFORE /:id route)
   app.get('/api/patients-registration/search/:query', authenticateToken, async (req: any, res) => {
     try {
