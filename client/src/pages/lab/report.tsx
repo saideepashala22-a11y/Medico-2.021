@@ -37,11 +37,12 @@ export default function LabReport() {
     createdAt: string;
     patient: {
       id: string;
-      patientId: string;
-      name: string;
+      mruNumber: string;
+      fullName: string;
       age: number;
       gender: string;
-      contact?: string;
+      contactPhone?: string;
+      referringDoctor?: string;
     };
   }>({
     queryKey: ['/api/lab-tests', labTestId],
@@ -87,11 +88,11 @@ export default function LabReport() {
       
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Patient ID: ${labTest.patient.patientId}`, 20, 80);
-      doc.text(`Patient Name: ${labTest.patient.name}`, 20, 87);
-      doc.text(`Age/Gender: ${labTest.patient.age} Years / ${labTest.patient.gender}`, 20, 94);
-      if (labTest.patient.contact) {
-        doc.text(`Contact: ${labTest.patient.contact}`, 20, 101);
+      doc.text(`Patient ID: ${labTest.patient.mruNumber || 'N/A'}`, 20, 80);
+      doc.text(`Patient Name: ${labTest.patient.fullName || 'N/A'}`, 20, 87);
+      doc.text(`Age/Gender: ${labTest.patient.age || 'N/A'} Years / ${labTest.patient.gender || 'N/A'}`, 20, 94);
+      if (labTest.patient.contactPhone) {
+        doc.text(`Contact: ${labTest.patient.contactPhone}`, 20, 101);
       }
       
       // Test Information (Right side of patient box)
@@ -103,7 +104,7 @@ export default function LabReport() {
       doc.text(`Collection Date: ${testDate.toLocaleDateString('en-IN')}`, 120, 80);
       doc.text(`Report Date: ${new Date().toLocaleDateString('en-IN')}`, 120, 87);
       doc.text(`Lab No: LAB-${labTest.id.substring(0, 8).toUpperCase()}`, 120, 94);
-      doc.text(`Doctor: Dr. Consulting Physician`, 120, 101);
+      doc.text(`Referring Doctor: ${labTest.patient.referringDoctor || 'Dr. Consulting Physician'}`, 120, 101);
       
       // Test Results Table Header
       let yPos = 125;
@@ -258,7 +259,7 @@ export default function LabReport() {
       doc.text('*** End of Report ***', pageWidth / 2, yPos + 10, { align: 'center' });
       
       // Save
-      doc.save(`Lab-Report-${labTest.patient.patientId}-${new Date().toISOString().split('T')[0]}.pdf`);
+      doc.save(`Lab-Report-${labTest.patient.mruNumber || 'Unknown'}-${new Date().toISOString().split('T')[0]}.pdf`);
       
       toast({
         title: 'Success',
@@ -397,20 +398,20 @@ export default function LabReport() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
                 <p className="text-sm font-medium text-gray-500">Patient ID</p>
-                <p className="text-lg font-semibold">{labTest.patient.patientId}</p>
+                <p className="text-lg font-semibold">{labTest.patient.mruNumber}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Name</p>
-                <p className="text-lg font-semibold">{labTest.patient.name}</p>
+                <p className="text-lg font-semibold">{labTest.patient.fullName}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Age & Gender</p>
                 <p className="text-lg font-semibold">{labTest.patient.age} years, {labTest.patient.gender}</p>
               </div>
-              {labTest.patient.contact && (
+              {labTest.patient.contactPhone && (
                 <div>
                   <p className="text-sm font-medium text-gray-500">Contact</p>
-                  <p className="text-lg font-semibold">{labTest.patient.contact}</p>
+                  <p className="text-lg font-semibold">{labTest.patient.contactPhone}</p>
                 </div>
               )}
             </div>
