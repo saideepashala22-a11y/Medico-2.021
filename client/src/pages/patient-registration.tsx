@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -51,6 +52,7 @@ interface PatientData {
 export default function PatientRegistration() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [nextMRU, setNextMRU] = useState('');
@@ -515,6 +517,9 @@ export default function PatientRegistration() {
       });
       
       console.log('Patient registered successfully:', patientData);
+      
+      // Invalidate patient search cache so newly registered patients appear immediately in pharmacy search
+      queryClient.invalidateQueries({ queryKey: ['/api/patients/search'] });
     } catch (error) {
       console.error('Registration error:', error);
       toast({

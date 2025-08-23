@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { Link, useLocation } from 'wouter';
 import { ArrowLeft, User, ArrowRight, Loader2 } from 'lucide-react';
@@ -14,6 +14,7 @@ import { ArrowLeft, User, ArrowRight, Loader2 } from 'lucide-react';
 export default function PatientRegistration() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   
   const [patientData, setPatientData] = useState({
@@ -36,6 +37,9 @@ export default function PatientRegistration() {
       return response.json();
     },
     onSuccess: (patient) => {
+      // Invalidate patient search cache so newly registered patients appear immediately in pharmacy search
+      queryClient.invalidateQueries({ queryKey: ['/api/patients/search'] });
+      
       toast({
         title: 'Success',
         description: 'Patient registered successfully',
