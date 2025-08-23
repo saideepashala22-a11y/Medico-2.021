@@ -12,12 +12,13 @@ import { ArrowLeft, TestTube, Plus, FileText, User, Calendar, Clipboard, FlaskCo
 export default function Lab() {
   const { user } = useAuth();
   const [showPatientSearch, setShowPatientSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: recentTests, isLoading: testsLoading } = useQuery<any[]>({
     queryKey: ['/api/lab-tests/recent'],
   });
 
-  // Fetch recent 3 patients
+  // Fetch recent 3 patients (when no search query)
   const { data: recentPatients } = useQuery({
     queryKey: ['/api/patients-registration/recent'],
     queryFn: async () => {
@@ -28,7 +29,22 @@ export default function Lab() {
       });
       return response.json();
     },
-    enabled: showPatientSearch, // Only fetch when search is shown
+    enabled: showPatientSearch && !searchQuery.trim(), // Only fetch when search is shown and no search query
+  });
+
+  // Fetch search results (when there's a search query)
+  const { data: searchResults } = useQuery({
+    queryKey: ['/api/patients-registration/search', searchQuery],
+    queryFn: async () => {
+      const response = await fetch(`/api/patients-registration/search/${encodeURIComponent(searchQuery)}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      return response.json();
+    },
+    enabled: showPatientSearch && searchQuery.trim().length > 0, // Only fetch when there's a search query
+    staleTime: 0, // Always fetch fresh search results
   });
 
   return (
@@ -107,44 +123,88 @@ export default function Lab() {
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Search recent patients or click to see recent 3..."
+                  placeholder="Search by MRU number, name, or phone..."
                   className="pl-10"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setShowPatientSearch(true)}
                   onBlur={() => setTimeout(() => setShowPatientSearch(false), 150)}
                   data-testid="patient-search-input"
                 />
                 
-                {showPatientSearch && recentPatients && (
+                {showPatientSearch && (
                   <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                    {(!Array.isArray(recentPatients) || recentPatients.length === 0) ? (
-                      <div className="p-3 text-sm text-gray-500">No recent patients found</div>
-                    ) : (
+                    {searchQuery.trim() ? (
+                      // Show search results
                       <>
-                        <div className="p-2 bg-gray-50 border-b">
-                          <p className="text-xs text-gray-600 font-medium">Recent 3 Patients</p>
-                        </div>
-                        {(Array.isArray(recentPatients) ? recentPatients : []).slice(0, 3).map((patient: any) => (
-                          <Link key={patient.id} href={`/lab/patient-registration?patientId=${patient.id}`}>
-                            <div className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <p className="font-medium text-gray-900">
-                                    {patient.salutation} {patient.fullName}
-                                  </p>
-                                  <p className="text-sm text-gray-500">{patient.mruNumber}</p>
-                                  <p className="text-xs text-gray-400">
-                                    {patient.contactPhone} • Age: {patient.age} {patient.ageUnit}
-                                  </p>
-                                </div>
-                                <div className="text-right">
-                                  <Badge variant="outline" className="text-xs">
-                                    {patient.bloodGroup || 'Unknown'}
-                                  </Badge>
-                                </div>
-                              </div>
+                        {!searchResults || (Array.isArray(searchResults) && searchResults.length === 0) ? (
+                          <div className="p-3 text-sm text-gray-500">
+                            {searchQuery.length > 0 ? `No patients found for "${searchQuery}"` : 'Start typing to search...'}
+                          </div>
+                        ) : (
+                          <>
+                            <div className="p-2 bg-gray-50 border-b">
+                              <p className="text-xs text-gray-600 font-medium">Search Results</p>
                             </div>
-                          </Link>
-                        ))}
+                            {(Array.isArray(searchResults) ? searchResults : []).map((patient: any) => (
+                              <Link key={patient.id} href={`/lab/patient-registration?patientId=${patient.id}`}>
+                                <div className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0">
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <p className="font-medium text-gray-900">
+                                        {patient.salutation} {patient.fullName}
+                                      </p>
+                                      <p className="text-sm text-gray-500">{patient.mruNumber}</p>
+                                      <p className="text-xs text-gray-400">
+                                        {patient.contactPhone} • Age: {patient.age} {patient.ageUnit}
+                                      </p>
+                                    </div>
+                                    <div className="text-right">
+                                      <Badge variant="outline" className="text-xs">
+                                        {patient.bloodGroup || 'Unknown'}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                </div>
+                              </Link>
+                            ))}
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      // Show recent patients when no search query
+                      <>
+                        {(!recentPatients || !Array.isArray(recentPatients) || recentPatients.length === 0) ? (
+                          <div className="p-3 text-sm text-gray-500">No recent patients found</div>
+                        ) : (
+                          <>
+                            <div className="p-2 bg-gray-50 border-b">
+                              <p className="text-xs text-gray-600 font-medium">Recent 3 Patients</p>
+                            </div>
+                            {recentPatients.slice(0, 3).map((patient: any) => (
+                              <Link key={patient.id} href={`/lab/patient-registration?patientId=${patient.id}`}>
+                                <div className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0">
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <p className="font-medium text-gray-900">
+                                        {patient.salutation} {patient.fullName}
+                                      </p>
+                                      <p className="text-sm text-gray-500">{patient.mruNumber}</p>
+                                      <p className="text-xs text-gray-400">
+                                        {patient.contactPhone} • Age: {patient.age} {patient.ageUnit}
+                                      </p>
+                                    </div>
+                                    <div className="text-right">
+                                      <Badge variant="outline" className="text-xs">
+                                        {patient.bloodGroup || 'Unknown'}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                </div>
+                              </Link>
+                            ))}
+                          </>
+                        )}
                       </>
                     )}
                   </div>
