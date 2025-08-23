@@ -545,8 +545,8 @@ export default function Pharmacy() {
                         <TableRow key={prescription.id}>
                           <TableCell>
                             <div>
-                              <div className="font-medium">{prescription.patient.name}</div>
-                              <div className="text-sm text-gray-500">{prescription.patient.patientId}</div>
+                              <div className="font-medium">{prescription.patient.fullName}</div>
+                              <div className="text-sm text-gray-500">{prescription.patient.mruNumber}</div>
                             </div>
                           </TableCell>
                           <TableCell className="text-sm">{prescription.billNumber}</TableCell>
