@@ -210,26 +210,41 @@ export default function LabReport() {
         yPos += 30;
       }
       
-      // Quality Assurance Section (after test results)
-      yPos += 15;
+      // Quality Assurance Section (after all test results)
+      yPos += 20;
       doc.setFontSize(9);
       doc.setFont('helvetica', 'italic');
       doc.text('NOTE: All tests performed using calibrated instruments and quality controlled reagents.', 20, yPos);
       doc.text('Reference ranges are age and gender specific. Please correlate with clinical findings.', 20, yPos + 7);
       
-      // Lab Technician Signature Section (after test results)
-      yPos += 25;
+      // Add separation line before signature
+      yPos += 20;
+      doc.setLineWidth(0.2);
+      doc.line(15, yPos, pageWidth - 15, yPos);
+      
+      // Lab Technician Signature Section (at the very end after all tests)
+      yPos += 20;
+      
+      // Enhanced signature block with better formatting
       doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('AUTHORIZED SIGNATORY', pageWidth - 80, yPos);
+      
+      yPos += 15;
+      doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
-      doc.text('Lab Technician', pageWidth - 60, yPos);
+      doc.text('Lab Technician', pageWidth - 70, yPos);
       
-      // Signature line
-      doc.setLineWidth(0.3);
-      doc.line(pageWidth - 90, yPos + 12, pageWidth - 20, yPos + 12);
+      // Professional signature line
+      doc.setLineWidth(0.5);
+      doc.line(pageWidth - 100, yPos + 12, pageWidth - 20, yPos + 12);
       
+      // Credentials and title
+      yPos += 18;
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
-      doc.text('Medical Laboratory Technologist', pageWidth - 85, yPos + 17);
+      doc.text('Medical Laboratory Technologist', pageWidth - 90, yPos);
+      doc.text('NAKSHATRA HOSPITAL', pageWidth - 70, yPos + 8);
       
       // Report Footer (at the very end)
       yPos += 35;
