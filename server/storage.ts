@@ -361,7 +361,7 @@ export class DatabaseStorage implements IStorage {
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    const [totalPatients] = await db.select({ count: sql`count(*)` }).from(patients);
+    const [totalPatients] = await db.select({ count: sql`count(*)` }).from(patientsRegistration);
     const [labTestsToday] = await db.select({ count: sql`count(*)` }).from(labTests)
       .where(sql`${labTests.createdAt} >= ${today} AND ${labTests.createdAt} < ${tomorrow}`);
     const [prescriptionsToday] = await db.select({ count: sql`count(*)` }).from(prescriptions)
