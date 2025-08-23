@@ -387,9 +387,13 @@ export default function PatientRegistration() {
         throw new Error('No authentication token found');
       }
 
+      // Generate the actual unique values for submission
+      const uniqueMRU = generateUniqueMRU();
+      const uniqueVisitId = generateUniqueVisitId();
+
       const registrationData = {
-        mruNumber: formData.mruNumber,
-        visitId: formData.visitId,
+        mruNumber: uniqueMRU,
+        visitId: uniqueVisitId,
         salutation: formData.salutation || null,
         fullName: formData.fullName,
         age: parseInt(formData.age) || 0,
@@ -429,8 +433,8 @@ export default function PatientRegistration() {
       // Add the new patient to the local state immediately
       const patientForState = {
         id: newPatient.id,
-        mru: formData.mruNumber,
-        visitId: formData.visitId,
+        mru: uniqueMRU,
+        visitId: uniqueVisitId,
         salutation: formData.salutation,
         fullName: formData.fullName,
         dateOfBirth: formData.dateOfBirth,
@@ -449,8 +453,8 @@ export default function PatientRegistration() {
 
       // Store patient info for consultation card modal
       setRegisteredPatientInfo({
-        mruNumber: formData.mruNumber,
-        visitId: formData.visitId,
+        mruNumber: uniqueMRU,
+        visitId: uniqueVisitId,
         fullName: formData.fullName,
         age: parseInt(formData.age) || 0,
         gender: formData.gender,
