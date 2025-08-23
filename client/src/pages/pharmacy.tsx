@@ -255,8 +255,8 @@ export default function Pharmacy() {
                           setPatientSearch('');
                         }}
                       >
-                        <div className="font-medium">{patient.name}</div>
-                        <div className="text-sm text-gray-500">{patient.patientId} • Age: {patient.age}</div>
+                        <div className="font-medium">{patient.fullName}</div>
+                        <div className="text-sm text-gray-500">{patient.mruNumber} • Age: {patient.age} {patient.ageUnit}</div>
                       </div>
                     ))}
                   </div>
@@ -268,10 +268,10 @@ export default function Pharmacy() {
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="font-medium text-gray-900">Selected Patient</h3>
                   <div className="mt-2 text-sm text-gray-600">
-                    <p><strong>Name:</strong> {selectedPatient.name}</p>
-                    <p><strong>ID:</strong> {selectedPatient.patientId}</p>
-                    <p><strong>Age:</strong> {selectedPatient.age}</p>
-                    <p><strong>Contact:</strong> {selectedPatient.contact || 'N/A'}</p>
+                    <p><strong>Name:</strong> {selectedPatient.fullName}</p>
+                    <p><strong>MRU Number:</strong> {selectedPatient.mruNumber}</p>
+                    <p><strong>Age:</strong> {selectedPatient.age} {selectedPatient.ageUnit}</p>
+                    <p><strong>Contact:</strong> {selectedPatient.contactPhone || 'N/A'}</p>
                   </div>
                 </div>
               )}

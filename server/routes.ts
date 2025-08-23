@@ -124,7 +124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!q) {
         return res.json([]);
       }
-      const patients = await storage.searchPatients(q as string);
+      const patients = await storage.searchPatientsRegistrations(q as string);
       res.json(patients);
     } catch (error) {
       res.status(500).json({ message: 'Server error' });
