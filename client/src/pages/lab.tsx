@@ -262,11 +262,21 @@ export default function Lab() {
                     <TableRow key={test.id}>
                       <TableCell>
                         <div>
-                          <p className="font-semibold">{test.patient.name}</p>
-                          <p className="text-sm text-gray-600">{test.patient.patientId}</p>
+                          <p className="font-semibold">{test.patient?.salutation} {test.patient?.fullName}</p>
+                          <p className="text-sm text-gray-600">{test.patient?.mruNumber}</p>
                         </div>
                       </TableCell>
-                      <TableCell>{test.testType}</TableCell>
+                      <TableCell>
+                        <div className="max-w-xs">
+                          {test.testTypes && Array.isArray(test.testTypes) ? (
+                            <p className="text-sm">
+                              {test.testTypes.map((testType: any) => testType.testName).join(', ')}
+                            </p>
+                          ) : (
+                            <p className="text-sm text-gray-400">No tests specified</p>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center text-sm text-gray-600">
                           <Calendar className="mr-1 h-4 w-4" />
