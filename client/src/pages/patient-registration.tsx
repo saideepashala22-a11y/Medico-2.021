@@ -504,20 +504,28 @@ export default function PatientRegistration() {
   // Handle edit patient
   const handleEdit = (patient: PatientData) => {
     setFormData({
+      mruNumber: patient.mru,
+      visitId: patient.visitId,
       salutation: patient.salutation,
       fullName: patient.fullName,
+      age: patient.age.toString(),
+      ageUnit: 'years', // Default to years, can be adjusted if needed
       dateOfBirth: patient.dateOfBirth,
       gender: patient.gender,
       contactPhone: patient.contactPhone,
-      email: patient.email,
-      address: patient.address,
-      emergencyContactName: patient.emergencyContactName,
-      emergencyContactPhone: patient.emergencyContactPhone,
-      bloodGroup: patient.bloodGroup,
-      medicalHistory: patient.medicalHistory
+      email: patient.email || '',
+      address: patient.address || '',
+      emergencyContactName: patient.emergencyContactName || '',
+      emergencyContactPhone: patient.emergencyContactPhone || '',
+      bloodGroup: patient.bloodGroup || '',
+      medicalHistory: patient.medicalHistory || '',
+      referringDoctor: '' // Not stored in current patient data, so default empty
     });
     setAge(patient.age);
     setEditingPatient(patient.id);
+    
+    // Scroll to top of form for better UX
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
 
