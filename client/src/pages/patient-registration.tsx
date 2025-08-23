@@ -50,20 +50,37 @@ export default function PatientRegistration() {
   const { toast } = useToast();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [nextMRU, setNextMRU] = useState('');
+  const [nextVisitId, setNextVisitId] = useState('');
+
   // Generate unique identifiers
-  const generateMRUNumber = () => {
-    const year = new Date().getFullYear().toString().slice(-2);
-    const counter = String(Date.now()).slice(-4);
-    return `MRU${year}-${counter}`;
+  const generateVisitId = () => {
+    const counter = String(Math.floor(Math.random() * 900000) + 100000);
+    return `VID-${counter}`;
   };
 
-  const generateVisitId = () => {
-    const counter = String(Date.now()).slice(-3);
-    return `VISIT-${counter}`;
+  // Fetch next MRU number from backend
+  const fetchNextMRU = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/patients-registration/next-mru', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setNextMRU(data.mruNumber);
+      }
+    } catch (error) {
+      console.error('Error fetching next MRU:', error);
+    }
   };
 
   const [formData, setFormData] = useState({
-    mruNumber: generateMRUNumber(),
+    mruNumber: '',
     visitId: generateVisitId(),
     salutation: '',
     fullName: '',
@@ -133,23 +150,8 @@ export default function PatientRegistration() {
     };
 
     fetchPatients();
+    fetchNextMRU();
   }, []);
-  // Generate unique MRU number based on current year
-  const generateUniqueMRU = (): string => {
-    const currentYear = new Date().getFullYear().toString().slice(-2);
-    const existingMRUs = patients.map(p => p.mru);
-    
-    let counter = 1;
-    let newMRU = `MRU${currentYear}-${String(counter).padStart(4, '0')}`;
-    
-    // Keep incrementing until we find a unique MRU
-    while (existingMRUs.includes(newMRU)) {
-      counter++;
-      newMRU = `MRU${currentYear}-${String(counter).padStart(4, '0')}`;
-    }
-    
-    return newMRU;
-  };
 
   // Generate unique Visit ID
   const generateUniqueVisitId = (): string => {
@@ -386,9 +388,9 @@ export default function PatientRegistration() {
         throw new Error('No authentication token found');
       }
 
-      // For editing, use existing values; for new registration, generate unique values
+      // For editing, use existing values; for new registration, use pre-fetched values
       const isEditing = editingPatient !== null;
-      const uniqueMRU = isEditing ? formData.mruNumber : generateUniqueMRU();
+      const uniqueMRU = isEditing ? formData.mruNumber : nextMRU;
       const uniqueVisitId = isEditing ? formData.visitId : generateUniqueVisitId();
 
       const registrationData = {
@@ -484,12 +486,12 @@ export default function PatientRegistration() {
         setShowConsultationModal(true);
       }
 
-      // Reset form after successful submission
-      const newMruNumber = generateMRUNumber();
+      // Reset form after successful submission and fetch next MRU
+      await fetchNextMRU(); // Get the next sequential MRU number
       const newVisitId = generateVisitId();
       
       setFormData({
-        mruNumber: newMruNumber,
+        mruNumber: '',
         visitId: newVisitId,
         salutation: '',
         fullName: '',
@@ -637,7 +639,7 @@ export default function PatientRegistration() {
                 <div>
                   <Label>MRU Number (Auto-generated)</Label>
                   <div className="bg-white p-2 border rounded text-gray-700 font-mono">
-                    {editingPatient ? patients.find(p => p.id === editingPatient)?.mru : generateUniqueMRU()}
+                    {editingPatient ? patients.find(p => p.id === editingPatient)?.mru : nextMRU || 'Loading...'}
                   </div>
                 </div>
                 <div>

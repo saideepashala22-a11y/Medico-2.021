@@ -620,6 +620,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get next MRU number
+  app.get('/api/patients-registration/next-mru', authenticateToken, async (req: any, res) => {
+    try {
+      const nextMRU = await storage.getNextMRUNumber();
+      res.json({ mruNumber: nextMRU });
+    } catch (error) {
+      console.error('Error generating next MRU number:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
   // AI Chat endpoints
   app.post('/api/chat', authenticateToken, async (req: any, res) => {
     try {

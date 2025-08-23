@@ -83,6 +83,7 @@ export interface IStorage {
   updatePatientsRegistration(id: string, updates: Partial<InsertPatientsRegistration>): Promise<PatientsRegistration | undefined>;
   searchPatientsRegistrations(query: string): Promise<PatientsRegistration[]>;
   getRecentPatientsRegistrations(limit?: number): Promise<PatientsRegistration[]>;
+  getNextMRUNumber(): Promise<string>;
   
   // Medicine Inventory
   getAllMedicines(): Promise<MedicineInventory[]>;
@@ -795,6 +796,29 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(patientsRegistration)
       .orderBy(desc(patientsRegistration.createdAt))
       .limit(limit);
+  }
+
+  async getNextMRUNumber(): Promise<string> {
+    const currentYear = new Date().getFullYear().toString().slice(-2);
+    const yearPrefix = `MRU${currentYear}-`;
+    
+    // Get the highest MRU number for the current year
+    const lastMRU = await db.select()
+      .from(patientsRegistration)
+      .where(sql`${patientsRegistration.mruNumber} LIKE ${yearPrefix + '%'}`)
+      .orderBy(desc(patientsRegistration.mruNumber))
+      .limit(1);
+    
+    if (lastMRU.length === 0) {
+      // First patient of the year
+      return `${yearPrefix}0001`;
+    }
+    
+    // Extract the number part and increment
+    const lastNumber = parseInt(lastMRU[0].mruNumber.split('-')[1]) || 0;
+    const nextNumber = lastNumber + 1;
+    
+    return `${yearPrefix}${String(nextNumber).padStart(4, '0')}`;
   }
   
   // Medicine Inventory Implementation
