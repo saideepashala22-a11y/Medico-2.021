@@ -458,13 +458,16 @@ export default function PatientRegistration() {
     });
   };
 
-  // Filter patients for search
-  const filteredPatients = patients.filter(patient =>
-    patient.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.mru.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.contactPhone.includes(searchTerm) ||
-    patient.visitId.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter patients for search and show latest 5 records
+  const filteredPatients = patients
+    .filter(patient =>
+      patient.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.mru.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.contactPhone.includes(searchTerm) ||
+      patient.visitId.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => new Date(b.registrationDate).getTime() - new Date(a.registrationDate).getTime()) // Sort by most recent first
+    .slice(0, 5); // Show only latest 5 records
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -806,11 +809,11 @@ export default function PatientRegistration() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center text-blue-800">
                 <Users className="h-5 w-5 mr-2" />
-                Master Patient Register
+                Master Patient Register (Latest 5 Records)
               </CardTitle>
               <div className="flex items-center space-x-4">
                 <div className="text-sm text-gray-600">
-                  Total Patients: {patients.length}
+                  Showing: {filteredPatients.length} of {patients.length} patients
                 </div>
                 <div className="relative">
                   <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -897,10 +900,10 @@ export default function PatientRegistration() {
               <div className="text-center py-12">
                 <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500 text-lg">
-                  {searchTerm ? 'No patients found matching your search' : 'No patients registered yet'}
+                  {searchTerm ? 'No patients found matching your search' : 'No recent patient registrations'}
                 </p>
                 <p className="text-gray-400 text-sm mt-2">
-                  {searchTerm ? 'Try a different search term' : 'Register your first patient to get started'}
+                  {searchTerm ? 'Try a different search term' : 'Latest 5 registrations will appear here'}
                 </p>
               </div>
             )}
