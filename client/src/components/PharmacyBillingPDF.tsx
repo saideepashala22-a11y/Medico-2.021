@@ -97,7 +97,7 @@ export function generatePharmacyBillingPDF(data: PharmacyBillingData) {
   // ========== PRODUCT TABLE ==========
   const tableStartY = yPos;
   const rowHeight = 10;
-  const colWidths = [12, 50, 16, 16, 16, 16, 12, 20, 16, 16, 20]; // Adjusted column widths
+  const colWidths = [10, 40, 14, 14, 14, 14, 10, 18, 14, 14, 18]; // Adjusted to fit page width
   const colPositions: number[] = [];
   let currentX = margin;
   
