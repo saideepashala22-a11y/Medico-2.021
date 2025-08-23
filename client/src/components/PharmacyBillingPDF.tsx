@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import JsBarcode from 'jsbarcode';
 
 interface PharmacyBillingData {
   invoiceNumber: string;
@@ -23,6 +24,22 @@ interface PharmacyBillingData {
   subtotal: number;
   discount: number;
   grandTotal: number;
+}
+
+// Helper function to generate barcode as base64 image
+function generateBarcodeImage(text: string): string {
+  const canvas = document.createElement('canvas');
+  JsBarcode(canvas, text, {
+    format: "CODE128",
+    width: 2,
+    height: 40,
+    displayValue: true,
+    fontSize: 12,
+    margin: 0,
+    background: "#ffffff",
+    lineColor: "#000000"
+  });
+  return canvas.toDataURL('image/png');
 }
 
 export function generatePharmacyBillingPDF(data: PharmacyBillingData) {
@@ -205,6 +222,59 @@ export function generatePharmacyBillingPDF(data: PharmacyBillingData) {
   pdf.setFont('helvetica', 'bold');
   pdf.text('GRAND TOTAL:', totalsX + 3, yPos + 6.5);
   pdf.text(`${data.grandTotal.toFixed(2)}`, totalsX + totalsWidth - 3, yPos + 6.5, { align: 'right' });
+  
+  // ========== PROFESSIONAL BARCODE SECTION ==========
+  yPos += 40; // Add space for barcode
+  
+  // Generate barcode for invoice number
+  const barcodeData = data.invoiceNumber;
+  const barcodeImage = generateBarcodeImage(barcodeData);
+  
+  // Add barcode background (professional yellow color like in the image)
+  const barcodeAreaHeight = 50;
+  const barcodeAreaWidth = 140;
+  const barcodeX = margin + 10; // Left aligned with some margin
+  
+  // Yellow background for barcode area
+  pdf.setFillColor(255, 235, 59); // Professional yellow color
+  pdf.rect(barcodeX, yPos, barcodeAreaWidth, barcodeAreaHeight, 'F');
+  
+  // Add border around barcode area
+  pdf.setDrawColor(0, 0, 0);
+  pdf.setLineWidth(0.5);
+  pdf.rect(barcodeX, yPos, barcodeAreaWidth, barcodeAreaHeight, 'S');
+  
+  // Add barcode image
+  try {
+    pdf.addImage(barcodeImage, 'PNG', barcodeX + 10, yPos + 5, 120, 30);
+  } catch (error) {
+    console.warn('Failed to add barcode image:', error);
+    // Fallback: Add text-based barcode
+    pdf.setFontSize(14);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(`Barcode: ${barcodeData}`, barcodeX + 70, yPos + 25, { align: 'center' });
+  }
+  
+  // Add barcode label below
+  pdf.setFontSize(8);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('Invoice Barcode - Scan for Quick Reference', barcodeX + 70, yPos + 45, { align: 'center' });
+  
+  // ========== FOOTER INFORMATION ==========
+  yPos += barcodeAreaHeight + 15;
+  
+  // Add footer notes
+  pdf.setFontSize(9);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('GST 110% is 0 SGST. ** GET WELL SOON **', margin, yPos);
+  pdf.text('Please share screenshot after payment & same day payment', margin, yPos + 8);
+  
+  // Add professional footer with timestamp
+  yPos += 20;
+  pdf.setFontSize(8);
+  pdf.setFont('helvetica', 'italic');
+  const timestamp = new Date().toLocaleString('en-IN');
+  pdf.text(`Generated on: ${timestamp} | Nakshatra Hospital Management System`, margin, yPos);
   
   // Save the PDF
   const fileName = `pharmacy_bill_${data.invoiceNumber}.pdf`;
