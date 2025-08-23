@@ -1,0 +1,258 @@
+                                              
+            ---------------------------------------------------------------------
+             Slno    Investigations                                      Price   
+            ---------------------------------------------------------------------
+              1      24 Hrs URINARY PROTEINS                             700.00
+              2      ABSOLUTE EOSINOPHIL COUNT(AEC)                      600.00
+              3      AFB (Acid Fast Bacilli) CULTURE                     800.00
+              4      ALBUMIN                                             200.00
+              5      ANTENATAL PROFILE(ANC PROFILE)                      1.00
+              6      APTT                                                600.00
+              7      ASO TITRE                                           300.00
+              8      ASO/R.A/C.R.P                                       900.00
+              9      SERUM AMYLASE                                       400.00
+              10     BICARBONATE                                         500.00
+              11     BILE SALT & BILE PIGMENTS                           50.00
+              12     SERUM BILIRUBIN                                     200.00
+              13     BT CT                                               100.00
+              14     BGNNHNHNHN                                          800.00
+              15     BLOOD GROUP                                         100.00
+              16     BLOOD UREA                                          200.00
+              17     BLOOD UREA NITROGEN (BUN)                           200.00
+              18     SERUM CALCIUM                                       200.00
+              19     CBP                                                 300.00
+              20     CK-MB                                               300.00
+              21     CK-NAC                                              300.00
+              22     ARTHRITIS PROFILE                                   2500.00
+              23     CRP                                                 300.00
+              24     URINE CULTURE & SENSIVITY                           750.00
+              25     DENGUE IgG, IgM & NS1                               1500.00
+              26     ESR                                                 100.00
+              27     ESTROGEN                                            600.00
+              28     FBS & PLBS                                          100.00
+              29     FBS                                                 50.00
+              30     FERRITIN                                            1000.00
+              31     FSH                                                 500.00
+              32     FT3 FT4                                             600.00
+              33     HbA1c                                               500.00
+              34     GLUCOSE TOLERANCE TEST(GTT)                         400.00
+              35     GLYCOSYLATED HEMOGLOBIN(GHbA1c)                     500.00
+              36     GRAM STAIN                                          250.00
+              37     HAEMOGLOBIN                                         100.00
+              38     HAEMOGRAM                                           250.00
+              39     ECG                                                 400.00
+              40     CUE                                                 100.00
+              41     HBsAg                                               200.00
+              42     HCV                                                 600.00
+              43     HIV                                                 300.00
+              44     SERUM IRON                                          650.00
+              45     LH                                                  300.00
+              46     LIPID PROFILE TEST                                  500.00
+              47     LIVER FUNCTION TEST(LFT)                            500.00
+              48     MALARIAL PARASITE (PV & PF)                         300.00
+              49     MALARIAL PARASITE (SMEAR FOR MP)                    100.00
+              50     MANTOUX TEST                                        200.00
+              51     MYOGLOBIN                                           850.00
+              52     PCV (Packed Cell Volume)                            100.00
+              53     SERUM PHOSPHORUS                                    200.00
+              54     PLATELET COUNT                                      200.00
+              55     POST LUNCH BLOOD SUGAR                              70.00
+              56     SERUM POTASSIUM                                     200.00
+              57     URINE FOR PREGNANCY TEST                            100.00
+              58     PROGESTERONE                                        800.00
+              59     PROLACTIN                                           500.00
+              60     PT                                                  500.00
+              61     RA FACTOR                                           300.00
+              62     RBS                                                 50.00
+              63     REC (Reticulocyte Count)                            150.00
+              64     GAMMA G.T.                                          250.00
+              65     S.G.O.T.                                            200.00
+              66     S.G.P.T.                                            200.00
+              67     SEMEN ANALYSIS                                      200.00
+              68     SERUM CREATININE                                    200.00
+              69     SERUM PROTEINS                                      200.00
+              70     SMEAR FOR FUNGAL ELEMENTS                           500.00
+              71     SERUM SODIUM                                        200.00
+              72     SPUTUM FOR A.F.B                                    400.00
+              73     SPUTUM FOR MALIGNANT CELLS                          500.00
+              74     STONE ANALYSIS                                      1000.00
+              75     STOOL EXAMINATION                                   200.00
+              76     STOOL FOR OCCULT BLOOD                              150.00
+              77     T3                                                  250.00
+              78     T4                                                  250.00
+              79     TESTOSTERONE                                        750.00
+              80     THYROID PROFILE (T3 T4 & TSH)                       500.00
+              81     TOTAL CHOLESTEROL                                   200.00
+              82     TOTAL PROTEINS                                      200.00
+              83     SERUM TRIGLYCERIDES                                 200.00
+              84     ULTRA SOUND WHOLE ABDOMEN                           600.00
+              85     TSH                                                 300.00
+              86     SERUM URIC ACID                                     200.00
+              87     URINARY PROTEIN 24 HRS                              50.00
+              88     URINE FOR MICROALBUMIN                              450.00
+              89     VDRL                                                200.00
+              90     VITAMIN D3                                          650.00
+              91     WIDAL TEST WITH MP                                  400.00
+              92     X-RAY CHEST PA                                      500.00
+              93     X-RAY CHEST PA VIEW                                 500.00
+              94     X-RAY CHEST AP VIEW                                 500.00
+              95     X-RAY PELVIS                                        200.00
+              96     X-RAY PNS                                           200.00
+              97     X-RAY ABDOMEN ERRECT                                500.00
+              98     X-RAY BOTH HIP JOINT AP & LATERAL VIEW              500.00
+              99     X-RAY CERVICAL SPINE AP & LATERAL                   500.00
+              100    X-RAY CERVICAL SPINE AP VIEW                        500.00
+              101    X-RAY CERVICAL SPINE LATERAL VIEW                   500.00
+              102    X-RAY CHEST LATERAL VIEW                            500.00
+              103    X-RAY COCCYX AP & LATERAL VIEW                      500.00
+              104    X-RAY COCCYX AP VIEW                                500.00
+              105    X-RAY COCCYX LATERAL VIEW                           500.00
+              106    X-RAY DORSAL SPINE AP & LATERAL VIEW                500.00
+              107    X-RAY DORSAL SPINE AP VIEW                          500.00
+              108    X-RAY DORSAL SPINE LATERAL VIEW                     500.00
+              109    X-RAY IVP                                           2300.00
+              110    X-RAY KUB                                           500.00
+              111    X-RAY LEFT ANKLE AP & LATERAL VIEW                  500.00
+              112    X-RAY LEFT ANKLE AP VIEW                            500.00
+              113    X-RAY LEFT ANLKLE LATERAL VIEW                      500.00
+              114    X-RAY LEFT ELBOW AP & LATERAL VIEW                  500.00
+              115    X-RAY LEFT ELBOW AP VIEW                            500.00
+              116    X-RAY LEFT ELBOW LATERAL VIEW                       500.00
+              117    X-RAY LEFT FOREARM AP & LATERAL VIEW                500.00
+              118    X-RAY LEFT HAND AP & LATERAL VIEW                   500.00
+              119    X-RAY LEFT HAND AP VIEW                             200.00
+              120    X-RAY LEFT HAND LATERAL VIEW                        200.00
+              121    X-RAY LEFT HEEL LATERAL VIEW                        200.00
+              122    X-RAY LEFT HUMEROUS AP & LATERAL VIEW               200.00
+              123    X-RAY LEFT HUMEROUS AP VIEW                         200.00
+              124    X-RAY LEFT HUMEROUS LATERAL VIEW                    200.00
+              125    X-RAY LEFT KNEE JOINT AP & LATERAL VIEW             200.00
+              126    X-RAY LEFT KNEE JOINT AP VIEW                       200.00
+              127    X-RAY LEFT KNEE JOINT LATERAL VIEW                  200.00
+              128    X-RAY LEFT LEG AP & LATERAL VIEW                    200.00
+              129    X-RAY LEFT LEG AP VIEW                              200.00
+              130    X-RAY LEFT LEG LATERAL VIEW                         200.00
+              131    X-RAY LEFT MANDIABLE AP & LATERAL VIEW              400.00
+              132    X-RAY LEFT MANDIABLE AP VIEW                        200.00
+              133    X-RAY LEFT MANDIABLE LATERAL VIEW                   200.00
+              134    X-RAY LEFT SHOULDER AP & LATERAL VIEW               400.00
+              135    X-RAY LEFT SHOULDER AP VIEW                         200.00
+              136    X-RAY LEFT SHOULDER AXIL VIEW                       200.00
+              137    X-RAY LEFT SHOULDER LATERAL VIEW                    200.00
+              138    X-RAY LEFT THIGH AP & LATERAL VIEW                  400.00
+              139    X-RAY LEFT THIGH AP VIEW                            200.00
+              140    X-RAY LEFT THIGH LATERAL VIEW                       200.00
+              141    X-RAY LEFT WRIST AP & LATERAL VIEW                  200.00
+              142    X-RAY LEFT WRIST AP VIEW                            200.00
+              143    X-RAY LEFT WRIST LATERAL VIEW                       200.00
+              144    X-RAY LUMBAR SPINE AP & LATERAL VIEW                400.00
+              145    X-RAY LUMBAR SPINE AP VIEW                          200.00
+              146    X-RAY LUMBAR SPINE LATERAL VIEW                     200.00
+              147    X-RAY RIGHT ANKLE AP  & LATERAL VIEW                200.00
+              148    X-RAY RIGHT ANKLE AP VIEW                           200.00
+              149    X-RAY RIGHT ANKLE LATERAL VIEW                      200.00
+              150    X-RAY RIGHT ELBOW AP & LATERAL VIEW                 200.00
+              151    X-RAY RIGHT ELBOW AP VIEW                           200.00
+              152    X-RAY RIGHT ELBOW LATERAL VIEW                      200.00
+              153    X-RAY RIGHT FOREARM AP & LATERAL VIEW               200.00
+              154    X-RAY RIGHT HAND AP & LATERAL VIEW                  200.00
+              155    X-RAY RIGHT HAND AP VIEW                            200.00
+              156    X-RAY RIGHT HAND LATERAL VIEW                       200.00
+              157    X-RAY RIGHT HEEL LATERAL VIEW                       200.00
+              158    X-RAY RIGHT HIP JOINT AP & LATERAL VIEW             400.00
+              159    X-RAY RIGHT HIP JOINT AP VIEW                       200.00
+              160    X-RAY RIGHT HIP JOINT LATERAL VIEW                  200.00
+              161    X-RAY RIGHT HUMEROUS AP & LATERAL VIEW              200.00
+              162    X-RAY RIGHT HUMEROUS AP VIEW                        200.00
+              163    X-RAY RIGHT HUMEROUS LATERAL VIEW                   200.00
+              164    X-RAY RIGHT KNEE JOINT AP & LATERAL VIEW            200.00
+              165    X-RAY RIGHT KNEE JOINT AP VIEW                      200.00
+              166    X-RAY RIGHT LEG AP & LATERAL VIEW                   200.00
+              167    X-RAY RIGHT LEG AP VIEW                             500.00
+              168    X-RAY RIGHT LEG LATERAL VIEW                        500.00
+              169    X-RAY RIGHT MANDIABLE AP & LATERAL VIEW             400.00
+              170    X-RAY RIGHT MANDIABLE AP VIEW                       200.00
+              171    X-RAY RIGHT MANDIABLE LATERAL VIEW                  200.00
+              172    X-RAY RIGHT SHOULDER AP & LATERAL VIEW              400.00
+              173    X-RAY RIGHT SHOULDER AP VIEW                        500.00
+              174    X-RAY RIGHT SHOULDER AXIL VIEW                      500.00
+              175    X-RAY RIGHT SHOULDER LATERAL VIEW                   500.00
+              176    X-RAY RIGHT THIGH AP & LATERAL VIEW                 500.00
+              177    X-RAY RIGHT THIGH AP VIEW                           500.00
+              178    X-RAY RIGHT THIGH LATERAL VIEW                      500.00
+              179    X-RAY RIGHT WRIST AP & LATERAL VIEW                 500.00
+              180    X-RAY RIGHT WRIST AP VIEW                           500.00
+              181    X-RAY RIGHT WRIST LATERAL VIEW                      500.00
+              182    X-RAY SACRAM AP & LATERAL VIEW                      500.00
+              183    X-RAY SACRAM AP VIEW                                500.00
+              184    X-RAY SACRAM LATERAL VIEW                           500.00
+              185    X-RAY SKULL AP & LATERAL VIEW                       500.00
+              186    X-RAY SKULL AP VIEW                                 500.00
+              187    X-RAY SKULL LATERAL VIEW                            500.00
+              188    ULTRA SOUND THYROID                                 650.00
+              189    ULTRA SOUND SCROTUM                                 700.00
+              190    ULTRA SOUND PELVIS                                  600.00
+              191    ULTRA SOUND NECK                                    650.00
+              192    ULTRA SOUND KUB                                     600.00
+              193    ULTRA SOUND BREAST - SINGLE                         600.00
+              194    ULTRA SOUND BREAST - BOTH                           900.00
+              195    ULTRA SOUND ANTENATAL (OBSTERTIC)                   600.00
+              196    ULTRASOUND TIFFA SCAN                               800.00
+              197    ULTRASOUND FOLLICULAR STUDY                         1000.00
+              198    ULTRASOUND TRANS VAGINAL SCAN(Ist TRIMESTER) REPORT 700.00
+              200    ULTRASOUND INTERVAL GROWTH (IIIrd TRIMESTER)-BPP    1000.00
+              201    SPUTUM FOR GRAM STAIN                               300.00
+              202    URINE FOR KETONE BODIES                             150.00
+              203    STOOL FOR REDUCING SUBSTANCE                        100.00
+              204    X-RAY IOPA                                          500.00
+              205    TB IGG IGM                                          1100.00
+              206    X-RAY BOTH  KNEE JOINT AP                           500.00
+              207    SERUM CHOLESTROL                                    200.00
+              208    KETON BODIES                                        100.00
+              209    SERUM LIPASE                                        400.00
+              210    2D ECHO & COLOUR DOPPLER                            1500.00
+              211    SERUM MAGNESIUM                                     250.00
+              212    COOMBS INDIRECT                                     450.00
+              213    FSH,LH,PROLACTIN                                    1500.00
+              214    SERUM ELECTROLYTES                                  700.00
+              215    HIV WITH BLOOD GROUP                                500.00
+              216    URINE  NORMAL                                       100.00
+              217    VITAMIN B-12                                        1200.00
+              218    CREATININE KINASE                                   150.00
+              219    RUBELLA  IgG.                                       0.00
+              220    RUBELLA VIRUS  - IgG                                0.00
+              221    CHIKUNGUNYA                                         800.00
+              222    WIDAL TEST WITH MP,BG,BILIRUBIN,CRP,RBS             950.00
+              223    WIDAL TEST WITH MP,PC,RBS                           350.00
+              224    WIDAL TEST                                          150.00
+              225    LH TEST                                             300.00
+              226    ULTRASOUND SCAN OF ABDOMEN ( MALE )                 100.00
+              227    ANTI HEPATITIS A VIRUS - IGM                        120.00
+              228    RFT                                                 600.00
+              229    TROP I                                              1500.00
+              230    TROP T                                              1500.00
+              231    SERUM COLONOSTRASE                                  1200.00
+              232    vcvcvvcvcvcvc                                       100.00
+              233    Anti Phospolipid Anti bodies  IgG & IgM             1300.00
+              234    Anti Mullerian Harmone (AMH)                        2000.00
+              235    SERUM IgE                                           1000.00
+              236    VITAMIN - D                                         1.00
+              237    PT INR                                              300.00
+              238    TORCH TEST                                          2500.00
+              239    HS1 IgG IgM                                         600.00
+              240    SPUTUM CULTURE & SENSIVITY                          500.00
+              241    D-DIMER                                             1500.00
+              242    HOMOCYSTINE                                         1000.00
+              243    PERIPHERAL SMEAR                                    250.00
+              244    IRON PROFILE                                        1400.00
+              245    LDH                                                 600.00
+              246    SERUM INSULIN                                       700.00
+              247    C-PEPTIDE                                           900.00
+              248    BLOOD  HCG                                          1200.00
+              249    SERUM PROCALSOTONIN                                 2500.00
+              250    BLOOD KETONES                                       400.00
+              251    SERUM HAPTO GLOBIN                                  1800.00
+              252    CULTURE & SENSIVITY                                 400.00
+              253    BLOOD CULTURE & SENSIVITY                           1500.00
+              254    serum igm                                           2000.00
+            ---------------------------------------------------------------------
