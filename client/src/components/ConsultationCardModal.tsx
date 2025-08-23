@@ -101,7 +101,11 @@ export function ConsultationCardModal({ isOpen, onClose, patientInfo }: Consulta
         pdf.text(detail.value, xPos, yPosText + 8);
       });
       
-      // Clean consultation form section starts here
+      // Add separator line for medicine writing area
+      yPos += 15;
+      pdf.setDrawColor(0, 0, 0);
+      pdf.setLineWidth(1);
+      pdf.line(margin, yPos, pageWidth - margin, yPos);
       
       // Signature section at bottom
       const bottomY = pageHeight - 35;
