@@ -179,27 +179,6 @@ export default function Pharmacy() {
     createPrescriptionMutation.mutate(prescriptionData);
   };
 
-  const handlePrintBill = () => {
-    if (!selectedPatient || medicines.length === 0) {
-      toast({
-        title: 'Error',
-        description: 'Please complete the prescription first',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const prescriptionData = {
-      billNumber: `PH-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
-      medicines,
-      subtotal: getSubtotal().toFixed(2),
-      tax: getTax().toFixed(2),
-      total: getTotal().toFixed(2),
-      createdAt: new Date().toISOString(),
-    };
-
-    generatePrescriptionPDF(selectedPatient, prescriptionData as any);
-  };
 
   const handlePrintGSTBill = () => {
     if (!selectedPatient || medicines.length === 0) {
@@ -510,16 +489,6 @@ export default function Pharmacy() {
                           ) : (
                             'Save Prescription'
                           )}
-                        </Button>
-                        
-                        <Button
-                          onClick={handlePrintBill}
-                          variant="outline"
-                          className="border-medical-primary text-medical-primary hover:bg-medical-primary hover:text-white"
-                          data-testid="print-bill-button"
-                        >
-                          <Printer className="mr-2 h-4 w-4" />
-                          Print Simple Bill
                         </Button>
                         
                         <Button
