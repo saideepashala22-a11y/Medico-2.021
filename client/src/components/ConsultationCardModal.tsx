@@ -113,41 +113,7 @@ export function ConsultationCardModal({ isOpen, onClose, patientInfo }: Consulta
       
       yPos += 12;
       
-      // Compact consultation sections to fit in remaining 80%
-      const availableHeight = pageHeight - yPos - 30; // Reserve 30px for footer
-      const consultationSections = [
-        { title: 'CHIEF COMPLAINT', lines: 2 },
-        { title: 'HISTORY & EXAMINATION', lines: 3 },
-        { title: 'CLINICAL FINDINGS', lines: 2 },
-        { title: 'DIAGNOSIS', lines: 2 },
-        { title: 'TREATMENT & PRESCRIPTIONS', lines: 3 }
-      ];
-      
-      const lineSpacing = Math.min(8, availableHeight / (consultationSections.reduce((acc, section) => acc + section.lines + 1, 0)));
-      
-      consultationSections.forEach((section) => {
-        // Section title
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(16, 97, 143);
-        pdf.text(section.title + ':', margin, yPos);
-        
-        yPos += 6;
-        
-        // Writing lines
-        for (let i = 0; i < section.lines; i++) {
-          pdf.setDrawColor(180, 180, 180);
-          pdf.setLineWidth(0.3);
-          const lineY = yPos + (i * lineSpacing);
-          
-          // Draw dotted line
-          for (let x = margin; x < pageWidth - margin; x += 2) {
-            pdf.line(x, lineY, x + 1, lineY);
-          }
-        }
-        
-        yPos += (section.lines * lineSpacing) + 5;
-      });
+      // Clean consultation form without predefined sections
       
       // Signature section at bottom
       const bottomY = pageHeight - 35;
