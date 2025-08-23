@@ -71,10 +71,19 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
   // Create medicine mutation
   const createMedicineMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest('/api/medicines', {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/medicines', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(data),
       });
+      if (!response.ok) {
+        throw new Error('Failed to create medicine');
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/medicines'] });
@@ -97,10 +106,19 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
   // Update medicine mutation
   const updateMedicineMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      return apiRequest(`/api/medicines/${id}`, {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/medicines/${id}`, {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(data),
       });
+      if (!response.ok) {
+        throw new Error('Failed to update medicine');
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/medicines'] });
@@ -123,9 +141,17 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
   // Delete medicine mutation
   const deleteMedicineMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/medicines/${id}`, {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/medicines/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
+      if (!response.ok) {
+        throw new Error('Failed to delete medicine');
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/medicines'] });
@@ -207,11 +233,13 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
     }
   };
 
-  const filteredMedicines = medicines?.filter((medicine: MedicineInventory) =>
-    medicine.medicineName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    medicine.batchNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    medicine.category?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredMedicines = Array.isArray(medicines) 
+    ? medicines.filter((medicine: MedicineInventory) =>
+        medicine.medicineName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        medicine.batchNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        medicine.category?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
