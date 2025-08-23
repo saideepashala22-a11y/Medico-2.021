@@ -119,7 +119,7 @@ export function ChatWidget({ className }: ChatWidgetProps) {
         <CardHeader className="flex flex-row items-center justify-between p-3 bg-blue-600 text-white rounded-t-lg">
           <div className="flex items-center gap-2">
             <Bot className="h-5 w-5" />
-            <CardTitle className="text-sm font-medium">AI Assistant</CardTitle>
+            <CardTitle className="text-sm font-medium">Nakshatra's AI</CardTitle>
           </div>
           <div className="flex items-center gap-1">
             <Button
