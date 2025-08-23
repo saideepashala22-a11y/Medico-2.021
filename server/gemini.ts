@@ -1,9 +1,14 @@
 import { GoogleGenAI } from "@google/genai";
 
 // This API key is from Gemini Developer API Key, not vertex AI API Key
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+const apiKey = process.env.GEMINI_API_KEY;
+const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 export async function generateChatResponse(message: string, context?: string): Promise<string> {
+    if (!ai || !apiKey) {
+        return "AI assistance is currently unavailable. Please contact hospital staff for assistance.";
+    }
+    
     try {
         const systemPrompt = `You are an AI assistant specifically for NAKSHATRA HOSPITAL Management System with REAL-TIME ACCESS to current hospital data. You are knowledgeable about our hospital's operations and HMS features.
 
@@ -61,6 +66,10 @@ Context: ${context || 'Nakshatra Hospital HMS assistance'}`;
 }
 
 export async function generateMedicalAssistance(symptoms: string, patientContext: string): Promise<string> {
+    if (!ai || !apiKey) {
+        return "Medical AI assistance is currently unavailable. Please consult with medical staff directly.";
+    }
+    
     try {
         const prompt = `As a medical assistant AI for Nakshatra Hospital staff, provide professional guidance for the following:
         
