@@ -23,8 +23,10 @@ import {
   MapPin,
   IdCard,
   Edit,
-  CheckCircle
+  CheckCircle,
+  Download
 } from 'lucide-react';
+import jsPDF from 'jspdf';
 
 interface PatientData {
   id: string;
@@ -100,6 +102,7 @@ export default function PatientRegistration() {
 
   const [patients, setPatients] = useState<PatientData[]>([]);
   const [editingPatient, setEditingPatient] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [age, setAge] = useState<number>(0);
   const [showConsultationModal, setShowConsultationModal] = useState(false);
@@ -519,6 +522,150 @@ export default function PatientRegistration() {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Generate consultation card for existing patients
+  const generateConsultationCard = async (patient: PatientData) => {
+    setIsDownloading(patient.id);
+    
+    try {
+      const pdf = new jsPDF();
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 15;
+      
+      // Calculate sections: 20% for patient details, 80% for consultation
+      const patientSectionHeight = pageHeight * 0.2;
+      const consultationStartY = patientSectionHeight + 10;
+      
+      // Professional Header Design - Compact
+      pdf.setFillColor(16, 97, 143);
+      pdf.rect(0, 0, pageWidth, 30, 'F');
+      
+      // Hospital Name
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(20);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('NAKSHATRA HOSPITAL', pageWidth / 2, 15, { align: 'center' });
+      
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('Patient Consultation Card', pageWidth / 2, 25, { align: 'center' });
+      
+      // Patient Information Section
+      let yPos = 40;
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('PATIENT INFORMATION', margin, yPos);
+      
+      yPos += 8;
+      
+      // Patient details
+      const details = [
+        { label: 'NAME', value: patient.fullName.toUpperCase() },
+        { label: 'MRU', value: patient.mru },
+        { label: 'VISIT ID', value: patient.visitId },
+        { label: 'AGE/GENDER', value: `${patient.age}Y / ${patient.gender.toUpperCase()}` },
+        { label: 'BLOOD GROUP', value: (patient.bloodGroup || 'N/A').toUpperCase() },
+        { label: 'PHONE', value: patient.contactPhone }
+      ];
+      
+      // Draw patient info boxes
+      const colWidth = (pageWidth - 2 * margin) / 3;
+      const rowHeight = 15;
+      
+      details.forEach((detail, index) => {
+        const col = index % 3;
+        const row = Math.floor(index / 3);
+        const xPos = margin + (col * colWidth);
+        const yPosBox = yPos + (row * rowHeight);
+        
+        // Box background
+        pdf.setFillColor(248, 249, 250);
+        pdf.rect(xPos, yPosBox, colWidth - 2, rowHeight - 2, 'F');
+        pdf.setDrawColor(200, 200, 200);
+        pdf.rect(xPos, yPosBox, colWidth - 2, rowHeight - 2, 'S');
+        
+        // Label and value
+        pdf.setFontSize(7);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(detail.label + ':', xPos + 2, yPosBox + 6);
+        
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(0, 0, 0);
+        pdf.text(detail.value, xPos + 2, yPosBox + 12);
+      });
+      
+      // Consultation Form Section
+      yPos = consultationStartY;
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(16, 97, 143);
+      pdf.text('MEDICAL CONSULTATION FORM', margin, yPos);
+      
+      // Decorative line
+      pdf.setDrawColor(16, 97, 143);
+      pdf.setLineWidth(1);
+      pdf.line(margin, yPos + 3, pageWidth - margin, yPos + 3);
+      
+      yPos += 12;
+      
+      // Clean consultation form without predefined sections
+      
+      // Signature section at bottom
+      const bottomY = pageHeight - 35;
+      const signatureBoxWidth = (pageWidth - 3 * margin) / 2;
+      
+      // Doctor signature
+      pdf.setDrawColor(16, 97, 143);
+      pdf.setLineWidth(0.5);
+      pdf.rect(margin, bottomY, signatureBoxWidth, 25, 'S');
+      pdf.setFontSize(8);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(16, 97, 143);
+      pdf.text('DOCTOR SIGNATURE & STAMP', margin + 2, bottomY + 6);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(100, 100, 100);
+      pdf.text('Date: ____________', margin + 2, bottomY + 20);
+      
+      // Next appointment
+      const rightBoxX = margin + signatureBoxWidth + 10;
+      pdf.rect(rightBoxX, bottomY, signatureBoxWidth, 25, 'S');
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(16, 97, 143);
+      pdf.text('NEXT APPOINTMENT', rightBoxX + 2, bottomY + 6);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(100, 100, 100);
+      pdf.text('Date: ____________', rightBoxX + 2, bottomY + 14);
+      pdf.text('Time: ____________', rightBoxX + 2, bottomY + 20);
+      
+      // Footer
+      pdf.setFontSize(7);
+      pdf.setFont('helvetica', 'italic');
+      pdf.setTextColor(150, 150, 150);
+      pdf.text(`Generated: ${new Date().toLocaleDateString('en-IN')} | Nakshatra Hospital Management System`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+      
+      // Save the PDF
+      pdf.save(`Nakshatra_Hospital_Consultation_Card_${patient.mru}_${new Date().toISOString().split('T')[0]}.pdf`);
+      
+      toast({
+        title: 'Success',
+        description: `Consultation card downloaded for ${patient.fullName}`,
+      });
+      
+    } catch (error) {
+      console.error('Error generating consultation card:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to generate consultation card',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDownloading(null);
     }
   };
 
@@ -970,9 +1117,23 @@ export default function PatientRegistration() {
                               variant="outline"
                               onClick={() => handleEdit(patient)}
                               className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                              title="View Patient Details"
+                              title="Edit Patient Details"
                             >
                               <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => generateConsultationCard(patient)}
+                              disabled={isDownloading === patient.id}
+                              className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                              title="Download Consultation Card"
+                            >
+                              {isDownloading === patient.id ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-green-600 border-t-transparent"></div>
+                              ) : (
+                                <Download className="h-4 w-4" />
+                              )}
                             </Button>
                           </div>
                         </td>
