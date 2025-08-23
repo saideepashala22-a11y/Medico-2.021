@@ -33,66 +33,66 @@ export function generatePharmacyBillingPDF(data: PharmacyBillingData) {
   
   let yPos = 15;
   
-  // ========== HEADER SECTION WITH BORDER ==========
+  // ========== HEADER BOX WITH PHARMACY AND PATIENT DETAILS ==========
   const headerHeight = 45;
   
   // Draw border around entire header
   pdf.setDrawColor(0, 0, 0);
   pdf.setLineWidth(0.5);
-  pdf.rect(margin, yPos - 5, pageWidth - 2 * margin, headerHeight, 'S');
+  pdf.rect(margin, yPos, pageWidth - 2 * margin, headerHeight, 'S');
   
   // Left side - Pharmacy details
   pdf.setFontSize(12);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('NAKSHATRA PHARMACY', margin + 5, yPos + 5);
+  pdf.text('NAKSHATRA PHARMACY', margin + 3, yPos + 8);
   
   pdf.setFontSize(9);
   pdf.setFont('helvetica', 'normal');
-  pdf.text('123 Medical Street, Healthcare City', margin + 5, yPos + 12);
-  pdf.text('Phone: +91 98765 43210', margin + 5, yPos + 18);
-  pdf.text('Email: pharmacy@nakshatra.com', margin + 5, yPos + 24);
-  pdf.text('GSTIN: 29ABCDE1234F1Z5', margin + 5, yPos + 30);
-  pdf.text('D.L. No.: DL-29-12345', margin + 5, yPos + 36);
+  pdf.text('123 Medical Street, Healthcare City', margin + 3, yPos + 15);
+  pdf.text('Phone: +91 98765 43210', margin + 3, yPos + 21);
+  pdf.text('Email: pharmacy@nakshatra.com', margin + 3, yPos + 27);
+  pdf.text('GSTIN: 29ABCDE1234F1Z5', margin + 3, yPos + 33);
+  pdf.text('D.L. No.: DL-29-12345', margin + 3, yPos + 39);
   
   // Right side - Patient details
   const rightX = pageWidth / 2 + 10;
   pdf.setFontSize(10);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('PATIENT DETAILS:', rightX, yPos + 5);
+  pdf.text('PATIENT DETAILS:', rightX, yPos + 8);
   
   pdf.setFontSize(9);
   pdf.setFont('helvetica', 'normal');
-  pdf.text(`Name: ${data.patient.name}`, rightX, yPos + 12);
-  pdf.text(`Address: ${data.patient.address}`, rightX, yPos + 18);
-  pdf.text(`Mobile: ${data.patient.mobile}`, rightX, yPos + 24);
+  pdf.text(`Name: ${data.patient.name}`, rightX, yPos + 15);
+  pdf.text(`Address: ${data.patient.address}`, rightX, yPos + 21);
+  pdf.text(`Mobile: ${data.patient.mobile}`, rightX, yPos + 27);
   if (data.patient.doctorName) {
-    pdf.text(`Doctor: ${data.patient.doctorName}`, rightX, yPos + 30);
+    pdf.text(`Doctor: ${data.patient.doctorName}`, rightX, yPos + 33);
   }
   
-  yPos += headerHeight + 10;
+  yPos += headerHeight + 8;
   
-  // ========== INVOICE INFO ROW ==========
-  const invoiceRowHeight = 15;
+  // ========== GST INVOICE ROW WITH SHADED BACKGROUND ==========
+  const invoiceRowHeight = 18;
   
-  // Light background for invoice row
-  pdf.setFillColor(240, 240, 240);
-  pdf.rect(margin, yPos - 3, pageWidth - 2 * margin, invoiceRowHeight, 'F');
+  // Shaded background for invoice row
+  pdf.setFillColor(230, 230, 230);
+  pdf.rect(margin, yPos, pageWidth - 2 * margin, invoiceRowHeight, 'F');
   
   // "GST INVOICE" title in center
   pdf.setFontSize(14);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('GST INVOICE', pageWidth / 2, yPos + 5, { align: 'center' });
+  pdf.text('GST INVOICE', pageWidth / 2, yPos + 12, { align: 'center' });
   
   // Invoice details on right
   const currentDate = new Date();
   const invoiceRightX = pageWidth - margin - 5;
   pdf.setFontSize(9);
   pdf.setFont('helvetica', 'normal');
-  pdf.text(`Invoice No: ${data.invoiceNumber}`, invoiceRightX, yPos + 2, { align: 'right' });
-  pdf.text(`Date: ${currentDate.toLocaleDateString('en-IN')}`, invoiceRightX, yPos + 7, { align: 'right' });
-  pdf.text(`Time: ${currentDate.toLocaleTimeString('en-IN')}`, invoiceRightX, yPos + 12, { align: 'right' });
+  pdf.text(`Invoice No: ${data.invoiceNumber}`, invoiceRightX, yPos + 5, { align: 'right' });
+  pdf.text(`Date: ${currentDate.toLocaleDateString('en-IN')}`, invoiceRightX, yPos + 10, { align: 'right' });
+  pdf.text(`Time: ${currentDate.toLocaleTimeString('en-IN')}`, invoiceRightX, yPos + 15, { align: 'right' });
   
-  yPos += invoiceRowHeight + 10;
+  yPos += invoiceRowHeight + 8;
   
   // ========== PRODUCT TABLE ==========
   const tableStartY = yPos;
