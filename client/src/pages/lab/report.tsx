@@ -235,20 +235,16 @@ export default function LabReport() {
       
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
-      doc.text('Lab Technician', 30, yPos + 8);
-      doc.text('Pathologist', 130, yPos + 8);
+      doc.text('Lab Technician', pageWidth / 2 - 30, yPos + 8);
       
-      // Signature lines
+      // Signature line
       doc.setLineWidth(0.3);
-      doc.line(25, yPos + 20, 85, yPos + 20);
-      doc.line(125, yPos + 20, 185, yPos + 20);
+      doc.line(pageWidth / 2 - 40, yPos + 20, pageWidth / 2 + 40, yPos + 20);
       
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
-      doc.text('Medical Laboratory Technologist', 25, yPos + 25);
-      doc.text('Dr. Chief Pathologist', 125, yPos + 25);
-      doc.text('BMLT, DMLT', 25, yPos + 29);
-      doc.text('MBBS, MD (Pathology)', 125, yPos + 29);
+      doc.text('Medical Laboratory Technologist', pageWidth / 2 - 35, yPos + 25);
+      doc.text('BMLT, DMLT', pageWidth / 2 - 15, yPos + 29);
       
       // Report Footer
       yPos += 40;
