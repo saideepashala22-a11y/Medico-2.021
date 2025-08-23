@@ -102,7 +102,7 @@ export function ConsultationCardModal({ isOpen, onClose, patientInfo }: Consulta
       });
       
       // Add separator line for medicine writing area
-      yPos += 12; // Moved up 1cm (28 points)
+      yPos += 40; // Reduced spacing
       pdf.setDrawColor(0, 0, 0);
       pdf.setLineWidth(1);
       pdf.line(margin, yPos, pageWidth - margin, yPos);
