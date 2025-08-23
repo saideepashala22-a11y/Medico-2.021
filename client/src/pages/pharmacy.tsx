@@ -62,9 +62,13 @@ export default function Pharmacy() {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      return response.json();
+      if (!response.ok) {
+        return []; // Return empty array on error
+      }
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
     },
-    enabled: billSearch.length > 0, // Only search when user types something
+    enabled: billSearch.length > 2, // Only search when user types at least 3 characters
   });
 
   const { data: recentPrescriptions, isLoading: prescriptionsLoading } = useQuery({
@@ -72,7 +76,9 @@ export default function Pharmacy() {
   });
 
   // Use search results if search is active, otherwise show recent prescriptions
-  const displayedPrescriptions = billSearch.length > 0 ? billSearchData : recentPrescriptions;
+  const displayedPrescriptions = billSearch.length > 0 
+    ? (Array.isArray(billSearchData) ? billSearchData : []) 
+    : (Array.isArray(recentPrescriptions) ? recentPrescriptions : []);
 
   // Fetch available medicines from inventory
   const { data: availableMedicines } = useQuery({
