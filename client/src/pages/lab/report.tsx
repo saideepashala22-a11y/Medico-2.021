@@ -134,10 +134,8 @@ export default function LabReport() {
       doc.setFont('helvetica', 'normal');
       
       try {
-        console.log('Debug - labTest.results:', labTest.results);
         if (labTest.results && labTest.results.trim() !== '') {
           const results = JSON.parse(labTest.results);
-          console.log('Debug - parsed results:', results);
           
           // Handle results as array (current format)
           if (Array.isArray(results) && results.length > 0) {
