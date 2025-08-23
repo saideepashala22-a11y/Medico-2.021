@@ -15,14 +15,6 @@ import { ArrowLeft, Pill, Plus, Printer, Search, Trash2, Loader2 } from 'lucide-
 import { generatePrescriptionPDF } from '@/components/pdf-generator';
 import { PharmacyInventoryModal } from '@/components/PharmacyInventoryModal';
 
-const availableMedicines = [
-  { id: 'paracetamol_500', name: 'Paracetamol 500mg', price: 5 },
-  { id: 'amoxicillin_250', name: 'Amoxicillin 250mg', price: 8 },
-  { id: 'omeprazole_20', name: 'Omeprazole 20mg', price: 12 },
-  { id: 'metformin_500', name: 'Metformin 500mg', price: 6 },
-  { id: 'aspirin_75', name: 'Aspirin 75mg', price: 3 },
-  { id: 'ciprofloxacin_500', name: 'Ciprofloxacin 500mg', price: 15 },
-];
 
 interface MedicineItem {
   medicineId: string;
@@ -59,6 +51,19 @@ export default function Pharmacy() {
 
   const { data: recentPrescriptions, isLoading: prescriptionsLoading } = useQuery({
     queryKey: ['/api/prescriptions/recent'],
+  });
+
+  // Fetch available medicines from inventory
+  const { data: availableMedicines } = useQuery({
+    queryKey: ['/api/medicines/active'],
+    queryFn: async () => {
+      const response = await fetch('/api/medicines/active', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      return response.json();
+    },
   });
 
   const createPrescriptionMutation = useMutation({
@@ -108,11 +113,11 @@ export default function Pharmacy() {
     
     // Auto-fill price when medicine is selected
     if (field === 'medicineId') {
-      const medicine = availableMedicines.find(m => m.id === value);
+      const medicine = availableMedicines?.find((m: any) => m.id === value);
       if (medicine) {
-        updated[index].name = medicine.name;
-        updated[index].price = medicine.price;
-        updated[index].total = updated[index].quantity * medicine.price;
+        updated[index].name = medicine.medicineName;
+        updated[index].price = parseFloat(medicine.mrp);
+        updated[index].total = updated[index].quantity * parseFloat(medicine.mrp);
       }
     }
     
@@ -323,11 +328,16 @@ export default function Pharmacy() {
                                 <SelectValue placeholder="Select Medicine" />
                               </SelectTrigger>
                               <SelectContent>
-                                {availableMedicines.map((med) => (
+                                {(availableMedicines || []).map((med: any) => (
                                   <SelectItem key={med.id} value={med.id}>
-                                    {med.name}
+                                    {med.medicineName} - ₹{med.mrp}
                                   </SelectItem>
                                 ))}
+                                {(!availableMedicines || availableMedicines.length === 0) && (
+                                  <SelectItem value="" disabled>
+                                    No medicines available
+                                  </SelectItem>
+                                )}
                               </SelectContent>
                             </Select>
                           </div>
