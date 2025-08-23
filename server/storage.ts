@@ -307,7 +307,7 @@ export class DatabaseStorage implements IStorage {
     .from(prescriptions)
     .innerJoin(patientsRegistration, eq(prescriptions.patientId, patientsRegistration.id))
     .orderBy(desc(prescriptions.createdAt))
-    .limit(10);
+    .limit(5);
   }
 
   async getDischargeSummary(id: string): Promise<DischargeSummary | undefined> {
