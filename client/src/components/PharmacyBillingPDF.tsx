@@ -173,13 +173,6 @@ export function generatePharmacyBillingPDF(data: PharmacyBillingData) {
   // ========== FOOTER NOTES SECTION ==========
   yPos += 15;
   
-  pdf.setFontSize(10);
-  pdf.setFont('helvetica', 'normal');
-  pdf.text('GST 110*0% = 0 SGST, ** GET WELL SOON **', margin, yPos);
-  
-  yPos += 10;
-  pdf.text('Please share screenshot after payment & same day payment', margin, yPos);
-  
   // ========== TOTALS SECTION (SEPARATE SMALL TABLE) ==========
   yPos += 20;
   
