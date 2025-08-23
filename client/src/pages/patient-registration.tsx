@@ -23,7 +23,6 @@ import {
   MapPin,
   IdCard,
   Edit,
-  Trash2,
   CheckCircle
 } from 'lucide-react';
 
@@ -521,14 +520,6 @@ export default function PatientRegistration() {
     setEditingPatient(patient.id);
   };
 
-  // Handle delete patient
-  const handleDelete = (patientId: string) => {
-    setPatients(prev => prev.filter(p => p.id !== patientId));
-    toast({
-      title: 'Success',
-      description: 'Patient deleted successfully',
-    });
-  };
 
   // Filter patients for search and show latest 5 records
   const filteredPatients = patients
@@ -949,17 +940,10 @@ export default function PatientRegistration() {
                               size="sm"
                               variant="outline"
                               onClick={() => handleEdit(patient)}
-                              className="h-8 w-8 p-0"
+                              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                              title="View Patient Details"
                             >
                               <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleDelete(patient.id)}
-                              className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                            >
-                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </td>
