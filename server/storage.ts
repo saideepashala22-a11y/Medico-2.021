@@ -16,6 +16,8 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUserOTP(username: string, otp: string, expiresAt: Date): Promise<boolean>;
+  resetUserPassword(username: string, newPassword: string): Promise<boolean>;
   
   // Patients
   getPatient(id: string): Promise<Patient | undefined>;
@@ -144,6 +146,39 @@ export class DatabaseStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
+  }
+
+  async updateUserOTP(username: string, otp: string, expiresAt: Date): Promise<boolean> {
+    try {
+      const result = await db
+        .update(users)
+        .set({ 
+          resetOtp: otp, 
+          otpExpires: expiresAt 
+        })
+        .where(eq(users.username, username));
+      return true;
+    } catch (error) {
+      console.error('Error updating user OTP:', error);
+      return false;
+    }
+  }
+
+  async resetUserPassword(username: string, newPassword: string): Promise<boolean> {
+    try {
+      const result = await db
+        .update(users)
+        .set({ 
+          password: newPassword,
+          resetOtp: null,
+          otpExpires: null
+        })
+        .where(eq(users.username, username));
+      return true;
+    } catch (error) {
+      console.error('Error resetting user password:', error);
+      return false;
+    }
   }
 
   async getPatient(id: string): Promise<Patient | undefined> {

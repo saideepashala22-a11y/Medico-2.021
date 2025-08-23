@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema, insertConsultationSchema, insertLabTestDefinitionSchema, insertSurgicalCaseSheetSchema, insertPatientsRegistrationSchema, insertMedicineInventorySchema } from "@shared/schema";
 import { z } from "zod";
 import { generateChatResponse, generateMedicalAssistance } from "./gemini";
+import { sendOTP, generateOTP } from "./twilioService";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
@@ -104,6 +105,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { password, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
     } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Forgot Password routes
+  app.post('/api/auth/forgot-password', async (req, res) => {
+    try {
+      const { username, phoneNumber } = req.body;
+      
+      if (!username || !phoneNumber) {
+        return res.status(400).json({ message: 'Username and phone number are required' });
+      }
+
+      // Check if user exists
+      const user = await storage.getUserByUsername(username);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Generate OTP
+      const otp = generateOTP();
+      const expiresAt = new Date();
+      expiresAt.setMinutes(expiresAt.getMinutes() + 10); // OTP expires in 10 minutes
+
+      // Update user with OTP
+      const otpUpdated = await storage.updateUserOTP(username, otp, expiresAt);
+      if (!otpUpdated) {
+        return res.status(500).json({ message: 'Failed to generate OTP' });
+      }
+
+      // Send OTP via SMS
+      const smsSent = await sendOTP(phoneNumber, otp);
+      if (!smsSent) {
+        return res.status(500).json({ message: 'Failed to send OTP' });
+      }
+
+      res.json({ message: 'OTP sent successfully to your phone number' });
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.post('/api/auth/verify-otp-reset', async (req, res) => {
+    try {
+      const { username, otp, newPassword } = req.body;
+      
+      if (!username || !otp || !newPassword) {
+        return res.status(400).json({ message: 'Username, OTP, and new password are required' });
+      }
+
+      // Get user
+      const user = await storage.getUserByUsername(username);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Check OTP
+      if (!user.resetOtp || user.resetOtp !== otp) {
+        return res.status(400).json({ message: 'Invalid OTP' });
+      }
+
+      // Check OTP expiration
+      if (!user.otpExpires || new Date() > user.otpExpires) {
+        return res.status(400).json({ message: 'OTP has expired' });
+      }
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // Reset password and clear OTP
+      const passwordReset = await storage.resetUserPassword(username, hashedPassword);
+      if (!passwordReset) {
+        return res.status(500).json({ message: 'Failed to reset password' });
+      }
+
+      res.json({ message: 'Password reset successfully' });
+    } catch (error) {
+      console.error('Verify OTP reset error:', error);
       res.status(500).json({ message: 'Server error' });
     }
   });

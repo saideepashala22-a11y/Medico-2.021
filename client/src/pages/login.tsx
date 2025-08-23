@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Hospital, Loader2 } from 'lucide-react';
+import { ForgotPasswordModal } from '@/components/ForgotPasswordModal';
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -15,6 +16,7 @@ export default function Login() {
     role: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { login } = useAuth();
   const { toast } = useToast();
 
@@ -102,6 +104,7 @@ export default function Login() {
               type="submit" 
               className="w-full bg-medical-primary hover:bg-medical-primary-dark text-white shadow-lg"
               disabled={isLoading}
+              data-testid="button-login"
             >
               {isLoading ? (
                 <>
@@ -114,11 +117,27 @@ export default function Login() {
             </Button>
           </form>
           
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              className="text-sm text-medical-primary hover:text-medical-primary-dark underline"
+              onClick={() => setShowForgotPassword(true)}
+              data-testid="link-forgot-password"
+            >
+              Forgot Password?
+            </button>
+          </div>
+          
           <div className="mt-6 text-center">
             <p className="text-xs text-gray-500">Demo Credentials: doctor/admin123 or staff/staff123</p>
           </div>
         </CardContent>
       </Card>
+      
+      <ForgotPasswordModal 
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+      />
     </div>
   );
 }

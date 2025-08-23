@@ -9,6 +9,9 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   role: text("role").notNull(), // 'doctor' or 'staff'
   name: text("name").notNull(),
+  phoneNumber: text("phone_number"), // For OTP sending
+  resetOtp: text("reset_otp"), // Current OTP for password reset
+  otpExpires: timestamp("otp_expires"), // OTP expiration time
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
