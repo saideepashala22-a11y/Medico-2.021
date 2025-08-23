@@ -90,6 +90,31 @@ export interface IStorage {
     consultationsToday: number;
     surgicalCasesToday: number;
   }>;
+  
+  // Historical Stats
+  getHistoricalStats(): Promise<{
+    yesterday: {
+      patientsRegistered: number;
+      labTests: number;
+      prescriptions: number;
+      discharges: number;
+      surgicalCases: number;
+    };
+    lastWeek: {
+      patientsRegistered: number;
+      labTests: number;
+      prescriptions: number;
+      discharges: number;
+      surgicalCases: number;
+    };
+    lastMonth: {
+      patientsRegistered: number;
+      labTests: number;
+      prescriptions: number;
+      discharges: number;
+      surgicalCases: number;
+    };
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -307,6 +332,117 @@ export class DatabaseStorage implements IStorage {
       dischargesToday: Number(dischargesToday.count),
       consultationsToday: Number(consultationsToday.count),
       surgicalCasesToday: Number(surgicalCasesToday.count),
+    };
+  }
+
+  async getHistoricalStats(): Promise<{
+    yesterday: {
+      patientsRegistered: number;
+      labTests: number;
+      prescriptions: number;
+      discharges: number;
+      surgicalCases: number;
+    };
+    lastWeek: {
+      patientsRegistered: number;
+      labTests: number;
+      prescriptions: number;
+      discharges: number;
+      surgicalCases: number;
+    };
+    lastMonth: {
+      patientsRegistered: number;
+      labTests: number;
+      prescriptions: number;
+      discharges: number;
+      surgicalCases: number;
+    };
+  }> {
+    const now = new Date();
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
+    const yesterdayEnd = new Date(yesterday);
+    yesterdayEnd.setHours(23, 59, 59, 999);
+
+    const lastWeekStart = new Date(now);
+    lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+    lastWeekStart.setHours(0, 0, 0, 0);
+
+    const lastMonthStart = new Date(now);
+    lastMonthStart.setDate(lastMonthStart.getDate() - 30);
+    lastMonthStart.setHours(0, 0, 0, 0);
+
+    // Yesterday's counts
+    const [yesterdayPatients] = await db.select({ count: sql`count(*)` }).from(patientsRegistration)
+      .where(sql`${patientsRegistration.createdAt} >= ${yesterday} AND ${patientsRegistration.createdAt} <= ${yesterdayEnd}`);
+    
+    const [yesterdayLabTests] = await db.select({ count: sql`count(*)` }).from(labTests)
+      .where(sql`${labTests.createdAt} >= ${yesterday} AND ${labTests.createdAt} <= ${yesterdayEnd}`);
+    
+    const [yesterdayPrescriptions] = await db.select({ count: sql`count(*)` }).from(prescriptions)
+      .where(sql`${prescriptions.createdAt} >= ${yesterday} AND ${prescriptions.createdAt} <= ${yesterdayEnd}`);
+    
+    const [yesterdayDischarges] = await db.select({ count: sql`count(*)` }).from(dischargeSummaries)
+      .where(sql`${dischargeSummaries.createdAt} >= ${yesterday} AND ${dischargeSummaries.createdAt} <= ${yesterdayEnd}`);
+    
+    const [yesterdaySurgical] = await db.select({ count: sql`count(*)` }).from(surgicalCaseSheets)
+      .where(sql`${surgicalCaseSheets.createdAt} >= ${yesterday} AND ${surgicalCaseSheets.createdAt} <= ${yesterdayEnd}`);
+
+    // Last week's counts
+    const [weekPatients] = await db.select({ count: sql`count(*)` }).from(patientsRegistration)
+      .where(sql`${patientsRegistration.createdAt} >= ${lastWeekStart}`);
+    
+    const [weekLabTests] = await db.select({ count: sql`count(*)` }).from(labTests)
+      .where(sql`${labTests.createdAt} >= ${lastWeekStart}`);
+    
+    const [weekPrescriptions] = await db.select({ count: sql`count(*)` }).from(prescriptions)
+      .where(sql`${prescriptions.createdAt} >= ${lastWeekStart}`);
+    
+    const [weekDischarges] = await db.select({ count: sql`count(*)` }).from(dischargeSummaries)
+      .where(sql`${dischargeSummaries.createdAt} >= ${lastWeekStart}`);
+    
+    const [weekSurgical] = await db.select({ count: sql`count(*)` }).from(surgicalCaseSheets)
+      .where(sql`${surgicalCaseSheets.createdAt} >= ${lastWeekStart}`);
+
+    // Last month's counts
+    const [monthPatients] = await db.select({ count: sql`count(*)` }).from(patientsRegistration)
+      .where(sql`${patientsRegistration.createdAt} >= ${lastMonthStart}`);
+    
+    const [monthLabTests] = await db.select({ count: sql`count(*)` }).from(labTests)
+      .where(sql`${labTests.createdAt} >= ${lastMonthStart}`);
+    
+    const [monthPrescriptions] = await db.select({ count: sql`count(*)` }).from(prescriptions)
+      .where(sql`${prescriptions.createdAt} >= ${lastMonthStart}`);
+    
+    const [monthDischarges] = await db.select({ count: sql`count(*)` }).from(dischargeSummaries)
+      .where(sql`${dischargeSummaries.createdAt} >= ${lastMonthStart}`);
+    
+    const [monthSurgical] = await db.select({ count: sql`count(*)` }).from(surgicalCaseSheets)
+      .where(sql`${surgicalCaseSheets.createdAt} >= ${lastMonthStart}`);
+
+    return {
+      yesterday: {
+        patientsRegistered: Number(yesterdayPatients?.count || 0),
+        labTests: Number(yesterdayLabTests?.count || 0),
+        prescriptions: Number(yesterdayPrescriptions?.count || 0),
+        discharges: Number(yesterdayDischarges?.count || 0),
+        surgicalCases: Number(yesterdaySurgical?.count || 0),
+      },
+      lastWeek: {
+        patientsRegistered: Number(weekPatients?.count || 0),
+        labTests: Number(weekLabTests?.count || 0),
+        prescriptions: Number(weekPrescriptions?.count || 0),
+        discharges: Number(weekDischarges?.count || 0),
+        surgicalCases: Number(weekSurgical?.count || 0),
+      },
+      lastMonth: {
+        patientsRegistered: Number(monthPatients?.count || 0),
+        labTests: Number(monthLabTests?.count || 0),
+        prescriptions: Number(monthPrescriptions?.count || 0),
+        discharges: Number(monthDischarges?.count || 0),
+        surgicalCases: Number(monthSurgical?.count || 0),
+      },
     };
   }
 

@@ -602,17 +602,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Message is required' });
       }
 
-      // Get current hospital stats to provide real data to AI
+      // Get current hospital stats and historical data to provide real data to AI
       const stats = await storage.getStats();
+      const historicalStats = await storage.getHistoricalStats();
       const hospitalContext = `=== REAL-TIME NAKSHATRA HOSPITAL DATA (YOU HAVE ACCESS TO THIS) ===
-Current Statistics:
+Today's Statistics:
 - Total Patients Registered: ${stats.totalPatients}
 - Lab Tests Completed Today: ${stats.labTestsToday}
 - Prescriptions Issued Today: ${stats.prescriptionsToday}
 - Patient Discharges Today: ${stats.dischargesToday}
 - Surgical Cases Today: ${stats.surgicalCasesToday || 0}
 
-MANDATORY: Use these exact numbers when users ask about hospital statistics. You DO have access to real data.
+Yesterday's Statistics:
+- Patients Registered: ${historicalStats.yesterday.patientsRegistered}
+- Lab Tests: ${historicalStats.yesterday.labTests}
+- Prescriptions: ${historicalStats.yesterday.prescriptions}
+- Discharges: ${historicalStats.yesterday.discharges}
+- Surgical Cases: ${historicalStats.yesterday.surgicalCases}
+
+Last 7 Days Statistics:
+- Patients Registered: ${historicalStats.lastWeek.patientsRegistered}
+- Lab Tests: ${historicalStats.lastWeek.labTests}
+- Prescriptions: ${historicalStats.lastWeek.prescriptions}
+- Discharges: ${historicalStats.lastWeek.discharges}
+- Surgical Cases: ${historicalStats.lastWeek.surgicalCases}
+
+Last 30 Days Statistics:
+- Patients Registered: ${historicalStats.lastMonth.patientsRegistered}
+- Lab Tests: ${historicalStats.lastMonth.labTests}
+- Prescriptions: ${historicalStats.lastMonth.prescriptions}
+- Discharges: ${historicalStats.lastMonth.discharges}
+- Surgical Cases: ${historicalStats.lastMonth.surgicalCases}
+
+MANDATORY: Use these exact numbers when users ask about hospital statistics for any time period. You DO have access to historical data.
 
 ${context || 'Nakshatra Hospital HMS assistance'}`;
 
