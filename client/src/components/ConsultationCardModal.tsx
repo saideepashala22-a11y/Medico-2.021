@@ -102,10 +102,10 @@ export function ConsultationCardModal({ isOpen, onClose, patientInfo }: Consulta
       });
       
       // Add separator line for medicine writing area
-      yPos += 25; // Moved up more
+      yPos += 40; // Reduced spacing
       pdf.setDrawColor(0, 0, 0);
       pdf.setLineWidth(1);
-      pdf.line(pageWidth - margin, yPos, margin, yPos); // Right to left
+      pdf.line(margin, yPos, pageWidth - margin, yPos);
       
       // Signature section at bottom
       const bottomY = pageHeight - 35;
