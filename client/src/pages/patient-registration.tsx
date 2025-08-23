@@ -572,32 +572,27 @@ export default function PatientRegistration() {
         { label: 'PHONE', value: patient.contactPhone }
       ];
       
-      // Draw patient info boxes
+      // Clean professional layout without boxes
       const colWidth = (pageWidth - 2 * margin) / 3;
-      const rowHeight = 15;
+      const rowHeight = 18;
       
       details.forEach((detail, index) => {
         const col = index % 3;
         const row = Math.floor(index / 3);
         const xPos = margin + (col * colWidth);
-        const yPosBox = yPos + (row * rowHeight);
+        const yPosText = yPos + (row * rowHeight);
         
-        // Box background
-        pdf.setFillColor(248, 249, 250);
-        pdf.rect(xPos, yPosBox, colWidth - 2, rowHeight - 2, 'F');
-        pdf.setDrawColor(200, 200, 200);
-        pdf.rect(xPos, yPosBox, colWidth - 2, rowHeight - 2, 'S');
-        
-        // Label and value
-        pdf.setFontSize(7);
+        // Label
+        pdf.setFontSize(8);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(100, 100, 100);
-        pdf.text(detail.label + ':', xPos + 2, yPosBox + 6);
+        pdf.text(detail.label + ':', xPos, yPosText);
         
-        pdf.setFontSize(9);
+        // Value
+        pdf.setFontSize(11);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(0, 0, 0);
-        pdf.text(detail.value, xPos + 2, yPosBox + 12);
+        pdf.text(detail.value, xPos, yPosText + 8);
       });
       
       // Clean consultation form section starts here
