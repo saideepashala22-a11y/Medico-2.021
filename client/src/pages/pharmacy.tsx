@@ -42,6 +42,7 @@ export default function Pharmacy() {
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
   const [medicines, setMedicines] = useState<MedicineItem[]>([]);
   const [showInventoryModal, setShowInventoryModal] = useState(false);
+  const [showPatientDropdown, setShowPatientDropdown] = useState(false);
 
   const { data: searchResults } = useQuery({
     queryKey: ['/api/patients/search', patientSearch],
@@ -53,7 +54,7 @@ export default function Pharmacy() {
       });
       return response.json();
     },
-    enabled: true, // Always enabled
+    enabled: showPatientDropdown, // Only enabled when dropdown should show
   });
 
   const { data: recentPrescriptions, isLoading: prescriptionsLoading } = useQuery({
@@ -238,12 +239,17 @@ export default function Pharmacy() {
                     placeholder="Enter patient name or ID..."
                     value={patientSearch}
                     onChange={(e) => setPatientSearch(e.target.value)}
+                    onFocus={() => setShowPatientDropdown(true)}
+                    onBlur={() => {
+                      // Delay hiding to allow clicks on dropdown items
+                      setTimeout(() => setShowPatientDropdown(false), 200);
+                    }}
                     className="pl-10"
                   />
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                 </div>
                 
-                {searchResults && searchResults.length > 0 && (
+                {showPatientDropdown && searchResults && searchResults.length > 0 && (
                   <div className="mt-2 border rounded-lg bg-white shadow-sm max-h-60 overflow-y-auto">
                     {searchResults.map((patient: any) => (
                       <div
@@ -252,6 +258,7 @@ export default function Pharmacy() {
                         onClick={() => {
                           setSelectedPatient(patient);
                           setPatientSearch('');
+                          setShowPatientDropdown(false);
                         }}
                       >
                         <div className="font-medium">{patient.fullName}</div>
@@ -261,7 +268,7 @@ export default function Pharmacy() {
                   </div>
                 )}
                 
-                {patientSearch && searchResults && searchResults.length === 0 && (
+                {showPatientDropdown && patientSearch && searchResults && searchResults.length === 0 && (
                   <div className="mt-2 border rounded-lg bg-white shadow-sm p-3 text-gray-500 text-center">
                     No patients found matching "{patientSearch}"
                   </div>
