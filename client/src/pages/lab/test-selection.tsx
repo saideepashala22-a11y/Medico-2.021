@@ -25,7 +25,18 @@ export default function TestSelection() {
 
   // Fetch patient details
   const { data: patient, isLoading: patientLoading } = useQuery<any>({
-    queryKey: ['/api/patients', patientId],
+    queryKey: ['/api/patients-registration', patientId],
+    queryFn: async () => {
+      const response = await fetch(`/api/patients-registration/${patientId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Patient not found');
+      }
+      return response.json();
+    },
   });
 
   // Fetch available test definitions
@@ -235,12 +246,12 @@ export default function TestSelection() {
           <CardContent>
             <div className="grid grid-cols-4 gap-6">
               <div>
-                <p className="text-sm text-gray-600">Patient ID</p>
-                <p className="font-semibold">{patient.patientId}</p>
+                <p className="text-sm text-gray-600">MRU Number</p>
+                <p className="font-semibold">{patient.mruNumber}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Name</p>
-                <p className="font-semibold">{patient.salutation} {patient.name}</p>
+                <p className="font-semibold">{patient.salutation} {patient.fullName}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Age & Gender</p>
@@ -250,7 +261,7 @@ export default function TestSelection() {
                 <p className="text-sm text-gray-600">Contact</p>
                 <p className="font-semibold flex items-center">
                   <Phone className="h-4 w-4 mr-1" />
-                  {patient.phone}
+                  {patient.contactPhone}
                 </p>
               </div>
             </div>
