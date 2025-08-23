@@ -578,6 +578,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get next MRU number (MUST BE BEFORE /:id route)
+  app.get('/api/patients-registration/next-mru', authenticateToken, async (req: any, res) => {
+    try {
+      const nextMRU = await storage.getNextMRUNumber();
+      res.json({ mruNumber: nextMRU });
+    } catch (error) {
+      console.error('Error generating next MRU number:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Search patients registration by MRU number, name, or phone (MUST BE BEFORE /:id route)
+  app.get('/api/patients-registration/search/:query', authenticateToken, async (req: any, res) => {
+    try {
+      const registrations = await storage.searchPatientsRegistrations(req.params.query);
+      res.json(registrations);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
   app.get('/api/patients-registration/:id', authenticateToken, async (req: any, res) => {
     try {
       const registration = await storage.getPatientsRegistration(req.params.id);
@@ -610,26 +631,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Search patients registration by MRU number, name, or phone
-  app.get('/api/patients-registration/search/:query', authenticateToken, async (req: any, res) => {
-    try {
-      const registrations = await storage.searchPatientsRegistrations(req.params.query);
-      res.json(registrations);
-    } catch (error) {
-      res.status(500).json({ message: 'Server error' });
-    }
-  });
-
-  // Get next MRU number
-  app.get('/api/patients-registration/next-mru', authenticateToken, async (req: any, res) => {
-    try {
-      const nextMRU = await storage.getNextMRUNumber();
-      res.json({ mruNumber: nextMRU });
-    } catch (error) {
-      console.error('Error generating next MRU number:', error);
-      res.status(500).json({ message: 'Server error' });
-    }
-  });
 
   // AI Chat endpoints
   app.post('/api/chat', authenticateToken, async (req: any, res) => {
