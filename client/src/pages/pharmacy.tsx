@@ -190,7 +190,10 @@ export default function Pharmacy() {
       return;
     }
 
-    const invoiceNumber = `INV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
+    // Generate bill number using same format as database prescriptions
+    const year = new Date().getFullYear();
+    const nextNumber = ((recentPrescriptions as any[])?.length || 0) + 1;
+    const invoiceNumber = `PH-${year}-${String(nextNumber).padStart(3, '0')}`;
     
     const billingData = {
       invoiceNumber,
