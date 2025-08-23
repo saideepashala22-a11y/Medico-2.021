@@ -13,6 +13,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { Link } from 'wouter';
 import { ArrowLeft, Pill, Plus, Printer, Search, Trash2, Loader2 } from 'lucide-react';
 import { generatePrescriptionPDF } from '@/components/pdf-generator';
+import { generatePharmacyBillingPDF } from '@/components/PharmacyBillingPDF';
 import { PharmacyInventoryModal } from '@/components/PharmacyInventoryModal';
 
 
@@ -197,6 +198,51 @@ export default function Pharmacy() {
     };
 
     generatePrescriptionPDF(selectedPatient, prescriptionData as any);
+  };
+
+  const handlePrintGSTBill = () => {
+    if (!selectedPatient || medicines.length === 0) {
+      toast({
+        title: 'Error',
+        description: 'Please complete the prescription first',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const invoiceNumber = `INV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
+    
+    const billingData = {
+      invoiceNumber,
+      patient: {
+        name: selectedPatient.fullName || selectedPatient.name,
+        address: selectedPatient.address || 'Not provided',
+        mobile: selectedPatient.contactPhone || selectedPatient.contact,
+        doctorName: selectedPatient.referringDoctor || undefined,
+      },
+      medicines: medicines.map(med => ({
+        name: med.name,
+        pack: '1S', // Default pack
+        batch: 'B110', // Default batch
+        hsn: '3004', // Default HSN for medicines
+        exp: '12/25', // Default expiry
+        quantity: med.quantity,
+        mrp: med.price,
+        sgst: 0.00, // 0% GST as per requirement
+        cgst: 0.00, // 0% GST as per requirement
+        total: med.total,
+      })),
+      subtotal: getSubtotal(),
+      discount: 0.00,
+      grandTotal: getTotal(),
+    };
+
+    generatePharmacyBillingPDF(billingData);
+    
+    toast({
+      title: 'Success',
+      description: 'GST invoice downloaded successfully',
+    });
   };
 
   return (
@@ -384,6 +430,71 @@ export default function Pharmacy() {
                     </>
                   )}
                 </div>
+                
+                {/* Totals and Action Buttons */}
+                {medicines.length > 0 && (
+                  <div className="mt-6 border-t pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Totals Section */}
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <h3 className="font-medium text-gray-900 mb-3">Bill Summary</h3>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span>Subtotal:</span>
+                            <span>₹{getSubtotal().toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Tax (0%):</span>
+                            <span>₹{getTax().toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between border-t pt-2 font-medium">
+                            <span>Total:</span>
+                            <span>₹{getTotal().toFixed(2)}</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Action Buttons */}
+                      <div className="flex flex-col space-y-3">
+                        <Button
+                          onClick={handleSavePrescription}
+                          disabled={createPrescriptionMutation.isPending}
+                          className="bg-medical-primary hover:bg-medical-primary-dark"
+                          data-testid="save-prescription-button"
+                        >
+                          {createPrescriptionMutation.isPending ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Saving...
+                            </>
+                          ) : (
+                            'Save Prescription'
+                          )}
+                        </Button>
+                        
+                        <Button
+                          onClick={handlePrintBill}
+                          variant="outline"
+                          className="border-medical-primary text-medical-primary hover:bg-medical-primary hover:text-white"
+                          data-testid="print-bill-button"
+                        >
+                          <Printer className="mr-2 h-4 w-4" />
+                          Print Simple Bill
+                        </Button>
+                        
+                        <Button
+                          onClick={handlePrintGSTBill}
+                          variant="outline"
+                          className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                          data-testid="print-gst-bill-button"
+                        >
+                          <Printer className="mr-2 h-4 w-4" />
+                          Print GST Invoice
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
