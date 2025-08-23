@@ -603,10 +603,10 @@ export default function PatientRegistration() {
       });
       
       // Add separator line for medicine writing area
-      yPos += 40; // Reduced spacing
+      yPos += 25; // Moved up more
       pdf.setDrawColor(0, 0, 0);
       pdf.setLineWidth(1);
-      pdf.line(margin, yPos, pageWidth - margin, yPos);
+      pdf.line(pageWidth - margin, yPos, margin, yPos); // Right to left
       
       // Signature section at bottom
       const bottomY = pageHeight - 35;
