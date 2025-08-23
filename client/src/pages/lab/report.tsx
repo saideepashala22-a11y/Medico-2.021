@@ -187,21 +187,10 @@ export default function LabReport() {
                 yPos += 8;
               }
             });
-          } else {
-            doc.setFont('helvetica', 'italic');
-            doc.text('Test results are pending laboratory analysis.', 20, yPos + 10);
-            yPos += 20;
           }
-        } else {
-          doc.setFont('helvetica', 'italic');
-          doc.text('Test results are pending laboratory analysis.', 20, yPos + 10);
-          yPos += 20;
         }
       } catch (error) {
         console.error('Error parsing results:', error);
-        doc.setFont('helvetica', 'italic');
-        doc.text('Test results are being processed.', 20, yPos + 10);
-        yPos += 20;
       }
       
       // Clinical Notes Section
