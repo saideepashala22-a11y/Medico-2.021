@@ -168,8 +168,12 @@ export default function PatientRegistration() {
 
   // Handle date of birth change
   const handleDateOfBirthChange = (value: string) => {
-    setFormData(prev => ({ ...prev, dateOfBirth: value }));
     const calculatedAge = calculateAge(value);
+    setFormData(prev => ({ 
+      ...prev, 
+      dateOfBirth: value,
+      age: calculatedAge.toString()
+    }));
     setAge(calculatedAge);
     
     // Auto-suggest salutation based on age and gender
@@ -207,8 +211,12 @@ export default function PatientRegistration() {
     const dateString = newDate.toISOString().split('T')[0];
     
     // Update form data and calculate age
-    setFormData(prev => ({ ...prev, dateOfBirth: dateString }));
     const calculatedAge = calculateAge(dateString);
+    setFormData(prev => ({ 
+      ...prev, 
+      dateOfBirth: dateString,
+      age: calculatedAge.toString()
+    }));
     setAge(calculatedAge);
     
     // Auto-suggest salutation based on age and gender
@@ -635,6 +643,23 @@ export default function PatientRegistration() {
                       <p className="text-xs text-green-600 font-medium">Age: {age} years</p>
                     )}
                   </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="age">Age (Years) *</Label>
+                  <Input
+                    id="age"
+                    type="number"
+                    value={formData.age}
+                    onChange={(e) => setFormData(prev => ({ ...prev, age: e.target.value }))}
+                    className="border-gray-300 bg-gray-50"
+                    placeholder="Calculated from DOB"
+                    readOnly
+                    data-testid="input-age"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    🔄 Auto-calculated from Date of Birth
+                  </p>
                 </div>
 
                 <div>
