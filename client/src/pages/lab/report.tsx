@@ -244,7 +244,6 @@ export default function LabReport() {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
       doc.text('Medical Laboratory Technologist', pageWidth / 2 - 35, yPos + 25);
-      doc.text('BMLT, DMLT', pageWidth / 2 - 15, yPos + 29);
       
       // Report Footer
       yPos += 40;
