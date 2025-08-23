@@ -232,7 +232,7 @@ export default function LabReport() {
       // Signature section (right side, no border)
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
-      doc.text('Lab Technician', pageWidth - 80, yPos + 8);
+      doc.text('Lab Technician', pageWidth - 60, yPos + 8);
       
       // Signature line
       doc.setLineWidth(0.3);
