@@ -507,7 +507,7 @@ export default function PatientRegistration() {
         referringDoctor: '',
       });
       
-      console.log('Patient registered successfully:', newPatient);
+      console.log('Patient registered successfully:', patientData);
     } catch (error) {
       console.error('Registration error:', error);
       toast({
