@@ -96,8 +96,8 @@ export function generatePharmacyBillingPDF(data: PharmacyBillingData) {
   
   // ========== PRODUCT TABLE ==========
   const tableStartY = yPos;
-  const rowHeight = 8;
-  const colWidths = [15, 45, 20, 20, 20, 20, 20, 25, 20, 20, 25]; // Column widths
+  const rowHeight = 10;
+  const colWidths = [12, 50, 16, 16, 16, 16, 12, 20, 16, 16, 20]; // Adjusted column widths
   const colPositions: number[] = [];
   let currentX = margin;
   
@@ -110,136 +110,108 @@ export function generatePharmacyBillingPDF(data: PharmacyBillingData) {
   // Table headers
   const headers = ['SN', 'Product Name', 'Pack', 'Batch', 'HSN', 'EXP', 'QTY', 'MRP', 'SGST', 'CGST', 'TOTAL'];
   
-  // Draw header row background
-  pdf.setFillColor(220, 220, 220);
-  pdf.rect(margin, yPos, pageWidth - 2 * margin, rowHeight, 'F');
-  
-  // Draw header borders and text
+  // Draw header row
   pdf.setDrawColor(0, 0, 0);
-  pdf.setLineWidth(0.3);
-  pdf.setFontSize(9);
+  pdf.setLineWidth(0.5);
+  pdf.setFontSize(10);
   pdf.setFont('helvetica', 'bold');
   
+  // Header background
+  pdf.setFillColor(240, 240, 240);
+  pdf.rect(margin, yPos, pageWidth - 2 * margin, rowHeight, 'FD');
+  
   headers.forEach((header, index) => {
-    // Vertical lines
-    pdf.line(colPositions[index], yPos, colPositions[index], yPos + rowHeight);
+    // Vertical lines for header
+    if (index > 0) {
+      pdf.line(colPositions[index], yPos, colPositions[index], yPos + rowHeight);
+    }
+    
     // Header text (centered)
-    const colCenter = colPositions[index] + colWidths[index] / 2;
-    pdf.text(header, colCenter, yPos + 5.5, { align: 'center' });
+    const colCenterX = colPositions[index] + colWidths[index] / 2;
+    pdf.text(header, colCenterX, yPos + 6.5, { align: 'center' });
   });
-  
-  // Right border of table
-  pdf.line(pageWidth - margin, yPos, pageWidth - margin, yPos + rowHeight);
-  
-  // Top and bottom borders of header
-  pdf.line(margin, yPos, pageWidth - margin, yPos);
-  pdf.line(margin, yPos + rowHeight, pageWidth - margin, yPos + rowHeight);
   
   yPos += rowHeight;
   
-  // Sample data row (as requested)
-  const sampleMedicine = {
-    name: 'D-Cold-20 TAB',
-    pack: '1S',
-    batch: 'B110',
-    hsn: '3004',
-    exp: '12/25',
-    quantity: 1,
-    mrp: 110.00,
-    sgst: 0.00,
-    cgst: 0.00,
-    total: 110.00
-  };
+  // ========== MEDICINE ROWS ==========
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(9);
   
-  // Add sample row to medicines if empty
-  const medicineData = data.medicines.length > 0 ? data.medicines : [sampleMedicine];
-  
-  // Draw medicine rows
-  medicineData.forEach((medicine, index) => {
-    const rowData = [
+  // Generate rows for each medicine
+  data.medicines.forEach((medicine, index) => {
+    const sampleRow = [
       (index + 1).toString(),
       medicine.name,
-      medicine.pack || '1S',
-      medicine.batch || 'B110',
+      medicine.pack,
+      medicine.batch,
       medicine.hsn || '3004',
       medicine.exp || '12/25',
       medicine.quantity.toString(),
       medicine.mrp.toFixed(2),
-      medicine.sgst.toFixed(2),
-      medicine.cgst.toFixed(2),
+      medicine.sgst.toFixed(0),
+      medicine.cgst.toFixed(0),
       medicine.total.toFixed(2)
     ];
     
-    pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(9);
+    // Draw row border
+    pdf.rect(margin, yPos, pageWidth - 2 * margin, rowHeight, 'S');
     
-    // Draw row borders
-    rowData.forEach((data, colIndex) => {
-      pdf.line(colPositions[colIndex], yPos, colPositions[colIndex], yPos + rowHeight);
-      
-      // Center align for SN, QTY, amounts
-      const alignCenter = [0, 6, 7, 8, 9, 10].includes(colIndex);
-      if (alignCenter) {
-        const colCenter = colPositions[colIndex] + colWidths[colIndex] / 2;
-        pdf.text(data, colCenter, yPos + 5.5, { align: 'center' });
-      } else {
-        // Left align for text fields
-        pdf.text(data, colPositions[colIndex] + 2, yPos + 5.5);
+    sampleRow.forEach((cellData, colIndex) => {
+      // Vertical lines
+      if (colIndex > 0) {
+        pdf.line(colPositions[colIndex], yPos, colPositions[colIndex], yPos + rowHeight);
       }
+      
+      // Cell data
+      const colCenterX = colPositions[colIndex] + colWidths[colIndex] / 2;
+      pdf.text(cellData, colCenterX, yPos + 6.5, { align: 'center' });
     });
-    
-    // Right border
-    pdf.line(pageWidth - margin, yPos, pageWidth - margin, yPos + rowHeight);
-    // Bottom border
-    pdf.line(margin, yPos + rowHeight, pageWidth - margin, yPos + rowHeight);
     
     yPos += rowHeight;
   });
   
-  yPos += 10;
+  // ========== FOOTER NOTES SECTION ==========
+  yPos += 15;
   
-  // ========== FOOTER NOTES ==========
-  pdf.setFontSize(9);
+  pdf.setFontSize(10);
   pdf.setFont('helvetica', 'normal');
   pdf.text('GST 110*0% = 0 SGST, ** GET WELL SOON **', margin, yPos);
   
   yPos += 10;
-  
-  // ========== REMARK LINE ==========
-  pdf.setFont('helvetica', 'italic');
   pdf.text('Please share screenshot after payment & same day payment', margin, yPos);
   
-  // ========== TOTAL SECTION (Right Side) ==========
-  const totalSectionX = pageWidth - 80;
-  const totalSectionY = yPos - 30;
-  const totalBoxWidth = 70;
-  const totalRowHeight = 6;
+  // ========== TOTALS SECTION (SEPARATE SMALL TABLE) ==========
+  yPos += 20;
   
-  // Draw total section border
+  const totalsX = pageWidth - 85; // Right aligned totals section
+  const totalsWidth = 75;
+  const totalsRowHeight = 10;
+  
+  // Draw totals table border
   pdf.setDrawColor(0, 0, 0);
-  pdf.setLineWidth(0.3);
-  pdf.rect(totalSectionX, totalSectionY, totalBoxWidth, totalRowHeight * 3, 'S');
+  pdf.setLineWidth(0.5);
   
+  // Subtotal row
+  pdf.setFillColor(255, 255, 255);
+  pdf.rect(totalsX, yPos, totalsWidth, totalsRowHeight, 'S');
+  pdf.setFontSize(10);
   pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(9);
+  pdf.text('SUBTOTAL:', totalsX + 3, yPos + 6.5);
+  pdf.text(`${data.subtotal.toFixed(2)}`, totalsX + totalsWidth - 3, yPos + 6.5, { align: 'right' });
+  yPos += totalsRowHeight;
   
-  // SUB TOTAL
-  pdf.text('SUB TOTAL:', totalSectionX + 2, totalSectionY + 4);
-  pdf.text(data.subtotal.toFixed(2), totalSectionX + totalBoxWidth - 2, totalSectionY + 4, { align: 'right' });
-  pdf.line(totalSectionX, totalSectionY + totalRowHeight, totalSectionX + totalBoxWidth, totalSectionY + totalRowHeight);
+  // Discount row
+  pdf.rect(totalsX, yPos, totalsWidth, totalsRowHeight, 'S');
+  pdf.text('DISCOUNT:', totalsX + 3, yPos + 6.5);
+  pdf.text(`${data.discount.toFixed(2)}`, totalsX + totalsWidth - 3, yPos + 6.5, { align: 'right' });
+  yPos += totalsRowHeight;
   
-  // DISCOUNT
-  pdf.text('DISCOUNT:', totalSectionX + 2, totalSectionY + totalRowHeight + 4);
-  pdf.text(data.discount.toFixed(2), totalSectionX + totalBoxWidth - 2, totalSectionY + totalRowHeight + 4, { align: 'right' });
-  pdf.line(totalSectionX, totalSectionY + totalRowHeight * 2, totalSectionX + totalBoxWidth, totalSectionY + totalRowHeight * 2);
-  
-  // GRAND TOTAL (highlighted)
+  // Grand Total row (highlighted with light grey background)
   pdf.setFillColor(220, 220, 220);
-  pdf.rect(totalSectionX, totalSectionY + totalRowHeight * 2, totalBoxWidth, totalRowHeight, 'F');
-  
+  pdf.rect(totalsX, yPos, totalsWidth, totalsRowHeight, 'DF');
   pdf.setFont('helvetica', 'bold');
-  pdf.text('GRAND TOTAL:', totalSectionX + 2, totalSectionY + totalRowHeight * 2 + 4);
-  pdf.text(data.grandTotal.toFixed(2), totalSectionX + totalBoxWidth - 2, totalSectionY + totalRowHeight * 2 + 4, { align: 'right' });
+  pdf.text('GRAND TOTAL:', totalsX + 3, yPos + 6.5);
+  pdf.text(`${data.grandTotal.toFixed(2)}`, totalsX + totalsWidth - 3, yPos + 6.5, { align: 'right' });
   
   // Save the PDF
   const fileName = `pharmacy_bill_${data.invoiceNumber}.pdf`;
