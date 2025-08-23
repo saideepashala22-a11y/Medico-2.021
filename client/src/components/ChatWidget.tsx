@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageCircle, Send, X, Bot, User, Minimize2, Maximize2 } from 'lucide-react';
+import botIcon from '@assets/generated_images/Medical_AI_bot_icon_a5dc3dbb.png';
 
 interface Message {
   id: string;
@@ -118,7 +119,7 @@ export function ChatWidget({ className }: ChatWidgetProps) {
       <Card className={`${chatWidth} ${chatHeight} transition-all duration-300 shadow-xl`}>
         <CardHeader className="flex flex-row items-center justify-between p-3 bg-blue-600 text-white rounded-t-lg">
           <div className="flex items-center gap-2">
-            <Bot className="h-5 w-5" />
+            <img src={botIcon} alt="Nakshatra's AI" className="h-6 w-6 rounded-full" />
             <CardTitle className="text-sm font-medium">Nakshatra's AI</CardTitle>
           </div>
           <div className="flex items-center gap-1">
@@ -156,8 +157,8 @@ export function ChatWidget({ className }: ChatWidgetProps) {
                     data-testid={`message-${message.sender}`}
                   >
                     {message.sender === 'ai' && (
-                      <div className="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                        <Bot className="h-3 w-3 text-blue-600" />
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full overflow-hidden">
+                        <img src={botIcon} alt="Nakshatra's AI" className="w-full h-full object-cover" />
                       </div>
                     )}
                     <div
@@ -178,8 +179,8 @@ export function ChatWidget({ className }: ChatWidgetProps) {
                 ))}
                 {isLoading && (
                   <div className="flex items-start gap-2">
-                    <div className="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Bot className="h-3 w-3 text-blue-600" />
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full overflow-hidden">
+                      <img src={botIcon} alt="Nakshatra's AI" className="w-full h-full object-cover" />
                     </div>
                     <div className="bg-gray-100 p-2 rounded-lg text-sm">
                       <div className="flex gap-1">
