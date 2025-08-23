@@ -9,6 +9,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Link } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
 import { ConsultationCardModal } from '@/components/ConsultationCardModal';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
 import { 
   ArrowLeft, 
   UserPlus, 
@@ -167,6 +170,45 @@ export default function PatientRegistration() {
   const handleDateOfBirthChange = (value: string) => {
     setFormData(prev => ({ ...prev, dateOfBirth: value }));
     const calculatedAge = calculateAge(value);
+    setAge(calculatedAge);
+    
+    // Auto-suggest salutation based on age and gender
+    const suggested = getSuggestedSalutation(calculatedAge, formData.gender);
+    if (suggested && !formData.salutation) {
+      setFormData(prev => ({ ...prev, salutation: suggested }));
+    }
+  };
+
+  // Handle individual date component changes (year, month, day)
+  const handleDateComponentChange = (component: 'year' | 'month' | 'day', value: string) => {
+    const currentDate = formData.dateOfBirth ? new Date(formData.dateOfBirth) : new Date();
+    
+    let year = currentDate.getFullYear();
+    let month = currentDate.getMonth() + 1; // getMonth() returns 0-11
+    let day = currentDate.getDate();
+    
+    // Update the specific component
+    if (component === 'year') {
+      year = parseInt(value);
+    } else if (component === 'month') {
+      month = parseInt(value);
+    } else if (component === 'day') {
+      day = parseInt(value);
+    }
+    
+    // Validate day for the selected month/year
+    const daysInMonth = new Date(year, month, 0).getDate();
+    if (day > daysInMonth) {
+      day = daysInMonth;
+    }
+    
+    // Create new date string in YYYY-MM-DD format
+    const newDate = new Date(year, month - 1, day); // month is 0-indexed in Date constructor
+    const dateString = newDate.toISOString().split('T')[0];
+    
+    // Update form data and calculate age
+    setFormData(prev => ({ ...prev, dateOfBirth: dateString }));
+    const calculatedAge = calculateAge(dateString);
     setAge(calculatedAge);
     
     // Auto-suggest salutation based on age and gender
@@ -509,17 +551,90 @@ export default function PatientRegistration() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="dateOfBirth">Date of Birth *</Label>
-                  <Input
-                    id="dateOfBirth"
-                    type="date"
-                    value={formData.dateOfBirth}
-                    onChange={(e) => handleDateOfBirthChange(e.target.value)}
-                    className="border-gray-300"
-                    required
-                  />
-                  {age > 0 && (
-                    <p className="text-xs text-gray-600 mt-1">Age: {age} years</p>
-                  )}
+                  <div className="space-y-2">
+                    {/* Year, Month, Day Dropdowns */}
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <Label className="text-xs text-gray-600">Year</Label>
+                        <Select
+                          value={formData.dateOfBirth ? new Date(formData.dateOfBirth).getFullYear().toString() : ''}
+                          onValueChange={(year) => handleDateComponentChange('year', year)}
+                        >
+                          <SelectTrigger className="h-9">
+                            <SelectValue placeholder="Year" />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-[200px]">
+                            {Array.from({ length: 100 }, (_, i) => {
+                              const year = new Date().getFullYear() - i;
+                              return (
+                                <SelectItem key={year} value={year.toString()}>
+                                  {year}
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-xs text-gray-600">Month</Label>
+                        <Select
+                          value={formData.dateOfBirth ? (new Date(formData.dateOfBirth).getMonth() + 1).toString() : ''}
+                          onValueChange={(month) => handleDateComponentChange('month', month)}
+                        >
+                          <SelectTrigger className="h-9">
+                            <SelectValue placeholder="Month" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[
+                              { value: '1', label: 'Jan' },
+                              { value: '2', label: 'Feb' },
+                              { value: '3', label: 'Mar' },
+                              { value: '4', label: 'Apr' },
+                              { value: '5', label: 'May' },
+                              { value: '6', label: 'Jun' },
+                              { value: '7', label: 'Jul' },
+                              { value: '8', label: 'Aug' },
+                              { value: '9', label: 'Sep' },
+                              { value: '10', label: 'Oct' },
+                              { value: '11', label: 'Nov' },
+                              { value: '12', label: 'Dec' }
+                            ].map((month) => (
+                              <SelectItem key={month.value} value={month.value}>
+                                {month.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-xs text-gray-600">Day</Label>
+                        <Select
+                          value={formData.dateOfBirth ? new Date(formData.dateOfBirth).getDate().toString() : ''}
+                          onValueChange={(day) => handleDateComponentChange('day', day)}
+                        >
+                          <SelectTrigger className="h-9">
+                            <SelectValue placeholder="Day" />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-[200px]">
+                            {Array.from({ length: 31 }, (_, i) => {
+                              const day = i + 1;
+                              return (
+                                <SelectItem key={day} value={day.toString()}>
+                                  {day}
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    {age > 0 && (
+                      <p className="text-xs text-green-600 font-medium">Age: {age} years</p>
+                    )}
+                  </div>
                 </div>
 
                 <div>
