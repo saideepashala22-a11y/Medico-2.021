@@ -6,13 +6,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { ArrowLeft, TestTube, Plus, FileText, User, Calendar, Clipboard, FlaskConical, Search } from 'lucide-react';
 
 export default function Lab() {
   const { user } = useAuth();
   const [showPatientSearch, setShowPatientSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [, setLocation] = useLocation();
 
   const { data: recentTests, isLoading: testsLoading } = useQuery<any[]>({
     queryKey: ['/api/lab-tests/recent'],
@@ -128,7 +129,7 @@ export default function Lab() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setShowPatientSearch(true)}
-                  onBlur={() => setTimeout(() => setShowPatientSearch(false), 150)}
+                  onBlur={() => setTimeout(() => setShowPatientSearch(false), 300)}
                   data-testid="patient-search-input"
                 />
                 
@@ -147,8 +148,14 @@ export default function Lab() {
                               <p className="text-xs text-gray-600 font-medium">Search Results</p>
                             </div>
                             {(Array.isArray(searchResults) ? searchResults : []).map((patient: any) => (
-                              <Link key={patient.id} href={`/lab/test-selection/${patient.id}`}>
-                                <div className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0">
+                              <div 
+                                key={patient.id}
+                                className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                onClick={() => {
+                                  setShowPatientSearch(false);
+                                  setLocation(`/lab/test-selection/${patient.id}`);
+                                }}
+                              >
                                   <div className="flex items-center justify-between">
                                     <div>
                                       <p className="font-medium text-gray-900">
@@ -166,7 +173,6 @@ export default function Lab() {
                                     </div>
                                   </div>
                                 </div>
-                              </Link>
                             ))}
                           </>
                         )}
@@ -182,26 +188,31 @@ export default function Lab() {
                               <p className="text-xs text-gray-600 font-medium">Recent 3 Patients</p>
                             </div>
                             {recentPatients.slice(0, 3).map((patient: any) => (
-                              <Link key={patient.id} href={`/lab/test-selection/${patient.id}`}>
-                                <div className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0">
-                                  <div className="flex items-center justify-between">
-                                    <div>
-                                      <p className="font-medium text-gray-900">
-                                        {patient.salutation} {patient.fullName}
-                                      </p>
-                                      <p className="text-sm text-gray-500">{patient.mruNumber}</p>
-                                      <p className="text-xs text-gray-400">
-                                        {patient.contactPhone} • Age: {patient.age} {patient.ageUnit}
-                                      </p>
-                                    </div>
-                                    <div className="text-right">
-                                      <Badge variant="outline" className="text-xs">
-                                        {patient.bloodGroup || 'Unknown'}
-                                      </Badge>
-                                    </div>
+                              <div 
+                                key={patient.id}
+                                className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                onClick={() => {
+                                  setShowPatientSearch(false);
+                                  setLocation(`/lab/test-selection/${patient.id}`);
+                                }}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <p className="font-medium text-gray-900">
+                                      {patient.salutation} {patient.fullName}
+                                    </p>
+                                    <p className="text-sm text-gray-500">{patient.mruNumber}</p>
+                                    <p className="text-xs text-gray-400">
+                                      {patient.contactPhone} • Age: {patient.age} {patient.ageUnit}
+                                    </p>
+                                  </div>
+                                  <div className="text-right">
+                                    <Badge variant="outline" className="text-xs">
+                                      {patient.bloodGroup || 'Unknown'}
+                                    </Badge>
                                   </div>
                                 </div>
-                              </Link>
+                              </div>
                             ))}
                           </>
                         )}
