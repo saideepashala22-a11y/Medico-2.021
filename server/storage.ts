@@ -892,6 +892,25 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
+  async updateMedicineQuantity(id: string, quantityChange: number): Promise<MedicineInventory> {
+    const [updated] = await db.update(medicineInventory)
+      .set({ 
+        quantity: sql`quantity + ${quantityChange}`,
+        updatedAt: new Date() 
+      })
+      .where(eq(medicineInventory.id, id))
+      .returning();
+    return updated;
+  }
+
+  async checkMedicineStock(medicineId: string, requiredQuantity: number): Promise<boolean> {
+    const [medicine] = await db.select({ quantity: medicineInventory.quantity })
+      .from(medicineInventory)
+      .where(eq(medicineInventory.id, medicineId));
+    
+    return medicine ? medicine.quantity >= requiredQuantity : false;
+  }
+
   async deleteMedicine(id: string): Promise<void> {
     await db.update(medicineInventory)
       .set({ isActive: false, updatedAt: new Date() })

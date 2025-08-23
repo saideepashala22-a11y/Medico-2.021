@@ -75,6 +75,7 @@ export default function Pharmacy() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/prescriptions/recent'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/medicines/active'] }); // Refresh medicine quantities
       toast({
         title: 'Success',
         description: 'Prescription saved successfully',
@@ -85,11 +86,24 @@ export default function Pharmacy() {
       setPatientSearch('');
     },
     onError: (error: any) => {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to save prescription',
-        variant: 'destructive',
-      });
+      // Handle insufficient stock errors specifically
+      if (error.insufficientStock) {
+        const medicineNames = error.insufficientStock.map((item: any) => 
+          `${item.name} (requested: ${item.requestedQuantity})`
+        ).join(', ');
+        
+        toast({
+          title: 'Insufficient Stock',
+          description: `Not enough stock for: ${medicineNames}`,
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: error.message || 'Failed to save prescription',
+          variant: 'destructive',
+        });
+      }
     },
   });
 

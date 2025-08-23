@@ -309,6 +309,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         billNumber,
         createdBy: req.user.id,
       });
+
+      // Check if medicines array exists and has items
+      if (!prescriptionData.medicines || !Array.isArray(prescriptionData.medicines) || prescriptionData.medicines.length === 0) {
+        return res.status(400).json({ message: 'No medicines provided in prescription' });
+      }
+
+      // Check stock availability for all medicines
+      const medicinesArray = prescriptionData.medicines as any[];
+      const stockChecks = await Promise.all(
+        medicinesArray.map(async (medicine: any) => {
+          const hasStock = await storage.checkMedicineStock(medicine.medicineId, medicine.quantity);
+          return {
+            medicineId: medicine.medicineId,
+            name: medicine.name,
+            requestedQuantity: medicine.quantity,
+            hasStock
+          };
+        })
+      );
+
+      // Check if any medicine has insufficient stock
+      const insufficientStock = stockChecks.filter((check: any) => !check.hasStock);
+      if (insufficientStock.length > 0) {
+        return res.status(400).json({
+          message: 'Insufficient stock for the following medicines',
+          insufficientStock: insufficientStock.map((item: any) => ({
+            name: item.name,
+            requestedQuantity: item.requestedQuantity
+          }))
+        });
+      }
+
+      // All stock checks passed, deduct quantities and create prescription
+      await Promise.all(
+        medicinesArray.map(async (medicine: any) => {
+          await storage.updateMedicineQuantity(medicine.medicineId, -medicine.quantity);
+        })
+      );
       
       const prescription = await storage.createPrescription(prescriptionData);
       res.status(201).json(prescription);
