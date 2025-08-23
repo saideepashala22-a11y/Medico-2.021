@@ -206,3 +206,66 @@
     border-color: var(--medical-indigo);
   }
 }
+
+/* Mobile-specific optimizations for Android and iOS */
+@layer base {
+  html {
+    /* Prevent iOS zoom on input focus */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  body {
+    /* Prevent pull-to-refresh on mobile */
+    overscroll-behavior-y: contain;
+    /* Improve scrolling performance */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Optimize touch targets for mobile accessibility */
+  button, 
+  [role="button"], 
+  input[type="submit"], 
+  input[type="button"], 
+  .btn {
+    /* Minimum touch target size for accessibility */
+    min-height: 44px;
+    min-width: 44px;
+    /* Better touch response */
+    -webkit-tap-highlight-color: transparent;
+    tap-highlight-color: transparent;
+  }
+  
+  /* Improve form inputs on mobile */
+  input, 
+  textarea, 
+  select {
+    /* Prevent zoom on iOS when input is focused */
+    font-size: 16px;
+    /* Remove iOS input shadows */
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  
+  /* Mobile layout optimizations */
+  @media (max-width: 768px) {
+    /* Ensure tables are scrollable on mobile */
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Better spacing for mobile */
+    .card {
+      margin: 0.5rem;
+    }
+    
+    /* Optimize modal size for mobile */
+    .modal-content {
+      margin: 1rem;
+      max-height: calc(100vh - 2rem);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+}
