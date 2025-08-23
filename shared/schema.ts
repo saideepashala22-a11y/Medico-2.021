@@ -449,6 +449,8 @@ export const insertMedicineInventorySchema = createInsertSchema(medicineInventor
   createdAt: true,
   updatedAt: true,
 }).extend({
+  mrp: z.coerce.string(),
+  quantity: z.coerce.number(),
   expiryDate: z.coerce.date().nullable().optional(),
 });
 
