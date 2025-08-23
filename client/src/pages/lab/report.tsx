@@ -229,21 +229,18 @@ export default function LabReport() {
       // Professional Footer Section
       yPos = pageHeight - 60;
       
-      // Signature section
-      doc.setLineWidth(0.3);
-      doc.rect(15, yPos, pageWidth - 30, 35);
-      
+      // Signature section (right side, no border)
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
-      doc.text('Lab Technician', pageWidth / 2 - 30, yPos + 8);
+      doc.text('Lab Technician', pageWidth - 80, yPos + 8);
       
       // Signature line
       doc.setLineWidth(0.3);
-      doc.line(pageWidth / 2 - 40, yPos + 20, pageWidth / 2 + 40, yPos + 20);
+      doc.line(pageWidth - 90, yPos + 20, pageWidth - 20, yPos + 20);
       
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
-      doc.text('Medical Laboratory Technologist', pageWidth / 2 - 35, yPos + 25);
+      doc.text('Medical Laboratory Technologist', pageWidth - 85, yPos + 25);
       
       // Report Footer
       yPos += 40;
