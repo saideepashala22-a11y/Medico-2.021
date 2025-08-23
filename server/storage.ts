@@ -80,6 +80,7 @@ export interface IStorage {
   getPatientsRegistration(id: string): Promise<PatientsRegistration | undefined>;
   getAllPatientsRegistrations(): Promise<PatientsRegistration[]>;
   createPatientsRegistration(registration: InsertPatientsRegistration): Promise<PatientsRegistration>;
+  updatePatientsRegistration(id: string, updates: Partial<InsertPatientsRegistration>): Promise<PatientsRegistration | undefined>;
   searchPatientsRegistrations(query: string): Promise<PatientsRegistration[]>;
   getRecentPatientsRegistrations(limit?: number): Promise<PatientsRegistration[]>;
   
@@ -780,6 +781,14 @@ export class DatabaseStorage implements IStorage {
       )
       .orderBy(desc(patientsRegistration.createdAt))
       .limit(10);
+  }
+
+  async updatePatientsRegistration(id: string, updates: Partial<InsertPatientsRegistration>): Promise<PatientsRegistration | undefined> {
+    const [updated] = await db.update(patientsRegistration)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(patientsRegistration.id, id))
+      .returning();
+    return updated || undefined;
   }
 
   async getRecentPatientsRegistrations(limit: number = 5): Promise<PatientsRegistration[]> {

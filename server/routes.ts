@@ -590,6 +590,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put('/api/patients-registration/:id', authenticateToken, async (req: any, res) => {
+    try {
+      const validatedData = insertPatientsRegistrationSchema.parse(req.body);
+      const updatedRegistration = await storage.updatePatientsRegistration(req.params.id, {
+        ...validatedData,
+        createdBy: req.user.id
+      });
+      if (!updatedRegistration) {
+        return res.status(404).json({ message: 'Patient registration not found' });
+      }
+      res.json(updatedRegistration);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Validation error',
+          errors: error.errors
+        });
+      }
+      console.error('Error updating patient registration:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
   // Search patients registration by MRU number, name, or phone
   app.get('/api/patients-registration/search/:query', authenticateToken, async (req: any, res) => {
     try {

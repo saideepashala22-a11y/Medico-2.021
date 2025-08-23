@@ -386,9 +386,10 @@ export default function PatientRegistration() {
         throw new Error('No authentication token found');
       }
 
-      // Generate the actual unique values for submission
-      const uniqueMRU = generateUniqueMRU();
-      const uniqueVisitId = generateUniqueVisitId();
+      // For editing, use existing values; for new registration, generate unique values
+      const isEditing = editingPatient !== null;
+      const uniqueMRU = isEditing ? formData.mruNumber : generateUniqueMRU();
+      const uniqueVisitId = isEditing ? formData.visitId : generateUniqueVisitId();
 
       const registrationData = {
         mruNumber: uniqueMRU,
@@ -409,8 +410,12 @@ export default function PatientRegistration() {
         referringDoctor: formData.referringDoctor || null,
       };
 
-      const response = await fetch('/api/patients-registration', {
-        method: 'POST',
+      // Use different method and endpoint based on edit mode
+      const url = isEditing ? `/api/patients-registration/${editingPatient}` : '/api/patients-registration';
+      const method = isEditing ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
@@ -427,11 +432,11 @@ export default function PatientRegistration() {
         throw new Error(errorMessage);
       }
 
-      const newPatient = await response.json();
+      const patientData = await response.json();
 
-      // Add the new patient to the local state immediately
+      // Create patient object for state
       const patientForState = {
-        id: newPatient.id,
+        id: patientData.id,
         mru: uniqueMRU,
         visitId: uniqueVisitId,
         salutation: formData.salutation,
@@ -446,24 +451,38 @@ export default function PatientRegistration() {
         emergencyContactPhone: formData.emergencyContactPhone,
         bloodGroup: formData.bloodGroup,
         medicalHistory: formData.medicalHistory,
-        registrationDate: new Date().toISOString(),
+        registrationDate: patientData.createdAt || new Date().toISOString(),
       };
-      setPatients(prev => [patientForState, ...prev]);
 
-      // Store patient info for consultation card modal
-      setRegisteredPatientInfo({
-        mruNumber: uniqueMRU,
-        visitId: uniqueVisitId,
-        fullName: formData.fullName,
-        age: parseInt(formData.age) || 0,
-        gender: formData.gender,
-        contactPhone: formData.contactPhone,
-        bloodGroup: formData.bloodGroup,
-        registrationDate: new Date().toISOString(),
-      });
+      if (isEditing) {
+        // Update existing patient in the list
+        setPatients(prev => prev.map(p => p.id === editingPatient ? patientForState : p));
+        
+        toast({
+          title: 'Success',
+          description: `Patient ${formData.fullName} updated successfully`,
+        });
+        
+        // Reset editing state
+        setEditingPatient(null);
+      } else {
+        // Add new patient to the beginning of the list
+        setPatients(prev => [patientForState, ...prev]);
+        
+        // Show consultation card modal for new patients
+        setRegisteredPatientInfo({
+          mruNumber: uniqueMRU,
+          visitId: uniqueVisitId,
+          fullName: formData.fullName,
+          age: parseInt(formData.age) || 0,
+          gender: formData.gender,
+          contactPhone: formData.contactPhone,
+          bloodGroup: formData.bloodGroup,
+          registrationDate: new Date().toISOString(),
+        });
 
-      // Show consultation card modal instead of just toast
-      setShowConsultationModal(true);
+        setShowConsultationModal(true);
+      }
 
       // Reset form after successful submission
       const newMruNumber = generateMRUNumber();
