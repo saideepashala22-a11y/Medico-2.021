@@ -116,14 +116,14 @@ export default function Lab() {
                 
                 {showPatientSearch && recentPatients && (
                   <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                    {recentPatients.length === 0 ? (
+                    {(!Array.isArray(recentPatients) || recentPatients.length === 0) ? (
                       <div className="p-3 text-sm text-gray-500">No recent patients found</div>
                     ) : (
                       <>
                         <div className="p-2 bg-gray-50 border-b">
                           <p className="text-xs text-gray-600 font-medium">Recent 3 Patients</p>
                         </div>
-                        {recentPatients.slice(0, 3).map((patient: any) => (
+                        {(Array.isArray(recentPatients) ? recentPatients : []).slice(0, 3).map((patient: any) => (
                           <Link key={patient.id} href={`/lab/patient-registration?patientId=${patient.id}`}>
                             <div className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0">
                               <div className="flex items-center justify-between">
