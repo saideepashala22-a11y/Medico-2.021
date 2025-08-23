@@ -147,7 +147,7 @@ export default function Lab() {
                               <p className="text-xs text-gray-600 font-medium">Search Results</p>
                             </div>
                             {(Array.isArray(searchResults) ? searchResults : []).map((patient: any) => (
-                              <Link key={patient.id} href={`/lab/patient-registration?patientId=${patient.id}`}>
+                              <Link key={patient.id} href={`/lab/test-selection/${patient.id}`}>
                                 <div className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0">
                                   <div className="flex items-center justify-between">
                                     <div>
@@ -182,7 +182,7 @@ export default function Lab() {
                               <p className="text-xs text-gray-600 font-medium">Recent 3 Patients</p>
                             </div>
                             {recentPatients.slice(0, 3).map((patient: any) => (
-                              <Link key={patient.id} href={`/lab/patient-registration?patientId=${patient.id}`}>
+                              <Link key={patient.id} href={`/lab/test-selection/${patient.id}`}>
                                 <div className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0">
                                   <div className="flex items-center justify-between">
                                     <div>
