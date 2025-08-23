@@ -33,8 +33,7 @@ function generateBarcodeImage(text: string): string {
     format: "CODE128",
     width: 2,
     height: 40,
-    displayValue: true,
-    fontSize: 12,
+    displayValue: false, // Remove text display
     margin: 0,
     background: "#ffffff",
     lineColor: "#000000"
@@ -230,38 +229,24 @@ export function generatePharmacyBillingPDF(data: PharmacyBillingData) {
   const barcodeData = data.invoiceNumber;
   const barcodeImage = generateBarcodeImage(barcodeData);
   
-  // Add barcode background (professional yellow color like in the image)
-  const barcodeAreaHeight = 50;
-  const barcodeAreaWidth = 140;
+  // Add barcode without background
+  const barcodeAreaHeight = 40;
+  const barcodeAreaWidth = 120;
   const barcodeX = margin + 10; // Left aligned with some margin
   
-  // Yellow background for barcode area
-  pdf.setFillColor(255, 235, 59); // Professional yellow color
-  pdf.rect(barcodeX, yPos, barcodeAreaWidth, barcodeAreaHeight, 'F');
-  
-  // Add border around barcode area
-  pdf.setDrawColor(0, 0, 0);
-  pdf.setLineWidth(0.5);
-  pdf.rect(barcodeX, yPos, barcodeAreaWidth, barcodeAreaHeight, 'S');
-  
-  // Add barcode image
+  // Add barcode image (no background, no border)
   try {
-    pdf.addImage(barcodeImage, 'PNG', barcodeX + 10, yPos + 5, 120, 30);
+    pdf.addImage(barcodeImage, 'PNG', barcodeX, yPos, barcodeAreaWidth, barcodeAreaHeight);
   } catch (error) {
     console.warn('Failed to add barcode image:', error);
-    // Fallback: Add text-based barcode
-    pdf.setFontSize(14);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(`Barcode: ${barcodeData}`, barcodeX + 70, yPos + 25, { align: 'center' });
+    // Fallback: Add simple text
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`Barcode: ${barcodeData}`, barcodeX, yPos + 20);
   }
   
-  // Add barcode label below
-  pdf.setFontSize(8);
-  pdf.setFont('helvetica', 'normal');
-  pdf.text('Invoice Barcode - Scan for Quick Reference', barcodeX + 70, yPos + 45, { align: 'center' });
-  
   // ========== FOOTER INFORMATION ==========
-  yPos += barcodeAreaHeight + 15;
+  yPos += barcodeAreaHeight + 10;
   
   // Add footer notes
   pdf.setFontSize(9);
