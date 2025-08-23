@@ -48,12 +48,13 @@ export default function TestSelection() {
   const filteredTests = useMemo(() => {
     if (!testDefinitions) return [];
     
+    // Only show tests when user starts typing
+    if (!searchTerm || searchTerm.length === 0) {
+      return [];
+    }
+    
     let filtered = testDefinitions.filter(test => {
       const matchesDepartment = selectedDepartment === 'all' || test.department === selectedDepartment;
-      
-      if (!searchTerm) {
-        return test.isActive && matchesDepartment;
-      }
       
       const searchLower = searchTerm.toLowerCase();
       const testNameLower = test.testName.toLowerCase();
@@ -72,8 +73,6 @@ export default function TestSelection() {
     
     // Sort results: exact matches first, then alphabetical
     return filtered.sort((a, b) => {
-      if (!searchTerm) return a.testName.localeCompare(b.testName);
-      
       const searchLower = searchTerm.toLowerCase();
       const aStartsWith = a.testName.toLowerCase().startsWith(searchLower);
       const bStartsWith = b.testName.toLowerCase().startsWith(searchLower);
@@ -304,14 +303,18 @@ export default function TestSelection() {
                   {/* Search Results Info */}
                   <div className="flex items-center justify-between text-sm text-gray-600">
                     <span>
-                      {filteredTests.length} tests found
-                      {searchTerm && (
-                        <span className="ml-2">
-                          {searchTerm.length === 1 
-                            ? `starting with "${searchTerm.toUpperCase()}"`
-                            : `matching "${searchTerm}"`
-                          }
-                        </span>
+                      {!searchTerm ? (
+                        "Type to search from 253 available tests"
+                      ) : (
+                        <>
+                          {filteredTests.length} tests found
+                          <span className="ml-2">
+                            {searchTerm.length === 1 
+                              ? `starting with "${searchTerm.toUpperCase()}"`
+                              : `matching "${searchTerm}"`
+                            }
+                          </span>
+                        </>
                       )}
                     </span>
                     {searchTerm && (
@@ -359,8 +362,21 @@ export default function TestSelection() {
                   ) : (
                     <div className="text-center py-12">
                       <TestTube className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No tests found</h3>
-                      <p className="text-gray-600">Try adjusting your search or filter criteria.</p>
+                      {!searchTerm ? (
+                        <>
+                          <h3 className="text-lg font-medium text-gray-900 mb-2">Start typing to search tests</h3>
+                          <p className="text-gray-600">
+                            Type a letter (like 'c' for CBC) or test name to find from our 253 available tests
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <h3 className="text-lg font-medium text-gray-900 mb-2">No tests found</h3>
+                          <p className="text-gray-600">
+                            No tests match "{searchTerm}". Try a different search term.
+                          </p>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
