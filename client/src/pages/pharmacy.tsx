@@ -36,6 +36,7 @@ export default function Pharmacy() {
   const [medicines, setMedicines] = useState<MedicineItem[]>([]);
   const [showInventoryModal, setShowInventoryModal] = useState(false);
   const [showPatientDropdown, setShowPatientDropdown] = useState(false);
+  const [viewingPrescription, setViewingPrescription] = useState<any>(null);
 
   const { data: searchResults } = useQuery({
     queryKey: ['/api/patients/search', patientSearch],
@@ -242,6 +243,45 @@ export default function Pharmacy() {
     toast({
       title: 'Success',
       description: 'GST invoice downloaded successfully',
+    });
+  };
+
+  const handleViewPrescription = (prescription: any) => {
+    setViewingPrescription(prescription);
+  };
+
+  const handlePrintExistingBill = (prescription: any) => {
+    // Generate PDF for existing prescription
+    const billingData = {
+      invoiceNumber: prescription.billNumber,
+      patient: {
+        name: prescription.patient.fullName || prescription.patient.name,
+        address: prescription.patient.address || 'Not provided',
+        mobile: prescription.patient.contactPhone || prescription.patient.contact,
+        doctorName: prescription.patient.referringDoctor || undefined,
+      },
+      medicines: prescription.medicines.map((med: any) => ({
+        name: med.name,
+        pack: '1S',
+        batch: 'B110',
+        hsn: '3004',
+        exp: '12/25',
+        quantity: med.quantity,
+        mrp: med.price,
+        sgst: 0,
+        cgst: 0,
+        total: med.total,
+      })),
+      subtotal: parseFloat(prescription.subtotal),
+      discount: 0.00,
+      grandTotal: parseFloat(prescription.total),
+    };
+
+    generatePharmacyBillingPDF(billingData);
+    
+    toast({
+      title: 'Success',
+      description: 'Prescription downloaded successfully',
     });
   };
 
@@ -550,10 +590,20 @@ export default function Pharmacy() {
                           </TableCell>
                           <TableCell>
                             <div className="flex space-x-2">
-                              <Button variant="ghost" size="sm">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handleViewPrescription(prescription)}
+                                data-testid="view-prescription-button"
+                              >
                                 View
                               </Button>
-                              <Button variant="ghost" size="sm">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handlePrintExistingBill(prescription)}
+                                data-testid="print-existing-bill-button"
+                              >
                                 <Printer className="h-4 w-4" />
                               </Button>
                             </div>
@@ -574,6 +624,86 @@ export default function Pharmacy() {
         isOpen={showInventoryModal}
         onClose={() => setShowInventoryModal(false)}
       />
+
+      {/* View Prescription Modal */}
+      {viewingPrescription && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Prescription Details</h2>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setViewingPrescription(null)}
+              >
+                ✕
+              </Button>
+            </div>
+            
+            <div className="space-y-4">
+              {/* Patient Info */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-medium mb-2">Patient Information</h3>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div><strong>Name:</strong> {viewingPrescription.patient.fullName || viewingPrescription.patient.name}</div>
+                  <div><strong>ID:</strong> {viewingPrescription.patient.mruNumber || viewingPrescription.patient.patientId}</div>
+                  <div><strong>Mobile:</strong> {viewingPrescription.patient.contactPhone || viewingPrescription.patient.contact}</div>
+                  <div><strong>Date:</strong> {new Date(viewingPrescription.createdAt).toLocaleDateString()}</div>
+                </div>
+              </div>
+
+              {/* Bill Info */}
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h3 className="font-medium mb-2">Bill Information</h3>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div><strong>Bill Number:</strong> {viewingPrescription.billNumber}</div>
+                  <div><strong>Total Amount:</strong> ₹{viewingPrescription.total}</div>
+                </div>
+              </div>
+
+              {/* Medicines */}
+              <div>
+                <h3 className="font-medium mb-2">Medicines Prescribed</h3>
+                <div className="space-y-2">
+                  {viewingPrescription.medicines.map((medicine: any, index: number) => (
+                    <div key={index} className="border p-3 rounded">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <div className="font-medium">{medicine.name}</div>
+                          <div className="text-sm text-gray-600">
+                            Dosage: {medicine.dosage} | Quantity: {medicine.quantity}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-medium">₹{medicine.total}</div>
+                          <div className="text-sm text-gray-600">@₹{medicine.price} each</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex space-x-3 pt-4 border-t">
+                <Button 
+                  onClick={() => handlePrintExistingBill(viewingPrescription)}
+                  className="bg-medical-primary hover:bg-medical-primary-dark"
+                >
+                  <Printer className="mr-2 h-4 w-4" />
+                  Print Bill
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => setViewingPrescription(null)}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
