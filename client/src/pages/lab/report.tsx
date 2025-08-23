@@ -136,60 +136,62 @@ export default function LabReport() {
       try {
         if (labTest.results && labTest.results.trim() !== '') {
           const results = JSON.parse(labTest.results);
-          const testTypeNames = labTest.testTypes?.map(t => t.testName) || [];
           
-          testTypeNames.forEach((testName: string) => {
-            const cleanTestName = testName.trim();
-            const testResults = results[cleanTestName];
+          // Handle results as array (current format)
+          if (Array.isArray(results) && results.length > 0) {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
             
-            if (testResults && typeof testResults === 'object') {
-              // Test category header with background
-              yPos += 5;
-              doc.setFillColor(250, 250, 250);
-              doc.rect(15, yPos - 3, pageWidth - 30, 10, 'F');
-              doc.setFont('helvetica', 'bold');
-              doc.setFontSize(10);
-              doc.text(`${cleanTestName.toUpperCase()}`, 20, yPos + 3);
-              yPos += 10;
-              
-              doc.setFont('helvetica', 'normal');
-              doc.setFontSize(9);
-              
-              Object.entries(testResults).forEach(([parameter, value]) => {
-                if (value && parameter !== 'notes' && parameter !== 'technician') {
-                  // Draw row with alternating background
-                  if (Math.floor((yPos - 137) / 8) % 2 === 0) {
-                    doc.setFillColor(248, 249, 250);
-                    doc.rect(15, yPos - 3, pageWidth - 30, 8, 'F');
-                  }
-                  
-                  // Parameter name
-                  doc.text(`  ${parameter}`, 20, yPos + 2);
-                  
-                  // Result value (bold for emphasis)
-                  doc.setFont('helvetica', 'bold');
-                  doc.text(String(value), 80, yPos + 2);
-                  doc.setFont('helvetica', 'normal');
-                  
-                  // Unit
-                  doc.text('units', 120, yPos + 2);
-                  
-                  // Reference range
-                  doc.text('Consult reference', 140, yPos + 2);
-                  
-                  // Flag (Normal/Abnormal)
-                  doc.setFont('helvetica', 'bold');
-                  doc.setTextColor(0, 128, 0); // Green for normal
-                  doc.text('NORMAL', 180, yPos + 2);
-                  doc.setTextColor(0, 0, 0); // Reset to black
-                  doc.setFont('helvetica', 'normal');
-                  
-                  yPos += 8;
+            results.forEach((testResult, index) => {
+              if (testResult.value && testResult.value.trim() !== '') {
+                // Draw row with alternating background
+                if (index % 2 === 0) {
+                  doc.setFillColor(248, 249, 250);
+                  doc.rect(15, yPos - 3, pageWidth - 30, 8, 'F');
                 }
-              });
-              yPos += 5;
-            }
-          });
+                
+                // Test name
+                doc.setFont('helvetica', 'normal');
+                doc.text(testResult.testName || 'Unknown Test', 20, yPos + 2);
+                
+                // Result value (bold for emphasis)
+                doc.setFont('helvetica', 'bold');
+                doc.text(String(testResult.value), 80, yPos + 2);
+                doc.setFont('helvetica', 'normal');
+                
+                // Unit
+                doc.text(testResult.unit || 'units', 120, yPos + 2);
+                
+                // Reference range
+                doc.text(testResult.normalRange || 'Consult reference', 140, yPos + 2);
+                
+                // Flag (Normal/Abnormal)
+                doc.setFont('helvetica', 'bold');
+                const status = testResult.status || 'normal';
+                if (status === 'normal') {
+                  doc.setTextColor(0, 128, 0); // Green
+                  doc.text('NORMAL', 180, yPos + 2);
+                } else if (status === 'high') {
+                  doc.setTextColor(255, 140, 0); // Orange
+                  doc.text('HIGH', 180, yPos + 2);
+                } else if (status === 'low') {
+                  doc.setTextColor(0, 0, 255); // Blue
+                  doc.text('LOW', 180, yPos + 2);
+                } else if (status === 'critical') {
+                  doc.setTextColor(255, 0, 0); // Red
+                  doc.text('CRITICAL', 180, yPos + 2);
+                }
+                doc.setTextColor(0, 0, 0); // Reset to black
+                doc.setFont('helvetica', 'normal');
+                
+                yPos += 8;
+              }
+            });
+          } else {
+            doc.setFont('helvetica', 'italic');
+            doc.text('Test results are pending laboratory analysis.', 20, yPos + 10);
+            yPos += 20;
+          }
         } else {
           doc.setFont('helvetica', 'italic');
           doc.text('Test results are pending laboratory analysis.', 20, yPos + 10);
