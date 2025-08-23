@@ -45,6 +45,7 @@ interface PatientData {
   bloodGroup: string;
   medicalHistory: string;
   registrationDate: string;
+  referringDoctor?: string;
 }
 
 export default function PatientRegistration() {
@@ -484,6 +485,7 @@ export default function PatientRegistration() {
           contactPhone: formData.contactPhone,
           bloodGroup: formData.bloodGroup,
           registrationDate: new Date().toISOString(),
+          referringDoctor: formData.referringDoctor,
         });
 
         setShowConsultationModal(true);
@@ -1025,6 +1027,19 @@ export default function PatientRegistration() {
                     maxLength={10}
                   />
                 </div>
+              </div>
+
+              {/* Referring Doctor */}
+              <div>
+                <Label htmlFor="referringDoctor">Referring Doctor</Label>
+                <Input
+                  id="referringDoctor"
+                  type="text"
+                  value={formData.referringDoctor}
+                  onChange={(e) => setFormData(prev => ({ ...prev, referringDoctor: e.target.value }))}
+                  placeholder="Enter referring doctor's name (optional)"
+                  className="border-gray-300"
+                />
               </div>
 
               {/* Medical History */}

@@ -14,6 +14,7 @@ interface PatientInfo {
   contactPhone: string;
   bloodGroup?: string;
   registrationDate: string;
+  referringDoctor?: string;
 }
 
 interface ConsultationCardModalProps {
@@ -107,7 +108,25 @@ export function ConsultationCardModal({ isOpen, onClose, patientInfo }: Consulta
       pdf.text(patientInfo.bloodGroup || 'N/A', col2X, yPos);
       pdf.text(patientInfo.contactPhone, col3X, yPos);
       
-      yPos += 15;
+      yPos += 10;
+      
+      // Row 3: Referring Doctor (if provided)
+      if (patientInfo.referringDoctor) {
+        pdf.setFontSize(8);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(60, 60, 60);
+        pdf.text('REFERRING DOCTOR:', col1X, yPos);
+        
+        yPos += 5;
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(0, 0, 0);
+        pdf.text(patientInfo.referringDoctor, col1X, yPos);
+        
+        yPos += 10;
+      } else {
+        yPos += 5;
+      }
       
       // 3. LARGE DOCTOR NOTES SECTION (65-70% of page height)
       pdf.setFontSize(11);
