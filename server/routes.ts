@@ -604,14 +604,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get current hospital stats to provide real data to AI
       const stats = await storage.getStats();
-      const hospitalContext = `IMPORTANT - CURRENT HOSPITAL DATA (Use these exact numbers when asked):
+      const hospitalContext = `=== REAL-TIME NAKSHATRA HOSPITAL DATA (YOU HAVE ACCESS TO THIS) ===
+Current Statistics:
 - Total Patients Registered: ${stats.totalPatients}
 - Lab Tests Completed Today: ${stats.labTestsToday}
 - Prescriptions Issued Today: ${stats.prescriptionsToday}
 - Patient Discharges Today: ${stats.dischargesToday}
 - Surgical Cases Today: ${stats.surgicalCasesToday || 0}
 
-INSTRUCTION: When users ask about patient numbers or hospital statistics, provide these exact numbers directly. Do not explain how to find the data - give the specific numbers above.
+MANDATORY: Use these exact numbers when users ask about hospital statistics. You DO have access to real data.
 
 ${context || 'Nakshatra Hospital HMS assistance'}`;
 
