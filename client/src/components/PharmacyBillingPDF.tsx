@@ -251,8 +251,7 @@ export function generatePharmacyBillingPDF(data: PharmacyBillingData) {
   // Add footer notes
   pdf.setFontSize(9);
   pdf.setFont('helvetica', 'normal');
-  pdf.text('GST 110% is 0 SGST. ** GET WELL SOON **', margin, yPos);
-  pdf.text('Please share screenshot after payment & same day payment', margin, yPos + 8);
+  pdf.text('** GET WELL SOON **', margin, yPos);
   
   // Add professional footer with timestamp
   yPos += 20;
