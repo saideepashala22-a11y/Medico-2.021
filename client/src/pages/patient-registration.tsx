@@ -88,6 +88,32 @@ export default function PatientRegistration() {
   const [age, setAge] = useState<number>(0);
   const [showConsultationModal, setShowConsultationModal] = useState(false);
   const [registeredPatientInfo, setRegisteredPatientInfo] = useState<any>(null);
+
+  // Fetch patients data when component loads
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const response = await fetch('/api/patients-registration', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const patientsData = await response.json();
+          console.log('Fetched patients:', patientsData);
+          setPatients(patientsData);
+        }
+      } catch (error) {
+        console.error('Error fetching patients:', error);
+      }
+    };
+
+    fetchPatients();
+  }, []);
   // Generate unique MRU number based on current year
   const generateUniqueMRU = (): string => {
     const currentYear = new Date().getFullYear().toString().slice(-2);
@@ -378,6 +404,27 @@ export default function PatientRegistration() {
       }
 
       const newPatient = await response.json();
+
+      // Add the new patient to the local state immediately
+      const patientForState = {
+        id: newPatient.id,
+        mru: formData.mruNumber,
+        visitId: formData.visitId,
+        salutation: formData.salutation,
+        fullName: formData.fullName,
+        dateOfBirth: formData.dateOfBirth,
+        age: parseInt(formData.age) || 0,
+        gender: formData.gender,
+        contactPhone: formData.contactPhone,
+        email: formData.email,
+        address: formData.address,
+        emergencyContactName: formData.emergencyContactName,
+        emergencyContactPhone: formData.emergencyContactPhone,
+        bloodGroup: formData.bloodGroup,
+        medicalHistory: formData.medicalHistory,
+        registrationDate: new Date().toISOString(),
+      };
+      setPatients(prev => [patientForState, ...prev]);
 
       // Store patient info for consultation card modal
       setRegisteredPatientInfo({
