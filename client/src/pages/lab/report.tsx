@@ -134,13 +134,11 @@ export default function LabReport() {
       doc.setFont('helvetica', 'normal');
       
       try {
-        console.log('🔍 PDF Debug - Raw labTest.results:', labTest.results);
-        if (labTest.results && labTest.results.trim() !== '') {
-          const results = JSON.parse(labTest.results);
-          console.log('🔍 PDF Debug - Parsed results:', results);
+        // labTest.results is already an array of objects, no need to parse
+        if (labTest.results && Array.isArray(labTest.results) && labTest.results.length > 0) {
+          const results = labTest.results;
           
-          // Handle results as array (current format)
-          if (Array.isArray(results) && results.length > 0) {
+          if (results.length > 0) {
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(9);
             
