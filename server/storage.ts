@@ -219,7 +219,7 @@ export class DatabaseStorage implements IStorage {
       .limit(10);
   }
 
-  async getLabTest(id: string): Promise<(LabTest & { patient: Patient }) | undefined> {
+  async getLabTest(id: string): Promise<(LabTest & { patient: any }) | undefined> {
     const [labTest] = await db.select({
       id: labTests.id,
       patientId: labTests.patientId,
@@ -230,10 +230,10 @@ export class DatabaseStorage implements IStorage {
       status: labTests.status,
       createdBy: labTests.createdBy,
       createdAt: labTests.createdAt,
-      patient: patients,
+      patient: patientsRegistration,
     })
     .from(labTests)
-    .innerJoin(patients, eq(labTests.patientId, patients.id))
+    .innerJoin(patientsRegistration, eq(labTests.patientId, patientsRegistration.id))
     .where(eq(labTests.id, id));
     return labTest || undefined;
   }
@@ -257,7 +257,7 @@ export class DatabaseStorage implements IStorage {
     return updatedLabTest;
   }
 
-  async getRecentLabTests(): Promise<(LabTest & { patient: Patient })[]> {
+  async getRecentLabTests(): Promise<(LabTest & { patient: any })[]> {
     return await db.select({
       id: labTests.id,
       patientId: labTests.patientId,
@@ -268,10 +268,10 @@ export class DatabaseStorage implements IStorage {
       status: labTests.status,
       createdBy: labTests.createdBy,
       createdAt: labTests.createdAt,
-      patient: patients,
+      patient: patientsRegistration,
     })
     .from(labTests)
-    .innerJoin(patients, eq(labTests.patientId, patients.id))
+    .innerJoin(patientsRegistration, eq(labTests.patientId, patientsRegistration.id))
     .orderBy(desc(labTests.createdAt))
     .limit(10);
   }
