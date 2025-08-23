@@ -330,7 +330,8 @@ export default function Pharmacy() {
                       <div
                         key={patient.id}
                         className="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
-                        onClick={() => {
+                        onMouseDown={(e) => {
+                          e.preventDefault(); // Prevent the input from losing focus
                           setSelectedPatient(patient);
                           setPatientSearch('');
                           setShowPatientDropdown(false);
