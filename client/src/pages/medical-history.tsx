@@ -83,7 +83,7 @@ export default function MedicalHistory() {
   const [editingEntry, setEditingEntry] = useState<MedicalHistoryEntry | null>(null);
 
   // Search for patients
-  const { data: searchResults, isLoading: searchLoading } = useQuery({
+  const { data: searchResults, isLoading: searchLoading } = useQuery<Patient[]>({
     queryKey: ['/api/patients/search', searchTerm],
     enabled: searchTerm.length > 2,
   });

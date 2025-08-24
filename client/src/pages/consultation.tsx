@@ -79,7 +79,7 @@ export default function ConsultationPage() {
   const [viewingConsultation, setViewingConsultation] = useState<Consultation | null>(null);
 
   // Search for patients
-  const { data: searchResults, isLoading: searchLoading } = useQuery({
+  const { data: searchResults, isLoading: searchLoading } = useQuery<Patient[]>({
     queryKey: ['/api/patients/search', searchTerm],
     enabled: searchTerm.length > 2,
   });
@@ -148,10 +148,10 @@ export default function ConsultationPage() {
     
     // Hospital Header
     doc.setFontSize(20);
-    doc.setFont(undefined, 'bold');
+    doc.setFont('helvetica', 'bold');
     doc.text('CityMed Hospital', 105, 20, { align: 'center' });
     doc.setFontSize(12);
-    doc.setFont(undefined, 'normal');
+    doc.setFont('helvetica', 'normal');
     doc.text('Excellence in Healthcare', 105, 28, { align: 'center' });
     
     // Draw header line
