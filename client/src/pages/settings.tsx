@@ -228,7 +228,7 @@ export default function Settings() {
                       <FormItem>
                         <FormLabel className="text-medical-text font-medium">Website</FormLabel>
                         <FormControl>
-                          <Input {...field} type="url" placeholder="https://example.com" data-testid="input-website" />
+                          <Input {...field} type="text" placeholder="https://example.com (optional)" data-testid="input-website" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
