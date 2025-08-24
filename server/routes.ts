@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema, insertConsultationSchema, insertLabTestDefinitionSchema, insertSurgicalCaseSheetSchema, insertPatientsRegistrationSchema, insertMedicineInventorySchema } from "@shared/schema";
+import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema, insertConsultationSchema, insertLabTestDefinitionSchema, insertSurgicalCaseSheetSchema, insertPatientsRegistrationSchema, insertMedicineInventorySchema, insertHospitalSettingsSchema } from "@shared/schema";
 import { z } from "zod";
 import { generateChatResponse, generateMedicalAssistance } from "./gemini";
 import { sendOTP, generateOTP } from "./twilioService";
@@ -934,6 +934,31 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
     } catch (error) {
       console.error('Error deleting medicine:', error);
       res.status(500).json({ message: 'Failed to delete medicine' });
+    }
+  });
+
+  // Hospital Settings routes
+  app.get('/api/hospital-settings', authenticateToken, async (req, res) => {
+    try {
+      const settings = await storage.getHospitalSettings();
+      res.json(settings);
+    } catch (error) {
+      console.error('Error fetching hospital settings:', error);
+      res.status(500).json({ message: 'Failed to fetch hospital settings' });
+    }
+  });
+
+  app.patch('/api/hospital-settings', authenticateToken, async (req: any, res) => {
+    try {
+      const updates = insertHospitalSettingsSchema.partial().parse(req.body);
+      const settings = await storage.updateHospitalSettings(updates);
+      res.json(settings);
+    } catch (error) {
+      console.error('Error updating hospital settings:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Validation error', errors: error.errors });
+      }
+      res.status(500).json({ message: 'Failed to update hospital settings' });
     }
   });
 

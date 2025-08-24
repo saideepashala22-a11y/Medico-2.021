@@ -19,6 +19,7 @@ import Discharge from "@/pages/discharge";
 import MedicalHistory from "@/pages/medical-history";
 import Consultation from "@/pages/consultation";
 import SurgicalCaseSheets from "@/pages/surgical-case-sheets";
+import Settings from "@/pages/settings";
 import { Loader2 } from "lucide-react";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -140,6 +141,12 @@ function Router() {
       <Route path="/surgical-case-sheets">
         <ProtectedRoute>
           <SurgicalCaseSheets />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/settings">
+        <ProtectedRoute>
+          <Settings />
         </ProtectedRoute>
       </Route>
       

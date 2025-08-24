@@ -1,11 +1,11 @@
 import { 
-  users, patients, labTests, prescriptions, dischargeSummaries, medicalHistory, patientProfiles, consultations, labTestDefinitions, surgicalCaseSheets, patientsRegistration, medicineInventory,
+  users, patients, labTests, prescriptions, dischargeSummaries, medicalHistory, patientProfiles, consultations, labTestDefinitions, surgicalCaseSheets, patientsRegistration, medicineInventory, hospitalSettings,
   type User, type InsertUser, type Patient, type InsertPatient,
   type LabTest, type InsertLabTest, type Prescription, type InsertPrescription,
   type DischargeSummary, type InsertDischargeSummary, type MedicalHistory, type InsertMedicalHistory,
   type PatientProfile, type InsertPatientProfile, type Consultation, type InsertConsultation,
   type SurgicalCaseSheet, type InsertSurgicalCaseSheet, type PatientsRegistration, type InsertPatientsRegistration,
-  type MedicineInventory, type InsertMedicineInventory,
+  type MedicineInventory, type InsertMedicineInventory, type HospitalSettings, type InsertHospitalSettings,
   insertLabTestDefinitionSchema
 } from "@shared/schema";
 import { db } from "./db";
@@ -131,6 +131,11 @@ export interface IStorage {
       surgicalCases: number;
     };
   }>;
+  
+  // Hospital Settings
+  getHospitalSettings(): Promise<HospitalSettings>;
+  updateHospitalSettings(updates: Partial<InsertHospitalSettings>): Promise<HospitalSettings>;
+  createHospitalSettings(settings: InsertHospitalSettings & { createdBy: string }): Promise<HospitalSettings>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -953,6 +958,65 @@ export class DatabaseStorage implements IStorage {
         )
       )
       .orderBy(medicineInventory.medicineName);
+  }
+
+  // Hospital Settings Implementation
+  async getHospitalSettings(): Promise<HospitalSettings> {
+    // Try to get existing settings
+    const [settings] = await db.select()
+      .from(hospitalSettings)
+      .limit(1);
+    
+    // If no settings exist, create default ones
+    if (!settings) {
+      // Get the first admin/doctor user to create settings
+      const [firstUser] = await db.select()
+        .from(users)
+        .where(or(eq(users.role, 'doctor'), eq(users.role, 'staff')))
+        .limit(1);
+      
+      if (!firstUser) {
+        throw new Error('No user found to initialize hospital settings');
+      }
+      
+      const defaultSettings = {
+        hospitalName: 'NAKSHATRA HOSPITAL',
+        hospitalSubtitle: 'Multi Specialty Hospital & Research Centre',
+        address: '123 Medical District, Healthcare City, State - 123456',
+        phone: '+91-1234567890',
+        email: 'info@nakshatrahospital.com',
+        accreditation: 'NABL Accredited Laboratory | ISO 15189:2012 Certified',
+        createdBy: firstUser.id,
+      };
+      
+      const [created] = await db.insert(hospitalSettings)
+        .values(defaultSettings)
+        .returning();
+      
+      return created;
+    }
+    
+    return settings;
+  }
+
+  async updateHospitalSettings(updates: Partial<InsertHospitalSettings>): Promise<HospitalSettings> {
+    // Get existing settings first
+    const existing = await this.getHospitalSettings();
+    
+    const [updated] = await db.update(hospitalSettings)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(hospitalSettings.id, existing.id))
+      .returning();
+    
+    return updated;
+  }
+
+  async createHospitalSettings(settings: InsertHospitalSettings & { createdBy: string }): Promise<HospitalSettings> {
+    const [created] = await db.insert(hospitalSettings)
+      .values(settings)
+      .returning();
+    
+    return created;
   }
 }
 

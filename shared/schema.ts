@@ -459,3 +459,35 @@ export const insertMedicineInventorySchema = createInsertSchema(medicineInventor
 
 export type InsertMedicineInventory = z.infer<typeof insertMedicineInventorySchema>;
 export type MedicineInventory = typeof medicineInventory.$inferSelect;
+
+// Hospital Settings Table
+export const hospitalSettings = pgTable("hospital_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  hospitalName: text("hospital_name").notNull().default("NAKSHATRA HOSPITAL"),
+  hospitalSubtitle: text("hospital_subtitle").default("Multi Specialty Hospital & Research Centre"),
+  address: text("address").default("123 Medical District, Healthcare City, State - 123456"),
+  phone: text("phone").default("+91-1234567890"),
+  email: text("email").default("info@nakshatrahospital.com"),
+  accreditation: text("accreditation").default("NABL Accredited Laboratory | ISO 15189:2012 Certified"),
+  logo: text("logo"), // Path to logo file
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const hospitalSettingsRelations = relations(hospitalSettings, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [hospitalSettings.createdBy],
+    references: [users.id],
+  }),
+}));
+
+export const insertHospitalSettingsSchema = createInsertSchema(hospitalSettings).omit({
+  id: true,
+  createdBy: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertHospitalSettings = z.infer<typeof insertHospitalSettingsSchema>;
+export type HospitalSettings = typeof hospitalSettings.$inferSelect;
