@@ -67,7 +67,7 @@ export default function LabReport() {
     accreditation?: string;
   }>({
     queryKey: ['/api/hospital-settings'],
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    staleTime: 0, // Always fetch fresh data for PDFs
   });
 
   const generatePDF = () => {
