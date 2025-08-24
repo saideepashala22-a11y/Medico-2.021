@@ -49,7 +49,7 @@ export default function Dashboard() {
               <div className="flex-shrink-0 flex items-center">
                 <Hospital className="text-white text-2xl mr-3" />
                 <span className="text-xl font-bold text-white">
-                  {hospitalSettings?.hospitalName ? `${hospitalSettings.hospitalName} Management Dashboard` : 'Hospital Management Dashboard'}
+                  {hospitalSettings?.hospitalName || 'Hospital Management System'}
                 </span>
               </div>
             </div>
