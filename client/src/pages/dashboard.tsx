@@ -43,11 +43,15 @@ export default function Dashboard() {
               <span className="bg-medical-secondary text-white px-2 py-1 rounded-full text-xs">
                 {user?.role === 'doctor' ? 'Doctor' : 'Staff'}
               </span>
-              <Link href="/settings">
-                <Button variant="ghost" size="sm" className="text-white hover:bg-medical-primary-dark" data-testid="button-settings">
-                  <Settings className="h-4 w-4" />
-                </Button>
-              </Link>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-white hover:bg-medical-primary-dark" 
+                data-testid="button-settings"
+                onClick={() => window.location.href = '/settings'}
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
               <Button variant="ghost" size="sm" onClick={logout} className="text-white hover:bg-medical-primary-dark">
                 <LogOut className="h-4 w-4" />
               </Button>
