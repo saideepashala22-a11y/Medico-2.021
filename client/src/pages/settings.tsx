@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -41,26 +41,28 @@ export default function Settings() {
   const form = useForm<HospitalFormData>({
     resolver: zodResolver(hospitalSchema),
     defaultValues: {
-      name: hospitalSettings?.name || '',
-      address: hospitalSettings?.address || '',
-      phone: hospitalSettings?.phone || '',
-      email: hospitalSettings?.email || '',
-      website: hospitalSettings?.website || '',
-      registrationNumber: hospitalSettings?.registrationNumber || '',
+      name: '',
+      address: '',
+      phone: '',
+      email: '',
+      website: '',
+      registrationNumber: '',
     },
   });
 
-  // Reset form when data loads
-  if (hospitalSettings && !form.formState.isDirty) {
-    form.reset({
-      name: hospitalSettings.name || '',
-      address: hospitalSettings.address || '',
-      phone: hospitalSettings.phone || '',
-      email: hospitalSettings.email || '',
-      website: hospitalSettings.website || '',
-      registrationNumber: hospitalSettings.registrationNumber || '',
-    });
-  }
+  // Reset form when data loads - using useEffect to prevent infinite loops
+  useEffect(() => {
+    if (hospitalSettings) {
+      form.reset({
+        name: hospitalSettings.name || '',
+        address: hospitalSettings.address || '',
+        phone: hospitalSettings.phone || '',
+        email: hospitalSettings.email || '',
+        website: hospitalSettings.website || '',
+        registrationNumber: hospitalSettings.registrationNumber || '',
+      });
+    }
+  }, [hospitalSettings, form]);
 
   const updateHospitalMutation = useMutation({
     mutationFn: (data: HospitalFormData) => apiRequest('/api/hospital-settings', {
