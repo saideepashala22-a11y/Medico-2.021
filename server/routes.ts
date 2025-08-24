@@ -981,6 +981,7 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
     try {
       // Map form fields to database fields
       const { name, address, phone, email, website, registrationNumber, ...rest } = req.body;
+      console.log('PUT Hospital Settings - Request body:', req.body);
       
       const mappedData = {
         hospitalName: name,
@@ -991,16 +992,22 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
         accreditation: registrationNumber, // Map registration to accreditation for now
         ...rest
       };
+      console.log('PUT Hospital Settings - Mapped data:', mappedData);
       
       const updates = insertHospitalSettingsSchema.partial().parse(mappedData);
+      console.log('PUT Hospital Settings - Validated updates:', updates);
+      
       const settings = await storage.updateHospitalSettings(updates);
+      console.log('PUT Hospital Settings - Success:', settings);
       res.json(settings);
     } catch (error) {
-      console.error('Error updating hospital settings:', error);
+      console.error('PUT Hospital Settings - Error details:', error);
+      console.error('PUT Hospital Settings - Error stack:', error instanceof Error ? error.stack : 'No stack trace');
       if (error instanceof z.ZodError) {
+        console.error('PUT Hospital Settings - Zod validation errors:', error.errors);
         return res.status(400).json({ message: 'Validation error', errors: error.errors });
       }
-      res.status(500).json({ message: 'Failed to update hospital settings' });
+      res.status(500).json({ message: 'Failed to update hospital settings', error: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 
