@@ -10,6 +10,16 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { ArrowLeft, Save, Hospital, AlertTriangle } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface HospitalSettings {
   id: string;
@@ -150,15 +160,12 @@ export default function Settings() {
         </div>
       </nav>
 
-      {/* Main Content */}
+      {/* Settings Content */}
       <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <Card className="shadow-lg border-0">
-          <CardHeader className="bg-gradient-to-r from-medical-primary to-medical-primary-dark text-white">
-            <CardTitle className="text-2xl flex items-center">
-              <Hospital className="mr-3" />
-              Hospital Settings
-            </CardTitle>
-            <CardDescription className="text-medical-primary-light">
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-medical-text">Hospital Settings</CardTitle>
+            <CardDescription>
               Configure your hospital information that will appear on reports and documents.
             </CardDescription>
           </CardHeader>
@@ -209,7 +216,7 @@ export default function Settings() {
                       id="phone"
                       value={formData.phone}
                       onChange={(e) => handleInputChange('phone', e.target.value)}
-                      placeholder="Enter phone number"
+                      placeholder="+91-1234567890"
                       data-testid="input-phone"
                       className="border-medical-border focus:border-medical-primary"
                     />
@@ -224,7 +231,7 @@ export default function Settings() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      placeholder="Enter email address"
+                      placeholder="info@hospital.com"
                       data-testid="input-email"
                       className="border-medical-border focus:border-medical-primary"
                     />
@@ -283,15 +290,17 @@ export default function Settings() {
       </div>
 
       {/* Hospital Name Change Warning Dialog */}
-      {showNameWarning && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md mx-4">
-            <div className="flex items-center gap-2 text-amber-600 mb-4">
-              <AlertTriangle className="h-5 w-5" />
-              <h3 className="text-lg font-semibold">Warning: Hospital Name Change</h3>
-            </div>
-            <div className="space-y-3 text-sm text-gray-700">
-              <p><strong>This action will change your hospital name across the entire system!</strong></p>
+      <AlertDialog open={showNameWarning} onOpenChange={setShowNameWarning}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Warning: Hospital Name Change
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-left space-y-2">
+              <p>
+                <strong>This action will change your hospital name across the entire system!</strong>
+              </p>
               <p>The new name will appear on:</p>
               <ul className="list-disc list-inside ml-4 space-y-1">
                 <li>All future pharmacy bills and invoices</li>
@@ -303,21 +312,21 @@ export default function Settings() {
               <p className="font-medium text-amber-700">
                 Are you sure you want to proceed with changing the hospital name?
               </p>
-            </div>
-            <div className="flex justify-end space-x-3 mt-6">
-              <Button variant="outline" onClick={handleNameChangeCancel}>
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleNameChangeConfirmation}
-                className="bg-amber-600 hover:bg-amber-700 text-white"
-              >
-                OK, I Understand - Allow Changes
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleNameChangeCancel}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleNameChangeConfirmation}
+              className="bg-amber-600 hover:bg-amber-700"
+            >
+              OK, I Understand - Allow Changes
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
