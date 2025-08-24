@@ -8,8 +8,18 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'wouter';
-import { ArrowLeft, Save, Hospital } from 'lucide-react';
+import { ArrowLeft, Save, Hospital, AlertTriangle } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface HospitalSettings {
   id: string;
@@ -35,6 +45,10 @@ export default function Settings() {
     email: '',
     accreditation: '',
   });
+
+  const [showNameWarning, setShowNameWarning] = useState(false);
+  const [nameChangeConfirmed, setNameChangeConfirmed] = useState(false);
+  const [originalHospitalName, setOriginalHospitalName] = useState('');
 
   // Fetch current hospital settings
   const { data: settings, isLoading } = useQuery({
@@ -79,16 +93,45 @@ export default function Settings() {
   useEffect(() => {
     if (settings) {
       const settingsData = settings as HospitalSettings;
-      setFormData({
+      const newFormData = {
         hospitalName: settingsData.hospitalName || '',
         hospitalSubtitle: settingsData.hospitalSubtitle || '',
         address: settingsData.address || '',
         phone: settingsData.phone || '',
         email: settingsData.email || '',
         accreditation: settingsData.accreditation || '',
-      });
+      };
+      setFormData(newFormData);
+      setOriginalHospitalName(settingsData.hospitalName || '');
     }
   }, [settings]);
+
+  // Handle hospital name change with warning
+  const handleHospitalNameChange = (value: string) => {
+    // If the name is being changed from the original and not yet confirmed
+    if (value !== originalHospitalName && !nameChangeConfirmed) {
+      setShowNameWarning(true);
+    } else {
+      handleInputChange('hospitalName', value);
+    }
+  };
+
+  // Handle warning confirmation
+  const handleNameChangeConfirmation = () => {
+    setNameChangeConfirmed(true);
+    setShowNameWarning(false);
+    // Allow the user to edit the field now
+  };
+
+  // Handle warning cancellation
+  const handleNameChangeCancel = () => {
+    setShowNameWarning(false);
+    // Reset to original name
+    setFormData(prev => ({
+      ...prev,
+      hospitalName: originalHospitalName
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-medical-background">
@@ -142,11 +185,12 @@ export default function Settings() {
                     <Input
                       id="hospitalName"
                       value={formData.hospitalName}
-                      onChange={(e) => handleInputChange('hospitalName', e.target.value)}
+                      onChange={(e) => handleHospitalNameChange(e.target.value)}
                       placeholder="Enter hospital name"
                       required
                       data-testid="input-hospital-name"
                       className="border-medical-border focus:border-medical-primary"
+                      readOnly={!nameChangeConfirmed && formData.hospitalName === originalHospitalName}
                     />
                   </div>
 
@@ -244,6 +288,45 @@ export default function Settings() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Hospital Name Change Warning Dialog */}
+      <AlertDialog open={showNameWarning} onOpenChange={setShowNameWarning}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Warning: Hospital Name Change
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-left space-y-2">
+              <p>
+                <strong>This action will change your hospital name across the entire system!</strong>
+              </p>
+              <p>The new name will appear on:</p>
+              <ul className="list-disc list-inside ml-4 space-y-1">
+                <li>All future pharmacy bills and invoices</li>
+                <li>Laboratory test reports</li>
+                <li>Surgical case sheets</li>
+                <li>All other PDF documents</li>
+                <li>System headers and footers</li>
+              </ul>
+              <p className="font-medium text-amber-700">
+                Are you sure you want to proceed with changing the hospital name?
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleNameChangeCancel}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleNameChangeConfirmation}
+              className="bg-amber-600 hover:bg-amber-700"
+            >
+              OK, I Understand - Allow Changes
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
