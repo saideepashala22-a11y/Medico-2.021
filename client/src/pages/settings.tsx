@@ -33,7 +33,7 @@ export default function Settings() {
   const [pendingFormData, setPendingFormData] = useState<HospitalFormData | null>(null);
 
   // Fetch hospital settings with caching
-  const { data: hospitalSettings, isLoading } = useQuery({
+  const { data: hospitalSettings, isLoading } = useQuery<HospitalFormData>({
     queryKey: ['/api/hospital-settings'],
     staleTime: 5 * 60 * 1000, // 5 minutes cache
   });
@@ -65,10 +65,7 @@ export default function Settings() {
   }, [hospitalSettings, form]);
 
   const updateHospitalMutation = useMutation({
-    mutationFn: (data: HospitalFormData) => apiRequest('/api/hospital-settings', {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    }),
+    mutationFn: (data: HospitalFormData) => apiRequest('PUT', '/api/hospital-settings', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/hospital-settings'] });
       toast({
