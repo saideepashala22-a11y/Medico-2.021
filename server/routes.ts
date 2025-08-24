@@ -980,34 +980,41 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
   app.put('/api/hospital-settings', authenticateToken, async (req: any, res) => {
     try {
       // Map form fields to database fields
-      const { name, address, phone, email, website, registrationNumber, ...rest } = req.body;
-      console.log('PUT Hospital Settings - Request body:', req.body);
+      const { name, address, phone, email, website, registrationNumber } = req.body;
       
-      const mappedData = {
-        hospitalName: name,
-        address,
-        phone, 
-        email,
-        hospitalSubtitle: website, // Map website to subtitle for now
-        accreditation: registrationNumber, // Map registration to accreditation for now
-        ...rest
-      };
-      console.log('PUT Hospital Settings - Mapped data:', mappedData);
+      // Create clean mapped data - only include defined values
+      const mappedData: any = {};
+      if (name) mappedData.hospitalName = name;
+      if (address) mappedData.address = address;
+      if (phone) mappedData.phone = phone;
+      if (email) mappedData.email = email;
+      if (website !== undefined) mappedData.hospitalSubtitle = website;
+      if (registrationNumber) mappedData.accreditation = registrationNumber;
       
       const updates = insertHospitalSettingsSchema.partial().parse(mappedData);
-      console.log('PUT Hospital Settings - Validated updates:', updates);
-      
       const settings = await storage.updateHospitalSettings(updates);
-      console.log('PUT Hospital Settings - Success:', settings);
-      res.json(settings);
+      
+      // Map response back to form format
+      const responseData = {
+        name: settings.hospitalName,
+        address: settings.address || '',
+        phone: settings.phone || '',
+        email: settings.email || '',
+        website: settings.hospitalSubtitle || '',
+        registrationNumber: settings.accreditation || '',
+        // Keep original fields for PDF generation
+        hospitalName: settings.hospitalName,
+        hospitalSubtitle: settings.hospitalSubtitle,
+        accreditation: settings.accreditation,
+      };
+      
+      res.json(responseData);
     } catch (error) {
-      console.error('PUT Hospital Settings - Error details:', error);
-      console.error('PUT Hospital Settings - Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      console.error('Error updating hospital settings:', error);
       if (error instanceof z.ZodError) {
-        console.error('PUT Hospital Settings - Zod validation errors:', error.errors);
         return res.status(400).json({ message: 'Validation error', errors: error.errors });
       }
-      res.status(500).json({ message: 'Failed to update hospital settings', error: error instanceof Error ? error.message : 'Unknown error' });
+      res.status(500).json({ message: 'Failed to update hospital settings' });
     }
   });
 
