@@ -19,7 +19,7 @@ import Discharge from "@/pages/discharge";
 import MedicalHistory from "@/pages/medical-history";
 import Consultation from "@/pages/consultation";
 import SurgicalCaseSheets from "@/pages/surgical-case-sheets";
-// import Settings from "@/pages/settings-minimal";
+import Settings from "@/pages/settings";
 import { Loader2 } from "lucide-react";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -146,18 +146,7 @@ function Router() {
       
       <Route path="/settings">
         <ProtectedRoute>
-          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            <div className="bg-white p-8 rounded-lg shadow-md">
-              <h1 className="text-2xl font-bold mb-4">Settings Page Working!</h1>
-              <p className="mb-4">This is a test settings page inline in App.tsx</p>
-              <button 
-                onClick={() => window.location.href = '/dashboard'}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                Back to Dashboard
-              </button>
-            </div>
-          </div>
+          <Settings />
         </ProtectedRoute>
       </Route>
       
