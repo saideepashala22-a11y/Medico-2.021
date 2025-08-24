@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nakshatra-hms-v1';
+const CACHE_NAME = 'nakshatra-hms-v2';
 const urlsToCache = [
   '/',
   '/src/main.tsx',
