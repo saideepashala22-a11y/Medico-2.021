@@ -941,7 +941,22 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
   app.get('/api/hospital-settings', authenticateToken, async (req, res) => {
     try {
       const settings = await storage.getHospitalSettings();
-      res.json(settings);
+      
+      // Map database fields to form fields
+      const mappedSettings = {
+        name: settings.hospitalName,
+        address: settings.address || '',
+        phone: settings.phone || '',
+        email: settings.email || '',
+        website: settings.hospitalSubtitle || '',
+        registrationNumber: settings.accreditation || '',
+        // Keep original fields for PDF generation
+        hospitalName: settings.hospitalName,
+        hospitalSubtitle: settings.hospitalSubtitle,
+        accreditation: settings.accreditation,
+      };
+      
+      res.json(mappedSettings);
     } catch (error) {
       console.error('Error fetching hospital settings:', error);
       res.status(500).json({ message: 'Failed to fetch hospital settings' });
@@ -951,6 +966,32 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
   app.patch('/api/hospital-settings', authenticateToken, async (req: any, res) => {
     try {
       const updates = insertHospitalSettingsSchema.partial().parse(req.body);
+      const settings = await storage.updateHospitalSettings(updates);
+      res.json(settings);
+    } catch (error) {
+      console.error('Error updating hospital settings:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Validation error', errors: error.errors });
+      }
+      res.status(500).json({ message: 'Failed to update hospital settings' });
+    }
+  });
+
+  app.put('/api/hospital-settings', authenticateToken, async (req: any, res) => {
+    try {
+      // Map form fields to database fields
+      const { name, address, phone, email, website, registrationNumber, ...rest } = req.body;
+      const mappedData = {
+        hospitalName: name,
+        address,
+        phone, 
+        email,
+        hospitalSubtitle: website, // Map website to subtitle for now
+        accreditation: registrationNumber, // Map registration to accreditation for now
+        ...rest
+      };
+      
+      const updates = insertHospitalSettingsSchema.partial().parse(mappedData);
       const settings = await storage.updateHospitalSettings(updates);
       res.json(settings);
     } catch (error) {
