@@ -48,9 +48,7 @@ export default function Dashboard() {
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
                 <Hospital className="text-white text-2xl mr-3" />
-                <span className="text-xl font-bold text-white">
-                  {hospitalSettings?.hospitalName ? `${hospitalSettings.hospitalName} Management Dashboard` : 'Hospital Management Dashboard'}
-                </span>
+                <span className="text-xl font-bold text-white">HMS Dashboard</span>
               </div>
             </div>
             <div className="flex items-center space-x-4">

@@ -981,8 +981,6 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
     try {
       // Map form fields to database fields
       const { name, address, phone, email, website, registrationNumber, ...rest } = req.body;
-      console.log('Received PUT request body:', req.body);
-      console.log('Mapped name to hospitalName:', name);
       
       const mappedData = {
         hospitalName: name,
@@ -994,12 +992,8 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
         ...rest
       };
       
-      console.log('Mapped data before validation:', mappedData);
       const updates = insertHospitalSettingsSchema.partial().parse(mappedData);
-      console.log('Validated updates:', updates);
-      
       const settings = await storage.updateHospitalSettings(updates);
-      console.log('Updated settings returned:', settings);
       res.json(settings);
     } catch (error) {
       console.error('Error updating hospital settings:', error);
