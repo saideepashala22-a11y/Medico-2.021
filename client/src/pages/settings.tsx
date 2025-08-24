@@ -39,6 +39,7 @@ export default function Settings() {
   // Fetch current hospital settings
   const { data: settings, isLoading } = useQuery({
     queryKey: ['/api/hospital-settings'],
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
   });
 
   // Update hospital settings mutation
@@ -128,7 +129,8 @@ export default function Settings() {
           <CardContent>
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="text-medical-text-muted">Loading settings...</div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-medical-primary"></div>
+                <div className="ml-4 text-medical-text-muted">Loading settings...</div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
