@@ -327,7 +327,8 @@ export default function LabReport() {
       doc.setFontSize(8);
       doc.text("Medical Laboratory Technologist", 125, yPos);
       yPos += 6;
-      doc.text("NAKSHATRA HOSPITAL", 135, yPos);
+      const signatureHospitalName = hospitalSettings?.hospitalName || "NAKSHATRA HOSPITAL";
+      doc.text(signatureHospitalName, 135, yPos);
 
       // Report Footer (at the very end)
       yPos += 35;
