@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageCircle, Send, X, Bot, User, Minimize2, Maximize2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
 interface Message {
   id: string;
@@ -19,17 +20,49 @@ interface ChatWidgetProps {
 export function ChatWidget({ className }: ChatWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Fetch hospital settings for dynamic name
+  const { data: hospitalSettings } = useQuery<{
+    hospitalName: string;
+    hospitalSubtitle?: string;
+    address?: string;
+    phone?: string;
+    email?: string;
+    accreditation?: string;
+  }>({
+    queryKey: ['/api/hospital-settings'],
+    staleTime: 0, // Always fetch fresh data
+  });
+
+  const hospitalName = hospitalSettings?.hospitalName || 'Nakshatra Hospital';
+  
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Hello! I\'m your AI assistant for Nakshatra Hospital. How can I help you today?',
+      text: `Hello! I'm your AI assistant for ${hospitalName}. How can I help you today?`,
       sender: 'ai',
       timestamp: new Date(),
     }
   ]);
-  const [inputValue, setInputValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Update the initial message when hospital name changes
+  useEffect(() => {
+    if (hospitalSettings?.hospitalName) {
+      setMessages(prev => {
+        const updatedMessages = [...prev];
+        if (updatedMessages[0]?.id === '1') {
+          updatedMessages[0] = {
+            ...updatedMessages[0],
+            text: `Hello! I'm your AI assistant for ${hospitalSettings.hospitalName}. How can I help you today?`
+          };
+        }
+        return updatedMessages;
+      });
+    }
+  }, [hospitalSettings?.hospitalName]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -119,7 +152,7 @@ export function ChatWidget({ className }: ChatWidgetProps) {
         <CardHeader className="flex flex-row items-center justify-between p-3 bg-blue-600 text-white rounded-t-lg">
           <div className="flex items-center gap-2">
             <Bot className="h-6 w-6" />
-            <CardTitle className="text-sm font-medium">Nakshatra's AI</CardTitle>
+            <CardTitle className="text-sm font-medium">{hospitalName}'s AI</CardTitle>
           </div>
           <div className="flex items-center gap-1">
             <Button
