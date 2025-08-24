@@ -71,7 +71,9 @@ export function generatePharmacyBillingPDF(data: PharmacyBillingData) {
   pdf.setFontSize(12);
   pdf.setFont('helvetica', 'bold');
   const hospitalName = data.hospitalSettings?.hospitalName || 'NAKSHATRA HOSPITAL';
-  pdf.text(`${hospitalName} PHARMACY`, margin + 3, yPos + 8);
+  // Remove "Hospital" from the name and add "PHARMACY"
+  const pharmacyName = hospitalName.replace(/\s*hospital\s*/gi, '').trim();
+  pdf.text(`${pharmacyName} PHARMACY`, margin + 3, yPos + 8);
   
   pdf.setFontSize(9);
   pdf.setFont('helvetica', 'normal');
