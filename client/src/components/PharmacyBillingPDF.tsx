@@ -1,6 +1,15 @@
 import jsPDF from 'jspdf';
 import JsBarcode from 'jsbarcode';
 
+interface HospitalSettings {
+  hospitalName: string;
+  hospitalSubtitle?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  accreditation?: string;
+}
+
 interface PharmacyBillingData {
   invoiceNumber: string;
   patient: {
@@ -24,6 +33,7 @@ interface PharmacyBillingData {
   subtotal: number;
   discount: number;
   grandTotal: number;
+  hospitalSettings?: HospitalSettings;
 }
 
 // Helper function to generate barcode as base64 image
@@ -60,13 +70,18 @@ export function generatePharmacyBillingPDF(data: PharmacyBillingData) {
   // Left side - Pharmacy details
   pdf.setFontSize(12);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('NAKSHATRA PHARMACY', margin + 3, yPos + 8);
+  const hospitalName = data.hospitalSettings?.hospitalName || 'NAKSHATRA HOSPITAL';
+  pdf.text(`${hospitalName} PHARMACY`, margin + 3, yPos + 8);
   
   pdf.setFontSize(9);
   pdf.setFont('helvetica', 'normal');
-  pdf.text('123 Medical Street, Healthcare City', margin + 3, yPos + 15);
-  pdf.text('Phone: +91 98765 43210', margin + 3, yPos + 21);
-  pdf.text('Email: pharmacy@nakshatra.com', margin + 3, yPos + 27);
+  const address = data.hospitalSettings?.address || '123 Medical Street, Healthcare City';
+  const phone = data.hospitalSettings?.phone || '+91 98765 43210';
+  const email = data.hospitalSettings?.email || 'pharmacy@nakshatra.com';
+  
+  pdf.text(address, margin + 3, yPos + 15);
+  pdf.text(`Phone: ${phone}`, margin + 3, yPos + 21);
+  pdf.text(`Email: ${email}`, margin + 3, yPos + 27);
   pdf.text(`Bill No: ${data.invoiceNumber}`, margin + 3, yPos + 33);
   pdf.text('D.L. No.: DL-29-12345', margin + 3, yPos + 39);
   
@@ -258,7 +273,8 @@ export function generatePharmacyBillingPDF(data: PharmacyBillingData) {
   pdf.setFontSize(8);
   pdf.setFont('helvetica', 'italic');
   const timestamp = new Date().toLocaleString('en-IN');
-  pdf.text(`Generated on: ${timestamp} | Nakshatra Hospital Management System`, margin, yPos);
+  const systemName = data.hospitalSettings?.hospitalName || 'NAKSHATRA HOSPITAL';
+  pdf.text(`Generated on: ${timestamp} | ${systemName} Management System`, margin, yPos);
   
   // Save the PDF
   const fileName = `pharmacy_bill_${data.invoiceNumber}.pdf`;

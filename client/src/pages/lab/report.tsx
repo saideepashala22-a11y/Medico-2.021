@@ -57,6 +57,19 @@ export default function LabReport() {
     enabled: !!labTestId,
   });
 
+  // Fetch hospital settings for PDF generation
+  const { data: hospitalSettings } = useQuery<{
+    hospitalName: string;
+    hospitalSubtitle?: string;
+    address?: string;
+    phone?: string;
+    email?: string;
+    accreditation?: string;
+  }>({
+    queryKey: ['/api/hospital-settings'],
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+  });
+
   const generatePDF = () => {
     if (!labTest) return;
 
@@ -68,34 +81,23 @@ export default function LabReport() {
       // Professional Medical Header with Hospital Branding
       doc.setFontSize(18);
       doc.setFont("helvetica", "bold");
-      doc.text("NAKSHATRA HOSPITAL", pageWidth / 2, 15, { align: "center" });
+      const hospitalName = hospitalSettings?.hospitalName || "NAKSHATRA HOSPITAL";
+      doc.text(hospitalName, pageWidth / 2, 15, { align: "center" });
 
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
-      doc.text(
-        "Multi Specialty Hospital & Research Centre",
-        pageWidth / 2,
-        22,
-        { align: "center" },
-      );
-      doc.text(
-        "123 Medical District, Healthcare City, State - 123456",
-        pageWidth / 2,
-        28,
-        { align: "center" },
-      );
-      doc.text(
-        "Phone: +91-1234567890 | Email: info@nakshatrahospital.com",
-        pageWidth / 2,
-        34,
-        { align: "center" },
-      );
-      doc.text(
-        "NABL Accredited Laboratory | ISO 15189:2012 Certified",
-        pageWidth / 2,
-        40,
-        { align: "center" },
-      );
+      const subtitle = hospitalSettings?.hospitalSubtitle || "Multi Specialty Hospital & Research Centre";
+      doc.text(subtitle, pageWidth / 2, 22, { align: "center" });
+      
+      const address = hospitalSettings?.address || "123 Medical District, Healthcare City, State - 123456";
+      doc.text(address, pageWidth / 2, 28, { align: "center" });
+      
+      const phone = hospitalSettings?.phone || "+91-1234567890";
+      const email = hospitalSettings?.email || "info@nakshatrahospital.com";
+      doc.text(`Phone: ${phone} | Email: ${email}`, pageWidth / 2, 34, { align: "center" });
+      
+      const accreditation = hospitalSettings?.accreditation || "NABL Accredited Laboratory | ISO 15189:2012 Certified";
+      doc.text(accreditation, pageWidth / 2, 40, { align: "center" });
 
       // Horizontal line under header
       doc.setLineWidth(0.5);

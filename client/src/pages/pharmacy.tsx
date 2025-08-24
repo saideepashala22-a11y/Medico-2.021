@@ -53,6 +53,19 @@ export default function Pharmacy() {
     enabled: showPatientDropdown, // Only enabled when dropdown should show
   });
 
+  // Fetch hospital settings for PDF generation
+  const { data: hospitalSettings } = useQuery<{
+    hospitalName: string;
+    hospitalSubtitle?: string;
+    address?: string;
+    phone?: string;
+    email?: string;
+    accreditation?: string;
+  }>({
+    queryKey: ['/api/hospital-settings'],
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+  });
+
   // Search for prescriptions by bill number
   const { data: billSearchData } = useQuery({
     queryKey: ['/api/prescriptions/search', billSearch],
@@ -260,6 +273,7 @@ export default function Pharmacy() {
       subtotal: getSubtotal(),
       discount: 0.00,
       grandTotal: getTotal(),
+      hospitalSettings,
     };
 
     generatePharmacyBillingPDF(billingData);
@@ -300,6 +314,7 @@ export default function Pharmacy() {
       subtotal: parseFloat(prescription.subtotal),
       discount: 0.00,
       grandTotal: parseFloat(prescription.total),
+      hospitalSettings,
     };
 
     generatePharmacyBillingPDF(billingData);

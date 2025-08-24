@@ -23,7 +23,16 @@ function drawField(doc: PDFKit.PDFDocument, label: string, value: string, y: num
   doc.font("Helvetica").fontSize(12).text(value || ""); // just show value, no lines
 }
 
-export function createSurgicalCaseSheet(patient: Patient) {
+interface HospitalSettings {
+  hospitalName: string;
+  hospitalSubtitle?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  accreditation?: string;
+}
+
+export function createSurgicalCaseSheet(patient: Patient, hospitalSettings?: HospitalSettings) {
   const doc = new PDFDocument({ margin: 50 });
   const filePath = `surgical_case_sheet_${patient.id}.pdf`;
   doc.pipe(fs.createWriteStream(filePath));
@@ -31,9 +40,13 @@ export function createSurgicalCaseSheet(patient: Patient) {
   const caseSheetNo = generateCaseSheetNumber(patient.id);
 
   // ---------- HEADER ----------
-  doc.fontSize(18).text("NAKSHATRA HOSPITAL", { align: "center" });
-  doc.fontSize(10).text("Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.", { align: "center" });
-  doc.text("Cell: 7093939205", { align: "center" });
+  const hospitalName = hospitalSettings?.hospitalName || "NAKSHATRA HOSPITAL";
+  const address = hospitalSettings?.address || "Opp. to SBI Bank, Thurkappally (V&M), Yadadri Bhongiri District, T.S.";
+  const phone = hospitalSettings?.phone || "7093939205";
+  
+  doc.fontSize(18).text(hospitalName, { align: "center" });
+  doc.fontSize(10).text(address, { align: "center" });
+  doc.text(`Cell: ${phone}`, { align: "center" });
 
   doc.moveDown();
   doc.fontSize(14).text("SURGICAL CASE SHEET", { align: "center", underline: true });
