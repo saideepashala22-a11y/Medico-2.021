@@ -44,17 +44,45 @@ export default function EnterResults() {
   const patient = labTest?.patient;
   const patientLoading = false;
 
+  // CBP Parameters
+  const CBP_PARAMETERS = [
+    'HAEMOGLOBIN',
+    'Total R.B.C COUNT',
+    'P.C.V',
+    'W.B.C (TOTAL)',
+    'PLATELETS COUNT'
+  ];
+
   // Initialize results based on selected tests
   useEffect(() => {
     if (labTest && results.length === 0 && labTest.testTypes) {
       const testTypes = Array.isArray(labTest.testTypes) ? labTest.testTypes : [];
-      const initialResults = testTypes.map((test: any) => ({
-        testName: test.testName,
-        value: '',
-        unit: getDefaultUnit(test.testName),
-        normalRange: getNormalRange(test.testName),
-        status: 'normal' as const
-      }));
+      const initialResults: TestResult[] = [];
+      
+      testTypes.forEach((test: any) => {
+        // Special handling for CBP - expand into multiple parameters
+        if (test.testName === 'CBP (Complete Blood Picture)' || test.testName === 'CBP') {
+          CBP_PARAMETERS.forEach(parameter => {
+            initialResults.push({
+              testName: parameter,
+              value: '',
+              unit: getDefaultUnit(parameter),
+              normalRange: getNormalRange(parameter),
+              status: 'normal' as const
+            });
+          });
+        } else {
+          // Regular test - single parameter
+          initialResults.push({
+            testName: test.testName,
+            value: '',
+            unit: getDefaultUnit(test.testName),
+            normalRange: getNormalRange(test.testName),
+            status: 'normal' as const
+          });
+        }
+      });
+      
       setResults(initialResults);
     }
   }, [labTest, results.length]);
@@ -63,6 +91,10 @@ export default function EnterResults() {
   const getDefaultUnit = (testName: string): string => {
     const units: Record<string, string> = {
       'HAEMOGLOBIN': 'g/dL',
+      'Total R.B.C COUNT': 'million/μL',
+      'P.C.V': '%',
+      'W.B.C (TOTAL)': '/μL',
+      'PLATELETS COUNT': '/μL',
       'FBS (Fasting Blood Sugar)': 'mg/dL',
       'RBS (Random Blood Sugar)': 'mg/dL',
       'SERUM CREATININE': 'mg/dL',
@@ -83,6 +115,10 @@ export default function EnterResults() {
   const getNormalRange = (testName: string): string => {
     const ranges: Record<string, string> = {
       'HAEMOGLOBIN': '12.0-15.5 g/dL (F), 13.5-17.5 g/dL (M)',
+      'Total R.B.C COUNT': '4.5-5.5 million/μL (F), 4.7-6.1 million/μL (M)',
+      'P.C.V': '36-46% (F), 41-50% (M)',
+      'W.B.C (TOTAL)': '4,000-11,000 /μL',
+      'PLATELETS COUNT': '150,000-450,000 /μL',
       'FBS (Fasting Blood Sugar)': '70-100 mg/dL',
       'RBS (Random Blood Sugar)': '<140 mg/dL',
       'SERUM CREATININE': '0.6-1.2 mg/dL',
@@ -118,9 +154,27 @@ export default function EnterResults() {
         if (numValue > 140) return 'high';
         return 'normal';
       case 'HAEMOGLOBIN':
-        if (numValue < 10) return 'low';
+        if (numValue < 7) return 'critical';
         if (numValue < 12) return 'low';
         if (numValue > 18) return 'high';
+        return 'normal';
+      case 'Total R.B.C COUNT':
+        if (numValue < 3.5) return 'low';
+        if (numValue > 6.5) return 'high';
+        return 'normal';
+      case 'P.C.V':
+        if (numValue < 30) return 'low';
+        if (numValue > 55) return 'high';
+        return 'normal';
+      case 'W.B.C (TOTAL)':
+        if (numValue < 4000) return 'low';
+        if (numValue > 15000) return 'high';
+        if (numValue > 20000) return 'critical';
+        return 'normal';
+      case 'PLATELETS COUNT':
+        if (numValue < 100000) return 'low';
+        if (numValue < 50000) return 'critical';
+        if (numValue > 500000) return 'high';
         return 'normal';
       default:
         return 'normal';
@@ -334,55 +388,76 @@ export default function EnterResults() {
               
               {/* Individual test cards with clear separation */}
               <div className="space-y-8">
-                {results.map((result, index) => (
-                  <Card key={index} className="shadow-md border-2 border-gray-200 bg-white">
-                    <CardHeader className="bg-gray-50 border-b border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg font-semibold text-gray-900">{result.testName}</CardTitle>
-                        <Badge 
-                          className={
-                            result.status === 'normal' ? 'bg-green-100 text-green-800' :
-                            result.status === 'high' ? 'bg-yellow-100 text-yellow-800' :
-                            result.status === 'low' ? 'bg-blue-100 text-blue-800' :
-                            'bg-red-100 text-red-800'
-                          }
-                        >
-                          {result.status.charAt(0).toUpperCase() + result.status.slice(1)}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                      <div className="grid grid-cols-3 gap-4">
-                        <div>
-                          <Label htmlFor={`value-${index}`}>Result Value *</Label>
-                          <Input
-                            id={`value-${index}`}
-                            type="number"
-                            step="0.01"
-                            value={result.value}
-                            onChange={(e) => updateResult(index, 'value', e.target.value)}
-                            placeholder="Enter value"
-                            className="mt-1"
-                          />
+                {results.map((result, index) => {
+                  // Check if this is the first CBP parameter to show header
+                  const isCBPParameter = CBP_PARAMETERS.includes(result.testName);
+                  const isFirstCBPParameter = isCBPParameter && (index === 0 || !CBP_PARAMETERS.includes(results[index - 1]?.testName));
+                  
+                  return (
+                    <div key={index}>
+                      {/* CBP Group Header */}
+                      {isFirstCBPParameter && (
+                        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                          <h3 className="text-lg font-semibold text-blue-900 flex items-center">
+                            <TestTube className="h-5 w-5 mr-2" />
+                            CBP (Complete Blood Picture)
+                          </h3>
+                          <p className="text-sm text-blue-700 mt-1">Enter values for each parameter below</p>
                         </div>
-                        <div>
-                          <Label htmlFor={`unit-${index}`}>Unit</Label>
-                          <Input
-                            id={`unit-${index}`}
-                            value={result.unit}
-                            onChange={(e) => updateResult(index, 'unit', e.target.value)}
-                            placeholder="units"
-                            className="mt-1"
-                          />
-                        </div>
-                        <div>
-                          <Label>Normal Range</Label>
-                          <p className="text-sm text-gray-600 pt-3">Consult reference values</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      )}
+                      
+                      <Card className={`shadow-md border-2 ${isCBPParameter ? 'border-blue-200 bg-blue-50/30' : 'border-gray-200 bg-white'}`}>
+                        <CardHeader className={`border-b ${isCBPParameter ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'}`}>
+                          <div className="flex items-center justify-between">
+                            <CardTitle className={`text-lg font-semibold ${isCBPParameter ? 'text-blue-900' : 'text-gray-900'}`}>
+                              {isCBPParameter ? `• ${result.testName}` : result.testName}
+                            </CardTitle>
+                            <Badge 
+                              className={
+                                result.status === 'normal' ? 'bg-green-100 text-green-800' :
+                                result.status === 'high' ? 'bg-yellow-100 text-yellow-800' :
+                                result.status === 'low' ? 'bg-blue-100 text-blue-800' :
+                                'bg-red-100 text-red-800'
+                              }
+                            >
+                              {result.status.charAt(0).toUpperCase() + result.status.slice(1)}
+                            </Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                          <div className="grid grid-cols-3 gap-4">
+                            <div>
+                              <Label htmlFor={`value-${index}`}>Result Value *</Label>
+                              <Input
+                                id={`value-${index}`}
+                                type="number"
+                                step="0.01"
+                                value={result.value}
+                                onChange={(e) => updateResult(index, 'value', e.target.value)}
+                                placeholder="Enter value"
+                                className="mt-1"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`unit-${index}`}>Unit</Label>
+                              <Input
+                                id={`unit-${index}`}
+                                value={result.unit}
+                                onChange={(e) => updateResult(index, 'unit', e.target.value)}
+                                placeholder="units"
+                                className="mt-1"
+                              />
+                            </div>
+                            <div>
+                              <Label>Normal Range</Label>
+                              <p className="text-sm text-gray-600 pt-3">{result.normalRange}</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Additional information card */}
