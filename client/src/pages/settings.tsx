@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { ArrowLeft, Save, AlertTriangle, Hospital } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
+import { useLocation } from 'wouter';
 
 const hospitalSchema = z.object({
   name: z.string().min(1, 'Hospital name is required'),
@@ -29,6 +30,7 @@ export default function Settings() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
   const [showNameChangeWarning, setShowNameChangeWarning] = useState(false);
   const [pendingFormData, setPendingFormData] = useState<HospitalFormData | null>(null);
 
@@ -69,11 +71,16 @@ export default function Settings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/hospital-settings'] });
       toast({
-        title: 'Settings Updated',
+        title: 'Details Saved',
         description: 'Hospital settings have been successfully updated.',
       });
       setPendingFormData(null);
       setShowNameChangeWarning(false);
+      
+      // Navigate to home page after successful save
+      setTimeout(() => {
+        setLocation('/dashboard');
+      }, 1500); // Wait 1.5 seconds to show the success message
     },
     onError: (error: any) => {
       toast({
