@@ -59,9 +59,6 @@ export default function Dashboard() {
                 <span className="text-sm text-medical-primary-light">{user?.name}</span>
                 {user?.role === 'doctor' && <EditDoctorDialog />}
               </div>
-              <span className="bg-medical-secondary text-white px-2 py-1 rounded-full text-xs">
-                {user?.role === 'doctor' ? 'Doctor' : 'Staff'}
-              </span>
               <Button 
                 variant="ghost" 
                 size="sm" 
