@@ -55,7 +55,6 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-medical-primary-light">{user?.name}</span>
               <Button 
                 variant="ghost" 
                 size="sm" 
