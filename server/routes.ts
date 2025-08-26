@@ -298,14 +298,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Prescription routes
   app.post('/api/prescriptions', authenticateToken, async (req: any, res) => {
     try {
+      console.log('Received prescription data:', JSON.stringify(req.body, null, 2));
+      
       // Generate bill number
       const today = new Date();
       const year = today.getFullYear();
       const prescriptions = await storage.getRecentPrescriptions();
       const billNumber = `PH-${year}-${String(prescriptions.length + 1).padStart(3, '0')}`;
 
-      const prescriptionData = insertPrescriptionSchema.parse({
+      // Convert string decimals to numbers for database
+      const processedBody = {
         ...req.body,
+        subtotal: parseFloat(req.body.subtotal || 0),
+        tax: parseFloat(req.body.tax || 0),
+        total: parseFloat(req.body.total || 0),
+      };
+
+      console.log('Processed prescription data:', JSON.stringify(processedBody, null, 2));
+
+      const prescriptionData = insertPrescriptionSchema.parse({
+        ...processedBody,
         billNumber,
         createdBy: req.user.id,
       });
