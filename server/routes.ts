@@ -308,18 +308,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const allPrescriptions = await storage.getAllPrescriptionsForYear(year);
       const billNumber = `PH-${year}-${String(allPrescriptions.length + 1).padStart(3, '0')}`;
 
-      // Convert string decimals to numbers for database
-      const processedBody = {
-        ...req.body,
-        subtotal: parseFloat(req.body.subtotal || 0),
-        tax: parseFloat(req.body.tax || 0),
-        total: parseFloat(req.body.total || 0),
-      };
-
-      console.log('Processed prescription data:', JSON.stringify(processedBody, null, 2));
-
       const prescriptionData = insertPrescriptionSchema.parse({
-        ...processedBody,
+        ...req.body,
         billNumber,
         createdBy: req.user.id,
       });
