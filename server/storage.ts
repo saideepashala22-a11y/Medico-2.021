@@ -9,7 +9,7 @@ import {
   insertLabTestDefinitionSchema
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, ilike, or, sql } from "drizzle-orm";
+import { eq, desc, ilike, or, sql, and, gte, lt } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -45,6 +45,7 @@ export interface IStorage {
   getPrescriptionsByPatient(patientId: string): Promise<Prescription[]>;
   createPrescription(prescription: InsertPrescription): Promise<Prescription>;
   getRecentPrescriptions(): Promise<(Prescription & { patient: Patient })[]>;
+  getAllPrescriptionsForYear(year: number): Promise<Prescription[]>;
   searchPrescriptionsByBillNumber(billNumber: string): Promise<(Prescription & { patient: any })[]>;
   
   // Discharge Summaries
@@ -314,6 +315,21 @@ export class DatabaseStorage implements IStorage {
     .innerJoin(patientsRegistration, eq(prescriptions.patientId, patientsRegistration.id))
     .orderBy(desc(prescriptions.createdAt))
     .limit(3);
+  }
+
+  async getAllPrescriptionsForYear(year: number): Promise<Prescription[]> {
+    const startDate = new Date(year, 0, 1); // January 1st
+    const endDate = new Date(year + 1, 0, 1); // January 1st of next year
+    
+    return await db.select()
+      .from(prescriptions)
+      .where(
+        and(
+          gte(prescriptions.createdAt, startDate),
+          lt(prescriptions.createdAt, endDate)
+        )
+      )
+      .orderBy(prescriptions.createdAt);
   }
 
   async searchPrescriptionsByBillNumber(billNumber: string): Promise<(Prescription & { patient: any })[]> {

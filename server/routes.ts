@@ -303,8 +303,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate bill number
       const today = new Date();
       const year = today.getFullYear();
-      const prescriptions = await storage.getRecentPrescriptions();
-      const billNumber = `PH-${year}-${String(prescriptions.length + 1).padStart(3, '0')}`;
+      
+      // Get all prescriptions for current year to generate proper sequential number
+      const allPrescriptions = await storage.getAllPrescriptionsForYear(year);
+      const billNumber = `PH-${year}-${String(allPrescriptions.length + 1).padStart(3, '0')}`;
 
       // Convert string decimals to numbers for database
       const processedBody = {
