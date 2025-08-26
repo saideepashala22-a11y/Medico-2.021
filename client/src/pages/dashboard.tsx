@@ -6,7 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import { ChatWidget } from '@/components/ChatWidget';
 import { EditDoctorDialog } from '@/components/EditDoctorDialog';
 import { StatCard } from '@/components/StatCard';
-import { FloatingElements } from '@/components/FloatingElements';
 import { memo, useMemo } from 'react';
 import { 
   Hospital, 
@@ -47,10 +46,9 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen gradient-bg-page relative">
-      <FloatingElements />
-      {/* Enhanced Navigation Header */}
-      <nav className="nav-enhanced shadow-lg border-b border-white/20">
+    <div className="min-h-screen bg-medical-background">
+      {/* Navigation Header */}
+      <nav className="bg-medical-primary shadow-lg border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
@@ -84,12 +82,12 @@ export default function Dashboard() {
 
       {/* Dashboard Content */}
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 animate-slide-in">
-          <h1 className="text-4xl font-bold gradient-text mb-2">Welcome Back</h1>
-          <p className="text-lg text-medical-text-muted">Transform healthcare with our intelligent system</p>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-medical-text">Welcome Back</h1>
+          <p className="text-medical-text-muted mt-2">Select a module to get started</p>
         </div>
 
-        {/* Enhanced Stats with animations */}
+        {/* Quick Stats - Optimized with memoized components */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
           <StatCard
             title="Total Patients"
@@ -128,14 +126,14 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* Enhanced Module Cards with Glass Effect */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* Module Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Patient Registration Module - FIRST */}
           <Link href="/patient-registration">
-            <Card className="glass-card cursor-pointer group animate-delay-100">
-              <div className="gradient-bg-secondary p-6 rounded-t-xl">
-                <UserPlus className="text-white text-3xl mb-4 float-icon" />
-                <h3 className="text-xl font-bold text-white group-hover:scale-105 transition-transform">Patient Registration & Consultation</h3>
+            <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
+              <div className="bg-green-600 p-6">
+                <UserPlus className="text-white text-3xl mb-4" />
+                <h3 className="text-xl font-bold text-white">Patient Registration & Consultation</h3>
               </div>
               <CardContent className="p-6">
                 <p className="text-medical-text-muted mb-4">Central patient registration with unique ID for all modules</p>
@@ -163,10 +161,10 @@ export default function Dashboard() {
 
           {/* Laboratory Module - SECOND */}
           <Link href="/lab">
-            <Card className="glass-card cursor-pointer group animate-delay-200">
-              <div className="gradient-bg-primary p-6 rounded-t-xl">
-                <FlaskConical className="text-white text-3xl mb-4 float-icon" />
-                <h3 className="text-xl font-bold text-white group-hover:scale-105 transition-transform">Laboratory</h3>
+            <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
+              <div className="bg-medical-primary p-6">
+                <FlaskConical className="text-white text-3xl mb-4" />
+                <h3 className="text-xl font-bold text-white">Laboratory</h3>
               </div>
               <CardContent className="p-6">
                 <p className="text-medical-text-muted mb-4">Manage lab tests, enter results, and generate reports</p>
@@ -194,10 +192,10 @@ export default function Dashboard() {
 
           {/* Pharmacy Module - THIRD */}
           <Link href="/pharmacy">
-            <Card className="glass-card cursor-pointer group animate-delay-300">
-              <div className="gradient-bg-secondary p-6 rounded-t-xl">
-                <Pill className="text-white text-3xl mb-4 float-icon" />
-                <h3 className="text-xl font-bold text-white group-hover:scale-105 transition-transform">Pharmacy</h3>
+            <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
+              <div className="bg-medical-secondary p-6">
+                <Pill className="text-white text-3xl mb-4" />
+                <h3 className="text-xl font-bold text-white">Pharmacy</h3>
               </div>
               <CardContent className="p-6">
                 <p className="text-medical-text-muted mb-4">Handle prescriptions, inventory, and billing</p>
@@ -225,10 +223,10 @@ export default function Dashboard() {
 
           {/* Discharge Summary Module - FOURTH */}
           <Link href="/discharge">
-            <Card className="glass-card cursor-pointer group animate-delay-400">
-              <div className="bg-gradient-to-br from-amber-500 to-orange-600 p-6 rounded-t-xl">
-                <FileText className="text-white text-3xl mb-4 float-icon" />
-                <h3 className="text-xl font-bold text-white group-hover:scale-105 transition-transform">Discharge Summary</h3>
+            <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
+              <div className="bg-medical-warning p-6">
+                <FileText className="text-white text-3xl mb-4" />
+                <h3 className="text-xl font-bold text-white">Discharge Summary</h3>
               </div>
               <CardContent className="p-6">
                 <p className="text-medical-text-muted mb-4">Create and manage patient discharge summaries</p>
@@ -256,10 +254,10 @@ export default function Dashboard() {
 
           {/* Surgical Case Sheet Module - FIFTH */}
           <Link href="/surgical-case-sheets">
-            <Card className="glass-card cursor-pointer group animate-delay-500">
-              <div className="bg-gradient-to-br from-red-500 to-rose-600 p-6 rounded-t-xl">
-                <Scissors className="text-white text-3xl mb-4 float-icon" />
-                <h3 className="text-xl font-bold text-white group-hover:scale-105 transition-transform">Surgical Case Sheet</h3>
+            <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
+              <div className="bg-red-600 p-6">
+                <Scissors className="text-white text-3xl mb-4" />
+                <h3 className="text-xl font-bold text-white">Surgical Case Sheet</h3>
               </div>
               <CardContent className="p-6">
                 <p className="text-medical-text-muted mb-4">Create and manage surgical case sheets with downloadable forms</p>
@@ -287,10 +285,10 @@ export default function Dashboard() {
 
           {/* Track Patient (Medical History) Module - SIXTH */}
           <Link href="/medical-history">
-            <Card className="glass-card cursor-pointer group">
-              <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-6 rounded-t-xl">
-                <Heart className="text-white text-3xl mb-4 float-icon" />
-                <h3 className="text-xl font-bold text-white group-hover:scale-105 transition-transform">Track Patient</h3>
+            <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white shadow-lg rounded-xl">
+              <div className="bg-medical-accent p-6">
+                <Heart className="text-white text-3xl mb-4" />
+                <h3 className="text-xl font-bold text-white">Track Patient</h3>
               </div>
               <CardContent className="p-6">
                 <p className="text-medical-text-muted mb-4">Track patient medical history, conditions, and profiles</p>
