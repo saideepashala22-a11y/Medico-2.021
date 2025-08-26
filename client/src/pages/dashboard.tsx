@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { ChatWidget } from '@/components/ChatWidget';
+import { EditDoctorDialog } from '@/components/EditDoctorDialog';
 import { 
   Hospital, 
   LogOut, 
@@ -54,7 +55,10 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-medical-primary-light">{user?.name}</span>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-medical-primary-light">{user?.name}</span>
+                {user?.role === 'doctor' && <EditDoctorDialog />}
+              </div>
               <span className="bg-medical-secondary text-white px-2 py-1 rounded-full text-xs">
                 {user?.role === 'doctor' ? 'Doctor' : 'Staff'}
               </span>

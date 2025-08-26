@@ -18,6 +18,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUserOTP(username: string, otp: string, expiresAt: Date): Promise<boolean>;
   resetUserPassword(username: string, newPassword: string): Promise<boolean>;
+  updateUser(id: string, updates: Partial<Pick<User, 'name' | 'username' | 'phoneNumber'>>): Promise<User>;
   
   // Patients
   getPatient(id: string): Promise<Patient | undefined>;
@@ -186,6 +187,15 @@ export class DatabaseStorage implements IStorage {
       console.error('Error resetting user password:', error);
       return false;
     }
+  }
+
+  async updateUser(id: string, updates: Partial<Pick<User, 'name' | 'username' | 'phoneNumber'>>): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser;
   }
 
   async getPatient(id: string): Promise<Patient | undefined> {

@@ -5,6 +5,7 @@ interface User {
   username: string;
   role: string;
   name: string;
+  phoneNumber?: string;
 }
 
 interface AuthContextType {
@@ -12,6 +13,7 @@ interface AuthContextType {
   token: string | null;
   login: (username: string, password: string, role: string) => Promise<void>;
   logout: () => void;
+  updateUser: (userData: Partial<Pick<User, 'name' | 'username' | 'phoneNumber'>>) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -81,8 +83,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.location.href = '/login';
   };
 
+  const updateUser = async (userData: Partial<Pick<User, 'name' | 'username' | 'phoneNumber'>>) => {
+    if (!token) throw new Error('No authentication token');
+    
+    try {
+      const response = await fetch('/api/auth/me', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUser(data);
+      } else {
+        throw new Error(data.message || 'Update failed');
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, token, login, logout, updateUser, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

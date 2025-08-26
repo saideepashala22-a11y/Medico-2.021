@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema, insertConsultationSchema, insertLabTestDefinitionSchema, insertSurgicalCaseSheetSchema, insertPatientsRegistrationSchema, insertMedicineInventorySchema, insertHospitalSettingsSchema } from "@shared/schema";
+import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema, insertConsultationSchema, insertLabTestDefinitionSchema, insertSurgicalCaseSheetSchema, insertPatientsRegistrationSchema, insertMedicineInventorySchema, insertHospitalSettingsSchema, type User } from "@shared/schema";
 import { z } from "zod";
 import { generateChatResponse, generateMedicalAssistance } from "./gemini";
 import { sendOTP, generateOTP } from "./twilioService";
@@ -105,6 +105,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { password, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
     } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.put('/api/auth/me', authenticateToken, async (req: any, res) => {
+    try {
+      const { name, username, phoneNumber } = req.body;
+      
+      // Validate input
+      if (!name?.trim()) {
+        return res.status(400).json({ message: 'Name is required' });
+      }
+
+      // Check if username is being changed and if it already exists
+      if (username && username !== req.user.username) {
+        const existingUser = await storage.getUserByUsername(username);
+        if (existingUser && existingUser.id !== req.user.id) {
+          return res.status(409).json({ message: 'Username already exists' });
+        }
+      }
+
+      const updateData: Partial<Pick<User, 'name' | 'username' | 'phoneNumber'>> = {};
+      if (name) updateData.name = name.trim();
+      if (username) updateData.username = username.trim();
+      if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber?.trim() || null;
+
+      const updatedUser = await storage.updateUser(req.user.id, updateData);
+      const { password, ...userWithoutPassword } = updatedUser;
+      
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error('Update user error:', error);
       res.status(500).json({ message: 'Server error' });
     }
   });
