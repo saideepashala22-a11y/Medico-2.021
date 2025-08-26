@@ -55,10 +55,7 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-medical-primary-light">{user?.name}</span>
-                {user?.role === 'doctor' && <EditDoctorDialog />}
-              </div>
+              <span className="text-sm text-medical-primary-light">{user?.name}</span>
               <Button 
                 variant="ghost" 
                 size="sm" 
