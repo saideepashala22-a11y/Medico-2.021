@@ -10,20 +10,26 @@ interface StatCardProps {
   isLoading: boolean;
 }
 
-// Memoized stat card component to prevent unnecessary re-renders
+// Enhanced stat card with modern glass morphism design
 export const StatCard = memo(({ title, value, icon: Icon, iconColor, isLoading }: StatCardProps) => {
   return (
-    <Card>
+    <Card className="stat-card-enhanced group">
       <CardContent className="pt-6">
-        <div className="flex items-center">
-          <div className="flex-shrink-0">
-            <Icon className={`h-8 w-8 ${iconColor}`} />
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
+            <p className="text-3xl font-bold gradient-text">
+              {isLoading ? (
+                <div className="skeleton-modern h-8 w-16 rounded"></div>
+              ) : (
+                <span className="animate-fade-in">{value || 0}</span>
+              )}
+            </p>
           </div>
           <div className="ml-4">
-            <p className="text-sm font-medium text-medical-text-muted">{title}</p>
-            <p className="text-2xl font-bold text-medical-text">
-              {isLoading ? '...' : value || 0}
-            </p>
+            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 group-hover:from-blue-100 group-hover:to-indigo-100 transition-all duration-300">
+              <Icon className={`h-7 w-7 ${iconColor} float-icon`} />
+            </div>
           </div>
         </div>
       </CardContent>

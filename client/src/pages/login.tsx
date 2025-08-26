@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Hospital, Loader2 } from 'lucide-react';
 import { ForgotPasswordModal } from '@/components/ForgotPasswordModal';
+import { FloatingElements } from '@/components/FloatingElements';
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -50,48 +51,51 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-medical-primary to-medical-info">
-      <Card className="w-full max-w-md shadow-2xl">
+    <div className="min-h-screen flex items-center justify-center gradient-bg-page relative">
+      <FloatingElements />
+      <Card className="glass-card w-full max-w-md animate-scale-in">
         <CardHeader className="text-center">
-          <div className="mx-auto h-12 w-12 bg-medical-primary rounded-full flex items-center justify-center mb-4">
-            <Hospital className="text-white text-xl" />
+          <div className="mx-auto h-16 w-16 gradient-bg-primary rounded-full flex items-center justify-center mb-6 float-icon">
+            <Hospital className="text-white text-2xl" />
           </div>
-          <CardTitle className="text-2xl font-bold text-medical-text">Hospital Management</CardTitle>
-          <p className="text-medical-text-muted mt-2">Sign in to your account</p>
+          <CardTitle className="text-3xl font-bold gradient-text mb-2">Hospital Management</CardTitle>
+          <p className="text-lg text-gray-600">Welcome back to your digital healthcare platform</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
-            <div>
-              <Label htmlFor="username">Username</Label>
+            <div className="space-y-2">
+              <Label htmlFor="username" className="font-medium text-gray-700">Username</Label>
               <Input
                 id="username"
                 type="text"
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                placeholder="Enter username"
+                placeholder="Enter your username"
                 autoComplete="username"
+                className="modern-input"
                 required
               />
             </div>
             
-            <div>
-              <Label htmlFor="password">Password</Label>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="font-medium text-gray-700">Password</Label>
               <Input
                 id="password"
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                placeholder="Enter password"
+                placeholder="Enter your password"
                 autoComplete="new-password"
+                className="modern-input"
                 required
               />
             </div>
             
-            <div>
-              <Label htmlFor="role">Role</Label>
+            <div className="space-y-2">
+              <Label htmlFor="role" className="font-medium text-gray-700">Role</Label>
               <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Role" />
+                <SelectTrigger className="modern-input">
+                  <SelectValue placeholder="Select your role" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="doctor">Doctor/Admin</SelectItem>
@@ -102,7 +106,7 @@ export default function Login() {
             
             <Button 
               type="submit" 
-              className="w-full bg-medical-primary hover:bg-medical-primary-dark text-white shadow-lg"
+              className="btn-modern w-full text-white shadow-lg transform transition-all duration-200 hover:scale-105"
               disabled={isLoading}
               data-testid="button-login"
             >
@@ -117,10 +121,10 @@ export default function Login() {
             </Button>
           </form>
           
-          <div className="mt-4 text-center">
+          <div className="mt-6 text-center">
             <button
               type="button"
-              className="text-sm text-medical-primary hover:text-medical-primary-dark underline"
+              className="text-sm gradient-text hover:opacity-80 underline transition-opacity"
               onClick={() => setShowForgotPassword(true)}
               data-testid="link-forgot-password"
             >
