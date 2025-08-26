@@ -5,6 +5,8 @@ import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { ChatWidget } from '@/components/ChatWidget';
 import { EditDoctorDialog } from '@/components/EditDoctorDialog';
+import { StatCard } from '@/components/StatCard';
+import { memo, useMemo } from 'react';
 import { 
   Hospital, 
   LogOut, 
@@ -23,11 +25,14 @@ import {
 export default function Dashboard() {
   const { user, logout } = useAuth();
 
+  // Cache stats for 30 seconds to avoid constant refetching
   const { data: stats, isLoading } = useQuery({
     queryKey: ['/api/stats'],
+    staleTime: 30 * 1000, // Cache for 30 seconds
+    refetchInterval: 60 * 1000, // Auto-refresh every minute
   });
 
-  // Fetch hospital settings for dynamic title
+  // Fetch hospital settings for dynamic title (cached for 5 minutes)
   const { data: hospitalSettings } = useQuery<{
     hospitalName: string;
     hospitalSubtitle?: string;
@@ -37,7 +42,7 @@ export default function Dashboard() {
     accreditation?: string;
   }>({
     queryKey: ['/api/hospital-settings'],
-    staleTime: 0, // Always fetch fresh data
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   return (
@@ -82,88 +87,43 @@ export default function Dashboard() {
           <p className="text-medical-text-muted mt-2">Select a module to get started</p>
         </div>
 
-        {/* Quick Stats */}
+        {/* Quick Stats - Optimized with memoized components */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Users className="h-8 w-8 text-medical-primary" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-medical-text-muted">Total Patients</p>
-                  <p className="text-2xl font-bold text-medical-text">
-                    {isLoading ? '...' : (stats as any)?.totalPatients || 0}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <TestTube className="h-8 w-8 text-medical-secondary" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-medical-text-muted">Lab Tests Today</p>
-                  <p className="text-2xl font-bold text-medical-text">
-                    {isLoading ? '...' : (stats as any)?.labTestsToday || 0}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Pill className="h-8 w-8 text-medical-indigo" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-medical-text-muted">Prescriptions</p>
-                  <p className="text-2xl font-bold text-medical-text">
-                    {isLoading ? '...' : (stats as any)?.prescriptionsToday || 0}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <FileCheck className="h-8 w-8 text-medical-warning" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-medical-text-muted">Discharges</p>
-                  <p className="text-2xl font-bold text-medical-text">
-                    {isLoading ? '...' : (stats as any)?.dischargesToday || 0}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Scissors className="h-8 w-8 text-red-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-medical-text-muted">Surgery Cases</p>
-                  <p className="text-2xl font-bold text-medical-text">
-                    {isLoading ? '...' : (stats as any)?.surgicalCasesToday || 0}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <StatCard
+            title="Total Patients"
+            value={(stats as any)?.totalPatients}
+            icon={Users}
+            iconColor="text-medical-primary"
+            isLoading={isLoading}
+          />
+          <StatCard
+            title="Lab Tests Today"
+            value={(stats as any)?.labTestsToday}
+            icon={TestTube}
+            iconColor="text-medical-secondary"
+            isLoading={isLoading}
+          />
+          <StatCard
+            title="Prescriptions"
+            value={(stats as any)?.prescriptionsToday}
+            icon={Pill}
+            iconColor="text-medical-indigo"
+            isLoading={isLoading}
+          />
+          <StatCard
+            title="Discharges"
+            value={(stats as any)?.dischargesToday}
+            icon={FileCheck}
+            iconColor="text-medical-warning"
+            isLoading={isLoading}
+          />
+          <StatCard
+            title="Surgery Cases"
+            value={(stats as any)?.surgicalCasesToday}
+            icon={Scissors}
+            iconColor="text-red-600"
+            isLoading={isLoading}
+          />
         </div>
 
         {/* Module Cards */}

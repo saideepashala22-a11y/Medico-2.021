@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { useAuth } from '@/hooks/use-auth-simple';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
+import { useDebounce } from '@/hooks/useDebounce';
 import { apiRequest } from '@/lib/queryClient';
 import { Link } from 'wouter';
 import { 
@@ -82,10 +83,14 @@ export default function MedicalHistory() {
   const [isAddingEntry, setIsAddingEntry] = useState(false);
   const [editingEntry, setEditingEntry] = useState<MedicalHistoryEntry | null>(null);
 
-  // Search for patients
+  // Debounce search term for better performance
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  // Search for patients with debounced term
   const { data: searchResults, isLoading: searchLoading } = useQuery<Patient[]>({
-    queryKey: ['/api/patients/search', searchTerm],
-    enabled: searchTerm.length > 2,
+    queryKey: ['/api/patients/search', debouncedSearchTerm],
+    enabled: debouncedSearchTerm.length > 2,
+    staleTime: 30 * 1000, // Cache for 30 seconds
   });
 
   // Get patient profile
