@@ -1070,14 +1070,17 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
       const { password, isOwner, ...doctorData } = req.body;
       
       // Validate required fields
-      if (!doctorData.name || !doctorData.email || !password) {
-        return res.status(400).json({ message: 'Name, email, and password are required' });
+      if (!doctorData.name || !password) {
+        return res.status(400).json({ message: 'Name and password are required' });
       }
 
-      // Check if email already exists
-      const existingUser = await storage.getUserByUsername(doctorData.email);
+      // Generate username from email if provided, otherwise use name-based username
+      const username = doctorData.email || `${doctorData.name.toLowerCase().replace(/\s+/g, '.')}@${Date.now()}`;
+
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(username);
       if (existingUser) {
-        return res.status(409).json({ message: 'Email already exists' });
+        return res.status(409).json({ message: 'Username already exists' });
       }
 
       // Hash password
@@ -1085,11 +1088,11 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
       const hashedPassword = await bcrypt.hash(password, 10);
       
       const newDoctor = await storage.createUser({
-        username: doctorData.email, // Use email as username
+        username: username,
         password: hashedPassword,
         role: 'doctor',
         name: doctorData.name,
-        email: doctorData.email,
+        email: doctorData.email || null,
         phoneNumber: doctorData.phone || null,
         specialization: doctorData.specialization || null,
         licenseNumber: doctorData.licenseNumber || null,

@@ -137,10 +137,10 @@ export default function DoctorsManagement() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!doctorForm.name || !doctorForm.email || !doctorForm.password) {
+    if (!doctorForm.name || !doctorForm.password) {
       toast({
         title: 'Error',
-        description: 'Please fill in all required fields',
+        description: 'Please fill in all required fields (Name and Password)',
         variant: 'destructive',
       });
       return;
@@ -207,14 +207,13 @@ export default function DoctorsManagement() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
                       value={doctorForm.email}
                       onChange={(e) => setDoctorForm({...doctorForm, email: e.target.value})}
                       placeholder="doctor@hospital.com"
-                      required
                     />
                   </div>
                   <div>
