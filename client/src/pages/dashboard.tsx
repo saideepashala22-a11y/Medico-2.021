@@ -32,7 +32,9 @@ import {
   Activity,
   TrendingUp,
   AlertTriangle,
-  Clock
+  Clock,
+  RefreshCw,
+  UserCheck
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -137,6 +139,29 @@ export default function Dashboard() {
                       <div className="font-medium">{user?.name}</div>
                       <div className="text-gray-500 dark:text-gray-400 capitalize">{user?.role}</div>
                     </div>
+                    <button
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        // Add logic to switch doctor/user account
+                        alert('Switch Doctor functionality - This will allow changing to another doctor account');
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <RefreshCw className="inline w-4 h-4 mr-2" />
+                      Switch Doctor
+                    </button>
+                    <button
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        // Add logic to add new doctor
+                        alert('Add New Doctor functionality - This will allow adding a new doctor to the system');
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <UserCheck className="inline w-4 h-4 mr-2" />
+                      Add New Doctor
+                    </button>
+                    <div className="border-t dark:border-gray-700 my-1"></div>
                     <Link href="/settings">
                       <button
                         className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
