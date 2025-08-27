@@ -20,6 +20,11 @@ export interface IStorage {
   resetUserPassword(username: string, newPassword: string): Promise<boolean>;
   updateUser(id: string, updates: Partial<Pick<User, 'name' | 'username' | 'phoneNumber'>>): Promise<User>;
   
+  // Doctor Management
+  getAllDoctors(): Promise<User[]>;
+  updateDoctorOwnerStatus(doctorId: string, isOwner: boolean): Promise<User>;
+  deleteDoctor(doctorId: string): Promise<void>;
+  
   // Patients
   getPatient(id: string): Promise<Patient | undefined>;
   getPatientByPatientId(patientId: string): Promise<Patient | undefined>;
@@ -196,6 +201,39 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, id))
       .returning();
     return updatedUser;
+  }
+
+  // Doctor Management Methods
+  async getAllDoctors(): Promise<User[]> {
+    const doctors = await db
+      .select()
+      .from(users)
+      .where(eq(users.role, 'doctor'))
+      .orderBy(desc(users.createdAt));
+    return doctors;
+  }
+
+  async updateDoctorOwnerStatus(doctorId: string, isOwner: boolean): Promise<User> {
+    // If setting this doctor as owner, first remove owner status from all other doctors
+    if (isOwner) {
+      await db
+        .update(users)
+        .set({ isOwner: false })
+        .where(eq(users.role, 'doctor'));
+    }
+    
+    const [updatedDoctor] = await db
+      .update(users)
+      .set({ isOwner })
+      .where(eq(users.id, doctorId))
+      .returning();
+    return updatedDoctor;
+  }
+
+  async deleteDoctor(doctorId: string): Promise<void> {
+    await db
+      .delete(users)
+      .where(eq(users.id, doctorId));
   }
 
   async getPatient(id: string): Promise<Patient | undefined> {

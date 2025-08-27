@@ -1054,6 +1054,89 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
     }
   });
 
+  // Doctor Management API
+  app.get('/api/doctors', authenticateToken, async (req, res) => {
+    try {
+      const doctors = await storage.getAllDoctors();
+      res.json(doctors);
+    } catch (error) {
+      console.error('Error fetching doctors:', error);
+      res.status(500).json({ message: 'Failed to fetch doctors' });
+    }
+  });
+
+  app.post('/api/doctors', authenticateToken, async (req, res) => {
+    try {
+      const { password, isOwner, ...doctorData } = req.body;
+      
+      // Validate required fields
+      if (!doctorData.name || !doctorData.email || !password) {
+        return res.status(400).json({ message: 'Name, email, and password are required' });
+      }
+
+      // Check if email already exists
+      const existingUser = await storage.getUserByUsername(doctorData.email);
+      if (existingUser) {
+        return res.status(409).json({ message: 'Email already exists' });
+      }
+
+      // Hash password
+      const bcrypt = await import('bcryptjs');
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      const newDoctor = await storage.createUser({
+        username: doctorData.email, // Use email as username
+        password: hashedPassword,
+        role: 'doctor',
+        name: doctorData.name,
+        email: doctorData.email,
+        phoneNumber: doctorData.phone || null,
+        specialization: doctorData.specialization || null,
+        licenseNumber: doctorData.licenseNumber || null,
+        isOwner: isOwner || false,
+        isActive: true,
+      });
+
+      const { password: _, ...doctorWithoutPassword } = newDoctor;
+      res.status(201).json(doctorWithoutPassword);
+    } catch (error) {
+      console.error('Error creating doctor:', error);
+      res.status(500).json({ message: 'Failed to create doctor' });
+    }
+  });
+
+  app.patch('/api/doctors/:id/owner', authenticateToken, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { isOwner } = req.body;
+      
+      const updatedDoctor = await storage.updateDoctorOwnerStatus(id, isOwner);
+      const { password, ...doctorWithoutPassword } = updatedDoctor;
+      res.json(doctorWithoutPassword);
+    } catch (error) {
+      console.error('Error updating doctor owner status:', error);
+      res.status(500).json({ message: 'Failed to update doctor status' });
+    }
+  });
+
+  app.delete('/api/doctors/:id', authenticateToken, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Check if doctor is owner
+      const doctor = await storage.getUser(id);
+      if (doctor?.isOwner) {
+        return res.status(400).json({ message: 'Cannot delete hospital owner' });
+      }
+      
+      await storage.deleteDoctor(id);
+      res.json({ message: 'Doctor deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting doctor:', error);
+      res.status(500).json({ message: 'Failed to delete doctor' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

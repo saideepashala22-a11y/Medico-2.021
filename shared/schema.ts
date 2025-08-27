@@ -9,7 +9,12 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   role: text("role").notNull(), // 'doctor' or 'staff'
   name: text("name").notNull(),
+  email: text("email"),
   phoneNumber: text("phone_number"), // For OTP sending
+  specialization: text("specialization"), // Medical specialization for doctors
+  licenseNumber: text("license_number"), // Medical license number for doctors
+  isOwner: boolean("is_owner").notNull().default(false), // Hospital owner designation
+  isActive: boolean("is_active").notNull().default(true), // Account status
   resetOtp: text("reset_otp"), // Current OTP for password reset
   otpExpires: timestamp("otp_expires"), // OTP expiration time
   createdAt: timestamp("created_at").defaultNow().notNull(),
