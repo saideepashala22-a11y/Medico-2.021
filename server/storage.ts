@@ -22,6 +22,8 @@ export interface IStorage {
   
   // Doctor Management
   getAllDoctors(): Promise<User[]>;
+  setCurrentDoctor(doctorId: string): Promise<User>;
+  getCurrentDoctor(): Promise<User | undefined>;
   updateDoctorOwnerStatus(doctorId: string, isOwner: boolean): Promise<User>;
   deleteDoctor(doctorId: string): Promise<void>;
   
@@ -211,6 +213,30 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.role, 'doctor'))
       .orderBy(desc(users.createdAt));
     return doctors;
+  }
+
+  async setCurrentDoctor(doctorId: string): Promise<User> {
+    // First, remove current status from all doctors
+    await db
+      .update(users)
+      .set({ isCurrent: false })
+      .where(eq(users.role, 'doctor'));
+    
+    // Then set the selected doctor as current
+    const [updatedDoctor] = await db
+      .update(users)
+      .set({ isCurrent: true })
+      .where(eq(users.id, doctorId))
+      .returning();
+    return updatedDoctor;
+  }
+
+  async getCurrentDoctor(): Promise<User | undefined> {
+    const [currentDoctor] = await db
+      .select()
+      .from(users)
+      .where(and(eq(users.role, 'doctor'), eq(users.isCurrent, true)));
+    return currentDoctor || undefined;
   }
 
   async updateDoctorOwnerStatus(doctorId: string, isOwner: boolean): Promise<User> {

@@ -14,6 +14,7 @@ export const users = pgTable("users", {
   specialization: text("specialization"), // Medical specialization for doctors
   licenseNumber: text("license_number"), // Medical license number for doctors
   isOwner: boolean("is_owner").notNull().default(false), // Hospital owner designation
+  isCurrent: boolean("is_current").notNull().default(false), // Currently selected doctor for reports
   isActive: boolean("is_active").notNull().default(true), // Account status
   resetOtp: text("reset_otp"), // Current OTP for password reset
   otpExpires: timestamp("otp_expires"), // OTP expiration time

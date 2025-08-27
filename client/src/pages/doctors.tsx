@@ -21,7 +21,8 @@ import {
   Phone,
   Mail,
   Calendar,
-  Shield
+  Shield,
+  UserCheck
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -34,6 +35,7 @@ interface Doctor {
   licenseNumber?: string;
   isOwner: boolean;
   isActive: boolean;
+  isCurrent: boolean; // Currently selected doctor for reports
   createdAt: string;
 }
 
@@ -84,6 +86,28 @@ export default function DoctorsManagement() {
       toast({
         title: 'Error',
         description: error.message || 'Failed to add doctor',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Set current doctor for reports
+  const setCurrentDoctorMutation = useMutation({
+    mutationFn: async (doctorId: string) => {
+      const response = await apiRequest('PATCH', `/api/doctors/${doctorId}/current`, {});
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/doctors'] });
+      toast({
+        title: 'Success',
+        description: 'Current doctor updated',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to set current doctor',
         variant: 'destructive',
       });
     },
@@ -145,6 +169,10 @@ export default function DoctorsManagement() {
     }
 
     addDoctorMutation.mutate(doctorForm);
+  };
+
+  const handleSetCurrent = (doctorId: string) => {
+    setCurrentDoctorMutation.mutate(doctorId);
   };
 
   const handleSetOwner = (doctorId: string, isOwner: boolean) => {
@@ -303,6 +331,11 @@ export default function DoctorsManagement() {
                           <div>
                             <div className="font-medium flex items-center">
                               {doctor.name}
+                              {doctor.isCurrent && (
+                                <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 rounded-full">
+                                  Current
+                                </span>
+                              )}
                               {doctor.isOwner && (
                                 <Crown className="w-4 h-4 ml-2 text-yellow-500" />
                               )}
@@ -332,6 +365,11 @@ export default function DoctorsManagement() {
                           <Badge variant={doctor.isActive ? "default" : "secondary"}>
                             {doctor.isActive ? 'Active' : 'Inactive'}
                           </Badge>
+                          {doctor.isCurrent && (
+                            <Badge variant="outline" className="text-green-600 border-green-600">
+                              Current
+                            </Badge>
+                          )}
                           {doctor.isOwner && (
                             <Badge variant="outline" className="text-yellow-600 border-yellow-600">
                               Owner
@@ -343,9 +381,19 @@ export default function DoctorsManagement() {
                         <div className="flex space-x-2">
                           <Button
                             size="sm"
+                            variant={doctor.isCurrent ? "default" : "outline"}
+                            onClick={() => handleSetCurrent(doctor.id)}
+                            disabled={setCurrentDoctorMutation.isPending}
+                            title="Set as current doctor for reports"
+                          >
+                            <UserCheck className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
                             variant={doctor.isOwner ? "outline" : "default"}
                             onClick={() => handleSetOwner(doctor.id, !doctor.isOwner)}
                             disabled={updateOwnerMutation.isPending}
+                            title="Set as hospital owner"
                           >
                             <Crown className="h-3 w-3" />
                           </Button>
@@ -355,6 +403,7 @@ export default function DoctorsManagement() {
                             onClick={() => handleDelete(doctor.id)}
                             disabled={deleteDoctorMutation.isPending || doctor.isOwner}
                             className="text-red-600 hover:text-red-700"
+                            title="Delete doctor"
                           >
                             <Trash2 className="h-3 w-3" />
                           </Button>

@@ -1087,6 +1087,7 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
         specialization: doctorData.specialization || null,
         licenseNumber: doctorData.licenseNumber || null,
         isOwner: isOwner || false,
+        isCurrent: false,
         isActive: true,
       });
 
@@ -1095,6 +1096,34 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
     } catch (error) {
       console.error('Error creating doctor:', error);
       res.status(500).json({ message: 'Failed to create doctor' });
+    }
+  });
+
+  app.patch('/api/doctors/:id/current', authenticateToken, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const updatedDoctor = await storage.setCurrentDoctor(id);
+      const { password, ...doctorWithoutPassword } = updatedDoctor;
+      res.json(doctorWithoutPassword);
+    } catch (error) {
+      console.error('Error setting current doctor:', error);
+      res.status(500).json({ message: 'Failed to set current doctor' });
+    }
+  });
+
+  app.get('/api/current-doctor', authenticateToken, async (req, res) => {
+    try {
+      const currentDoctor = await storage.getCurrentDoctor();
+      if (currentDoctor) {
+        const { password, ...doctorWithoutPassword } = currentDoctor;
+        res.json(doctorWithoutPassword);
+      } else {
+        res.json(null);
+      }
+    } catch (error) {
+      console.error('Error fetching current doctor:', error);
+      res.status(500).json({ message: 'Failed to fetch current doctor' });
     }
   });
 
