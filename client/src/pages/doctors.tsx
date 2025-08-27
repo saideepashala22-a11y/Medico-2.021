@@ -386,7 +386,7 @@ export default function DoctorsManagement() {
                             disabled={setCurrentDoctorMutation.isPending}
                             title="Set as current doctor for reports"
                           >
-                            <UserCheck className="h-3 w-3" />
+                            <User className="h-3 w-3" />
                           </Button>
                           <Button
                             size="sm"
