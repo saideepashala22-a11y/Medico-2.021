@@ -72,11 +72,16 @@ function useTheme() {
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
 
+  const handleToggle = () => {
+    console.log('Theme toggle clicked, current theme:', theme);
+    toggleTheme();
+  };
+
   return (
     <Button
       variant="ghost"
       size="sm"
-      onClick={toggleTheme}
+      onClick={handleToggle}
       className="relative overflow-hidden transition-all duration-300 hover:scale-105"
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >
