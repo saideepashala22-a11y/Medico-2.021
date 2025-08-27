@@ -30,7 +30,9 @@ import {
   Plus,
   Calendar,
   Activity,
-  TrendingUp
+  TrendingUp,
+  AlertTriangle,
+  Clock
 } from 'lucide-react';
 
 export default function Dashboard() {
