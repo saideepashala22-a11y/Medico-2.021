@@ -104,7 +104,14 @@ export default function Dashboard() {
             
             {/* Right: Notifications + User Profile */}
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" className="relative">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="relative"
+                onClick={() => {
+                  alert('You have 3 new notifications:\n\n• New patient registered (John Doe)\n• Lab test completed (Patient #102)\n• Discharge summary ready (Mary Smith)');
+                }}
+              >
                 <Bell className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">3</span>
               </Button>
@@ -216,7 +223,7 @@ export default function Dashboard() {
                 <Link href="/pharmacy">
                   <Button className="bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
                     <Pill className="mr-2 h-4 w-4" />
-                    Add Prescription
+                    Add Medicines
                   </Button>
                 </Link>
                 <Link href="/lab">
