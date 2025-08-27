@@ -558,6 +558,12 @@ html.dark body,
   color: hsl(220 13% 91%) !important;
 }
 
+/* Force dark mode on the main background */
+html.dark .min-h-screen,
+.dark .min-h-screen {
+  background-color: hsl(210 20% 8%) !important;
+}
+
 html.dark .bg-white,
 .dark .bg-white,
 html.dark .bg-medical-background,
