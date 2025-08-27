@@ -258,7 +258,16 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                <Button variant="outline" className="w-full text-sm">
+                <Button 
+                  variant="outline" 
+                  className="w-full text-sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setNotificationsOpen(false);
+                    // You can navigate to a notifications page here
+                    alert('This would navigate to a full notifications page showing all notifications with search, filters, and mark as read functionality.');
+                  }}
+                >
                   View All Notifications
                 </Button>
               </div>
