@@ -30,8 +30,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Add current theme class
     root.classList.add(theme);
     
+    // Also set data attribute for better CSS targeting
+    root.setAttribute('data-theme', theme);
+    
     // Save to localStorage
     localStorage.setItem('hospital-theme', theme);
+    
+    console.log('Theme changed to:', theme); // Debug log
   }, [theme]);
 
   const setTheme = (newTheme: Theme) => {

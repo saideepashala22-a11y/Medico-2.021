@@ -543,3 +543,24 @@
 .border-medical-border {
   border-color: hsl(var(--medical-border));
 }
+
+/* Force dark mode styles */
+.dark .bg-medical-background,
+[data-theme="dark"] .bg-medical-background {
+  background-color: hsl(210 20% 8%) !important;
+}
+
+.dark .bg-medical-card,
+[data-theme="dark"] .bg-medical-card {
+  background-color: hsl(210 20% 12%) !important;
+}
+
+.dark .text-medical-text,
+[data-theme="dark"] .text-medical-text {
+  color: hsl(220 13% 91%) !important;
+}
+
+.dark .text-medical-text-muted,
+[data-theme="dark"] .text-medical-text-muted {
+  color: hsl(217 10% 64%) !important;
+}
