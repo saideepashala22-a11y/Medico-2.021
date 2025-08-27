@@ -41,6 +41,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [showAllNotifications, setShowAllNotifications] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   // Cache stats for 30 seconds to avoid constant refetching
   const { data: stats, isLoading } = useQuery({
@@ -118,12 +119,46 @@ export default function Dashboard() {
                 <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">3</span>
               </Button>
               <ThemeToggle />
-              <Button variant="ghost" size="sm">
-                <User className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="sm" onClick={logout} className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                <LogOut className="h-5 w-5" />
-              </Button>
+              <div className="relative">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center space-x-2"
+                >
+                  <User className="h-5 w-5" />
+                  <span className="hidden md:block text-sm">{user?.name}</span>
+                </Button>
+                
+                {/* User Dropdown Menu */}
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border dark:border-gray-700">
+                    <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border-b dark:border-gray-700">
+                      <div className="font-medium">{user?.name}</div>
+                      <div className="text-gray-500 dark:text-gray-400 capitalize">{user?.role}</div>
+                    </div>
+                    <Link href="/settings">
+                      <button
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <Settings className="inline w-4 h-4 mr-2" />
+                        Settings
+                      </button>
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        logout();
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <LogOut className="inline w-4 h-4 mr-2" />
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
