@@ -9,17 +9,47 @@ export function ThemeToggle() {
     console.log('Theme toggle clicked, current theme:', theme);
     toggleTheme();
     
-    // Force immediate visual feedback by manually applying styles
+    // Force immediate visual feedback by manually applying styles to everything
     setTimeout(() => {
       const newTheme = theme === 'light' ? 'dark' : 'light';
       console.log('Forcing theme to:', newTheme);
       
+      const root = document.documentElement;
+      const body = document.body;
+      
       if (newTheme === 'dark') {
-        document.body.style.backgroundColor = '#1a1a1a';
-        document.body.style.color = '#ffffff';
+        // Force dark mode on everything
+        root.style.backgroundColor = '#1a1a1a';
+        root.style.color = '#ffffff';
+        body.style.backgroundColor = '#1a1a1a';
+        body.style.color = '#ffffff';
+        
+        // Force all white backgrounds to dark
+        const whiteElements = document.querySelectorAll('.bg-white, .bg-gray-50, .bg-gray-100');
+        whiteElements.forEach(el => {
+          (el as HTMLElement).style.backgroundColor = '#2a2a2a';
+          (el as HTMLElement).style.color = '#ffffff';
+        });
+        
+        // Force all text to white
+        const textElements = document.querySelectorAll('.text-black, .text-gray-900, .text-gray-800');
+        textElements.forEach(el => {
+          (el as HTMLElement).style.color = '#ffffff';
+        });
+        
       } else {
-        document.body.style.backgroundColor = '';
-        document.body.style.color = '';
+        // Reset to light mode
+        root.style.backgroundColor = '';
+        root.style.color = '';
+        body.style.backgroundColor = '';
+        body.style.color = '';
+        
+        // Reset all forced styles
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
+          (el as HTMLElement).style.backgroundColor = '';
+          (el as HTMLElement).style.color = '';
+        });
       }
     }, 100);
   };
