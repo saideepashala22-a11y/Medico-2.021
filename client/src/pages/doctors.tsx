@@ -99,6 +99,7 @@ export default function DoctorsManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/doctors'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/current-doctor'] });
       toast({
         title: 'Success',
         description: 'Current doctor updated',

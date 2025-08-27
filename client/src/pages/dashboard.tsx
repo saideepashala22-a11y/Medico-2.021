@@ -65,6 +65,17 @@ export default function Dashboard() {
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
+  // Fetch current doctor
+  const { data: currentDoctor } = useQuery<{
+    id: string;
+    name: string;
+    email?: string;
+    specialization?: string;
+  }>({
+    queryKey: ['/api/current-doctor'],
+    staleTime: 60000, // 1 minute
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Top Navigation Bar */}
@@ -129,7 +140,7 @@ export default function Dashboard() {
                   className="flex items-center space-x-2"
                 >
                   <User className="h-5 w-5" />
-                  <span className="hidden md:block text-sm">{user?.name}</span>
+                  <span className="hidden md:block text-sm">{currentDoctor?.name || user?.name}</span>
                 </Button>
                 
                 {/* User Dropdown Menu */}
