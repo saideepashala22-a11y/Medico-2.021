@@ -998,13 +998,12 @@ export default function PatientRegistration() {
               {/* Address */}
               <div>
                 <Label htmlFor="address">Address</Label>
-                <Textarea
+                <Input
                   id="address"
                   value={formData.address}
                   onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
                   placeholder="Enter complete address"
                   className="border-gray-300"
-                  rows={3}
                 />
               </div>
 
