@@ -1067,29 +1067,19 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
 
   app.post('/api/doctors', authenticateToken, async (req, res) => {
     try {
-      const { password, isOwner, ...doctorData } = req.body;
+      const { isOwner, ...doctorData } = req.body;
       
       // Validate required fields
-      if (!doctorData.name || !password) {
-        return res.status(400).json({ message: 'Name and password are required' });
+      if (!doctorData.name) {
+        return res.status(400).json({ message: 'Doctor name is required' });
       }
 
-      // Generate username from email if provided, otherwise use name-based username
-      const username = doctorData.email || `${doctorData.name.toLowerCase().replace(/\s+/g, '.')}@${Date.now()}`;
-
-      // Check if username already exists
-      const existingUser = await storage.getUserByUsername(username);
-      if (existingUser) {
-        return res.status(409).json({ message: 'Username already exists' });
-      }
-
-      // Hash password
-      const bcrypt = await import('bcryptjs');
-      const hashedPassword = await bcrypt.hash(password, 10);
+      // Generate unique username for display purposes only
+      const username = `doctor_${doctorData.name.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;
       
       const newDoctor = await storage.createUser({
         username: username,
-        password: hashedPassword,
+        password: 'display_only', // Not used for login
         role: 'doctor',
         name: doctorData.name,
         email: doctorData.email || null,

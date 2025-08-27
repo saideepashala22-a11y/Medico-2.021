@@ -50,7 +50,6 @@ export default function DoctorsManagement() {
     phone: '',
     specialization: '',
     licenseNumber: '',
-    password: '',
     isOwner: false
   });
 
@@ -78,7 +77,6 @@ export default function DoctorsManagement() {
         phone: '',
         specialization: '',
         licenseNumber: '',
-        password: '',
         isOwner: false
       });
     },
@@ -137,10 +135,10 @@ export default function DoctorsManagement() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!doctorForm.name || !doctorForm.password) {
+    if (!doctorForm.name) {
       toast({
         title: 'Error',
-        description: 'Please fill in all required fields (Name and Password)',
+        description: 'Please enter the doctor name',
         variant: 'destructive',
       });
       return;
@@ -241,17 +239,6 @@ export default function DoctorsManagement() {
                       value={doctorForm.licenseNumber}
                       onChange={(e) => setDoctorForm({...doctorForm, licenseNumber: e.target.value})}
                       placeholder="MD123456"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="password">Password *</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      value={doctorForm.password}
-                      onChange={(e) => setDoctorForm({...doctorForm, password: e.target.value})}
-                      placeholder="Enter secure password"
-                      required
                     />
                   </div>
                 </div>
