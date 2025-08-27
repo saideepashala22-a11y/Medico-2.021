@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Hospital, Loader2 } from 'lucide-react';
 import { ForgotPasswordModal } from '@/components/ForgotPasswordModal';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -50,7 +51,10 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-medical-primary to-medical-info">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-medical-primary to-medical-info relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center">
           <div className="mx-auto h-12 w-12 bg-medical-primary rounded-full flex items-center justify-center mb-4">

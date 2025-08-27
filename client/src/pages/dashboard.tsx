@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ChatWidget } from '@/components/ChatWidget';
 import { EditDoctorDialog } from '@/components/EditDoctorDialog';
 import { StatCard } from '@/components/StatCard';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { memo, useMemo } from 'react';
 import { 
   Hospital, 
@@ -46,9 +47,9 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-medical-background">
+    <div className="min-h-screen bg-medical-background dark:bg-medical-background">
       {/* Navigation Header */}
-      <nav className="bg-medical-primary shadow-lg border-b border-gray-200">
+      <nav className="bg-medical-primary dark:bg-medical-primary shadow-lg border-b border-gray-200 dark:border-medical-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
@@ -60,6 +61,7 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              <ThemeToggle />
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -83,8 +85,8 @@ export default function Dashboard() {
       {/* Dashboard Content */}
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="mb-8 animate-fade-in">
-          <h1 className="text-3xl font-bold text-medical-text">Welcome Back</h1>
-          <p className="text-medical-text-muted mt-2">Select a module to get started</p>
+          <h1 className="text-3xl font-bold text-medical-text dark:text-medical-text">Welcome Back</h1>
+          <p className="text-medical-text-muted dark:text-medical-text-muted mt-2">Select a module to get started</p>
         </div>
 
         {/* Quick Stats - Optimized with memoized components */}
@@ -130,7 +132,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Patient Registration Module - FIRST */}
           <Link href="/patient-registration">
-            <Card className="cursor-pointer card-hover bg-white shadow-lg rounded-xl animate-fade-in">
+            <Card className="cursor-pointer card-hover bg-white dark:bg-medical-card shadow-lg rounded-xl animate-fade-in">
               <div className="bg-green-600 p-6">
                 <UserPlus className="text-white text-3xl mb-4 animate-bounce-gentle" />
                 <h3 className="text-xl font-bold text-white">Patient Registration & Consultation</h3>
@@ -161,7 +163,7 @@ export default function Dashboard() {
 
           {/* Laboratory Module - SECOND */}
           <Link href="/lab">
-            <Card className="cursor-pointer card-hover bg-white shadow-lg rounded-xl animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            <Card className="cursor-pointer card-hover bg-white dark:bg-medical-card shadow-lg rounded-xl animate-fade-in" style={{ animationDelay: '0.1s' }}>
               <div className="bg-medical-primary p-6">
                 <FlaskConical className="text-white text-3xl mb-4 animate-bounce-gentle" />
                 <h3 className="text-xl font-bold text-white">Laboratory</h3>
@@ -192,7 +194,7 @@ export default function Dashboard() {
 
           {/* Pharmacy Module - THIRD */}
           <Link href="/pharmacy">
-            <Card className="cursor-pointer card-hover bg-white shadow-lg rounded-xl animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <Card className="cursor-pointer card-hover bg-white dark:bg-medical-card shadow-lg rounded-xl animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <div className="bg-medical-secondary p-6">
                 <Pill className="text-white text-3xl mb-4 animate-bounce-gentle" />
                 <h3 className="text-xl font-bold text-white">Pharmacy</h3>
@@ -223,7 +225,7 @@ export default function Dashboard() {
 
           {/* Discharge Summary Module - FOURTH */}
           <Link href="/discharge">
-            <Card className="cursor-pointer card-hover bg-white shadow-lg rounded-xl animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <Card className="cursor-pointer card-hover bg-white dark:bg-medical-card shadow-lg rounded-xl animate-fade-in" style={{ animationDelay: '0.3s' }}>
               <div className="bg-medical-warning p-6">
                 <FileText className="text-white text-3xl mb-4 animate-bounce-gentle" />
                 <h3 className="text-xl font-bold text-white">Discharge Summary</h3>
@@ -254,7 +256,7 @@ export default function Dashboard() {
 
           {/* Surgical Case Sheet Module - FIFTH */}
           <Link href="/surgical-case-sheets">
-            <Card className="cursor-pointer card-hover bg-white shadow-lg rounded-xl animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <Card className="cursor-pointer card-hover bg-white dark:bg-medical-card shadow-lg rounded-xl animate-fade-in" style={{ animationDelay: '0.4s' }}>
               <div className="bg-red-600 p-6">
                 <Scissors className="text-white text-3xl mb-4 animate-bounce-gentle" />
                 <h3 className="text-xl font-bold text-white">Surgical Case Sheet</h3>
@@ -285,7 +287,7 @@ export default function Dashboard() {
 
           {/* Track Patient (Medical History) Module - SIXTH */}
           <Link href="/medical-history">
-            <Card className="cursor-pointer card-hover bg-white shadow-lg rounded-xl animate-fade-in" style={{ animationDelay: '0.5s' }}>
+            <Card className="cursor-pointer card-hover bg-white dark:bg-medical-card shadow-lg rounded-xl animate-fade-in" style={{ animationDelay: '0.5s' }}>
               <div className="bg-medical-accent p-6">
                 <Heart className="text-white text-3xl mb-4 animate-bounce-gentle" />
                 <h3 className="text-xl font-bold text-white">Track Patient</h3>
