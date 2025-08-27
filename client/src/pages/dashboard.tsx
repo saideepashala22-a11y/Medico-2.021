@@ -112,18 +112,6 @@ export default function Dashboard() {
               <Button variant="ghost" size="sm">
                 <User className="h-5 w-5" />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white" 
-                data-testid="button-settings"
-                onClick={() => {
-                  console.log('Settings button clicked');
-                  window.location.href = '/settings';
-                }}
-              >
-                <Settings className="h-5 w-5" />
-              </Button>
               <Button variant="ghost" size="sm" onClick={logout} className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
                 <LogOut className="h-5 w-5" />
               </Button>
