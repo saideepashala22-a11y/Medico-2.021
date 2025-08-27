@@ -69,7 +69,7 @@ export default function Login() {
                 id="username"
                 type="text"
                 value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value.replace(/\s/g, '') })}
                 placeholder="Enter username"
                 autoComplete="username"
                 required
