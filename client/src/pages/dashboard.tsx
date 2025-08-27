@@ -199,6 +199,11 @@ export default function Dashboard() {
               setNotificationsOpen(false);
             }
           }}
+          onMouseEnter={() => {
+            if (sidebarOpen && window.innerWidth < 1024) {
+              setSidebarOpen(false);
+            }
+          }}
         >
           {/* Notifications Panel */}
           {notificationsOpen && (
