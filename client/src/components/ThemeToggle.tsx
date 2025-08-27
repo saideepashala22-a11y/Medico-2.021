@@ -8,6 +8,20 @@ export function ThemeToggle() {
   const handleToggle = () => {
     console.log('Theme toggle clicked, current theme:', theme);
     toggleTheme();
+    
+    // Force immediate visual feedback by manually applying styles
+    setTimeout(() => {
+      const newTheme = theme === 'light' ? 'dark' : 'light';
+      console.log('Forcing theme to:', newTheme);
+      
+      if (newTheme === 'dark') {
+        document.body.style.backgroundColor = '#1a1a1a';
+        document.body.style.color = '#ffffff';
+      } else {
+        document.body.style.backgroundColor = '';
+        document.body.style.color = '';
+      }
+    }, 100);
   };
 
   return (
