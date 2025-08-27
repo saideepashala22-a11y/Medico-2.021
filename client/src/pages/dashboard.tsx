@@ -38,6 +38,7 @@ export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [showAllNotifications, setShowAllNotifications] = useState(false);
 
   // Cache stats for 30 seconds to avoid constant refetching
   const { data: stats, isLoading } = useQuery({
@@ -223,7 +224,46 @@ export default function Dashboard() {
                   </Button>
                 </div>
               </div>
-              <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
+              <div className={`p-4 space-y-4 overflow-y-auto ${showAllNotifications ? 'max-h-96' : 'max-h-64'}`}>
+                {showAllNotifications && (
+                  <>
+                    {/* Additional notifications when expanded */}
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center">
+                        <Calendar className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">Appointment scheduled</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Dr. Smith scheduled for tomorrow 10 AM</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">8 hours ago</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center">
+                        <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">Critical lab results</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Patient #205 requires immediate attention</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">12 hours ago</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/20 rounded-full flex items-center justify-center">
+                        <Clock className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">Medication reminder</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Update inventory for Ward 2</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">1 day ago</p>
+                      </div>
+                    </div>
+                  </>
+                )}
+                
+                {/* Original 3 notifications */}
                 <div className="flex items-start space-x-3">
                   <div className="w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
                     <UserPlus className="h-4 w-4 text-green-600 dark:text-green-400" />
@@ -258,18 +298,42 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                <Button 
-                  variant="outline" 
-                  className="w-full text-sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setNotificationsOpen(false);
-                    // Navigate to notifications page
-                    window.location.href = '/notifications';
-                  }}
-                >
-                  View All Notifications
-                </Button>
+                {!showAllNotifications ? (
+                  <Button 
+                    variant="outline" 
+                    className="w-full text-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowAllNotifications(true);
+                    }}
+                  >
+                    View All Notifications
+                  </Button>
+                ) : (
+                  <div className="space-y-2">
+                    <Button 
+                      variant="outline" 
+                      className="w-full text-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowAllNotifications(false);
+                      }}
+                    >
+                      Show Less
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      className="w-full text-sm text-blue-600 dark:text-blue-400"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setNotificationsOpen(false);
+                        setShowAllNotifications(false);
+                      }}
+                    >
+                      Mark All as Read
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           )}
