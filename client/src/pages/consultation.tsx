@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import jsPDF from 'jspdf';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface Patient {
   id: string;
@@ -303,9 +304,13 @@ export default function ConsultationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-medical-background">
+    <div className="min-h-screen bg-medical-background dark:bg-gray-900 relative">
+      {/* Theme Toggle */}
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
       {/* Header Navigation */}
-      <nav className="bg-medical-primary shadow-sm border-b">
+      <nav className="bg-medical-primary dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">

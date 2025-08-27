@@ -28,6 +28,7 @@ import {
   Download
 } from 'lucide-react';
 import jsPDF from 'jspdf';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface PatientData {
   id: string;
@@ -739,9 +740,14 @@ export default function PatientRegistration() {
     .slice(0, 5); // Show only latest 5 records
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 relative">
+      {/* Theme Toggle */}
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+      
       {/* Header */}
-      <div className="bg-blue-600 text-white shadow-lg">
+      <div className="bg-blue-600 dark:bg-blue-800 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">

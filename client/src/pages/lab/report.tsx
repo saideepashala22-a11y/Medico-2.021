@@ -14,6 +14,7 @@ import {
   Stethoscope,
 } from "lucide-react";
 import jsPDF from "jspdf";
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const testNames = {
   cbc: "Complete Blood Count (CBC)",
@@ -414,9 +415,13 @@ export default function LabReport() {
   const testTypes = Array.isArray(labTest.testTypes) ? labTest.testTypes : [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 relative">
+      {/* Theme Toggle */}
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
       {/* Header Navigation */}
-      <nav className="bg-white shadow-sm border-b">
+      <nav className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
