@@ -6,7 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import { ChatWidget } from '@/components/ChatWidget';
 import { EditDoctorDialog } from '@/components/EditDoctorDialog';
 import { StatCard } from '@/components/StatCard';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { memo, useMemo } from 'react';
 import { 
   Hospital, 
@@ -61,7 +60,6 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <ThemeToggle />
               <Button 
                 variant="ghost" 
                 size="sm" 
