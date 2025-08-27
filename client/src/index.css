@@ -72,25 +72,31 @@
 }
 
 .dark {
-  --background: hsl(0 0% 0%);
-  --foreground: hsl(200 6.6667% 91.1765%);
-  --card: hsl(228 9.8039% 10%);
-  --card-foreground: hsl(0 0% 85.0980%);
-  --popover: hsl(0 0% 0%);
-  --popover-foreground: hsl(200 6.6667% 91.1765%);
-  --primary: hsl(203.7736 87.6033% 52.5490%);
+  --background: hsl(210 20% 8%);
+  --foreground: hsl(220 13% 91%);
+  --card: hsl(210 20% 12%);
+  --card-foreground: hsl(220 13% 91%);
+  --popover: hsl(210 20% 12%);
+  --popover-foreground: hsl(220 13% 91%);
+  --primary: hsl(214 84% 56%);
   --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(195.0000 15.3846% 94.9020%);
-  --secondary-foreground: hsl(210 25% 7.8431%);
-  --muted: hsl(0 0% 9.4118%);
-  --muted-foreground: hsl(210 3.3898% 46.2745%);
-  --accent: hsl(205.7143 70% 7.8431%);
-  --accent-foreground: hsl(203.7736 87.6033% 52.5490%);
-  --destructive: hsl(356.3033 90.5579% 54.3137%);
-  --destructive-foreground: hsl(0 0% 100%);
-  --border: hsl(210 5.2632% 14.9020%);
-  --input: hsl(207.6923 27.6596% 18.4314%);
-  --ring: hsl(202.8169 89.1213% 53.1373%);
+  --secondary: hsl(210 15% 25%);
+  --secondary-foreground: hsl(217 10% 64%);
+  --muted: hsl(210 15% 25%);
+  --muted-foreground: hsl(217 10% 64%);
+  --accent: hsl(210 15% 25%);
+  --accent-foreground: hsl(220 13% 91%);
+  --destructive: hsl(0 62% 30%);
+  --destructive-foreground: hsl(0 0% 98%);
+  --border: hsl(210 15% 25%);
+  --input: hsl(210 15% 25%);
+  --ring: hsl(220 13% 91%);
+  
+  /* Medical theme colors - dark mode */
+  --medical-primary: hsl(214 84% 56%);
+  --medical-background: hsl(210 20% 8%);
+  --medical-text: hsl(220 13% 91%);
+  --medical-text-muted: hsl(217 10% 64%);
   --chart-1: hsl(203.8863 88.2845% 53.1373%);
   --chart-2: hsl(159.7826 100% 36.0784%);
   --chart-3: hsl(42.0290 92.8251% 56.2745%);
@@ -544,42 +550,52 @@
   border-color: hsl(var(--medical-border));
 }
 
-/* Comprehensive dark mode styles */
+/* Comprehensive dark mode styles with higher specificity */
+html.dark,
+html.dark body,
 .dark {
   background-color: hsl(210 20% 8%) !important;
-}
-
-.dark .bg-medical-background,
-[data-theme="dark"] .bg-medical-background {
-  background-color: hsl(210 20% 8%) !important;
-}
-
-.dark .bg-medical-card,
-[data-theme="dark"] .bg-medical-card,
-.dark .bg-white {
-  background-color: hsl(210 20% 12%) !important;
-}
-
-.dark .text-medical-text,
-[data-theme="dark"] .text-medical-text {
   color: hsl(220 13% 91%) !important;
 }
 
-.dark .text-medical-text-muted,
-[data-theme="dark"] .text-medical-text-muted {
+html.dark .bg-white,
+.dark .bg-white,
+html.dark .bg-medical-background,
+.dark .bg-medical-background,
+html.dark .bg-medical-card,
+.dark .bg-medical-card {
+  background-color: hsl(210 20% 12%) !important;
+}
+
+html.dark .text-black,
+.dark .text-black,
+html.dark .text-medical-text,
+.dark .text-medical-text,
+html.dark .text-gray-900,
+.dark .text-gray-900 {
+  color: hsl(220 13% 91%) !important;
+}
+
+html.dark .text-gray-600,
+.dark .text-gray-600,
+html.dark .text-medical-text-muted,
+.dark .text-medical-text-muted {
   color: hsl(217 10% 64%) !important;
 }
 
 /* Dark mode for cards and components */
+html.dark .shadow-lg,
 .dark .shadow-lg {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3) !important;
 }
 
+html.dark .border-gray-200,
 .dark .border-gray-200 {
   border-color: hsl(210 15% 25%) !important;
 }
 
 /* Dark mode hover effects */
+html.dark .card-hover:hover,
 .dark .card-hover:hover {
-  box-shadow: 0 15px 30px -3px rgba(0, 0, 0, 0.4), 0 6px 8px -2px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 15px 30px -3px rgba(0, 0, 0, 0.6), 0 6px 8px -2px rgba(0, 0, 0, 0.4) !important;
 }

@@ -28,11 +28,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement;
+    const body = document.body;
     
-    // Remove previous theme class
+    // Remove previous theme classes from both html and body
     root.classList.remove('light', 'dark');
-    // Add current theme class
+    body.classList.remove('light', 'dark');
+    
+    // Add current theme class to both html and body
     root.classList.add(theme);
+    body.classList.add(theme);
     
     // Also set data attribute for better CSS targeting
     root.setAttribute('data-theme', theme);
@@ -40,7 +44,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Save to localStorage
     localStorage.setItem('hospital-theme', theme);
     
-    console.log('Theme changed to:', theme); // Debug log
+    console.log('Theme changed to:', theme, 'HTML classes:', root.classList.toString());
   }, [theme]);
 
   const setTheme = (newTheme: Theme) => {
