@@ -264,8 +264,8 @@ export default function Dashboard() {
                   onClick={(e) => {
                     e.stopPropagation();
                     setNotificationsOpen(false);
-                    // You can navigate to a notifications page here
-                    alert('This would navigate to a full notifications page showing all notifications with search, filters, and mark as read functionality.');
+                    // Navigate to notifications page
+                    window.location.href = '/notifications';
                   }}
                 >
                   View All Notifications
