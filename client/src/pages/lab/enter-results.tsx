@@ -56,7 +56,11 @@ export default function EnterResults() {
     'EOSINOPHILS',
     'MONOCYTES',
     'BASOPHILS',
-    'PLATELETS COUNT'
+    'PLATELETS COUNT',
+    'a. RBC\'s',
+    'b. WBC\'s', 
+    'c. PLATELETS',
+    'SAMPLE TYPE'
   ];
 
   // Initialize results based on selected tests
@@ -71,7 +75,7 @@ export default function EnterResults() {
           CBP_PARAMETERS.forEach(parameter => {
             initialResults.push({
               testName: parameter,
-              value: '',
+              value: getDefaultValue(parameter),
               unit: getDefaultUnit(parameter),
               normalRange: getNormalRange(parameter),
               status: 'normal' as const
@@ -106,6 +110,10 @@ export default function EnterResults() {
       'MONOCYTES': '%',
       'BASOPHILS': '%',
       'PLATELETS COUNT': '/μL',
+      'a. RBC\'s': '',
+      'b. WBC\'s': '',
+      'c. PLATELETS': '',
+      'SAMPLE TYPE': '',
       'FBS (Fasting Blood Sugar)': 'mg/dL',
       'RBS (Random Blood Sugar)': 'mg/dL',
       'SERUM CREATININE': 'mg/dL',
@@ -135,6 +143,10 @@ export default function EnterResults() {
       'MONOCYTES': '2-8%',
       'BASOPHILS': '0.5-1%',
       'PLATELETS COUNT': '150,000-450,000 /μL',
+      'a. RBC\'s': 'Morphological assessment',
+      'b. WBC\'s': 'Functional assessment', 
+      'c. PLATELETS': 'Adequacy assessment',
+      'SAMPLE TYPE': 'Collection method',
       'FBS (Fasting Blood Sugar)': '70-100 mg/dL',
       'RBS (Random Blood Sugar)': '<140 mg/dL',
       'SERUM CREATININE': '0.6-1.2 mg/dL',
@@ -151,8 +163,24 @@ export default function EnterResults() {
     return ranges[testName] || 'Consult reference values';
   };
 
+  // Get default values for specific tests
+  const getDefaultValue = (testName: string): string => {
+    const defaults: Record<string, string> = {
+      'a. RBC\'s': 'NORMOCYTIC',
+      'b. WBC\'s': 'within limits',
+      'c. PLATELETS': 'adequate',
+      'SAMPLE TYPE': 'whole blood EDTA'
+    };
+    return defaults[testName] || '';
+  };
+
   // Determine result status based on value and normal range
   const determineStatus = (value: string, testName: string): 'normal' | 'high' | 'low' | 'critical' => {
+    // For text-based parameters, always return normal
+    if (testName === 'a. RBC\'s' || testName === 'b. WBC\'s' || testName === 'c. PLATELETS' || testName === 'SAMPLE TYPE') {
+      return 'normal';
+    }
+    
     if (!value || isNaN(parseFloat(value))) return 'normal';
     
     const numValue = parseFloat(value);
@@ -269,8 +297,14 @@ export default function EnterResults() {
     results.forEach((result, index) => {
       if (!result.value.trim()) {
         errors.push(`Test result for "${result.testName}" is required`);
-      } else if (isNaN(parseFloat(result.value))) {
-        errors.push(`Test result for "${result.testName}" must be a valid number`);
+      } else {
+        // Only check for numeric values if it's not a text-based parameter
+        const isTextBasedParameter = result.testName === 'a. RBC\'s' || result.testName === 'b. WBC\'s' || 
+                                    result.testName === 'c. PLATELETS' || result.testName === 'SAMPLE TYPE';
+        
+        if (!isTextBasedParameter && isNaN(parseFloat(result.value))) {
+          errors.push(`Test result for "${result.testName}" must be a valid number`);
+        }
       }
     });
     
@@ -507,13 +541,21 @@ export default function EnterResults() {
                               </Label>
                               <Input
                                 id={`value-${index}`}
-                                type="number"
+                                type={
+                                  (result.testName === 'a. RBC\'s' || result.testName === 'b. WBC\'s' || 
+                                   result.testName === 'c. PLATELETS' || result.testName === 'SAMPLE TYPE') 
+                                    ? 'text' : 'number'
+                                }
                                 step="0.01"
                                 value={result.value}
                                 onChange={(e) => updateResult(index, 'value', e.target.value)}
                                 placeholder={
                                   result.testName === 'P.C.V' ? 'Will auto-calculate from Hb' :
                                   result.testName === 'Total R.B.C COUNT' ? 'Will auto-calculate from Hb' :
+                                  result.testName === 'a. RBC\'s' ? 'RBC morphology' :
+                                  result.testName === 'b. WBC\'s' ? 'WBC assessment' :
+                                  result.testName === 'c. PLATELETS' ? 'Platelet adequacy' :
+                                  result.testName === 'SAMPLE TYPE' ? 'Sample collection type' :
                                   'Enter value'
                                 }
                                 className={`mt-1 ${
