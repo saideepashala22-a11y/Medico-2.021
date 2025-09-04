@@ -51,6 +51,11 @@ export default function EnterResults() {
     'Total R.B.C COUNT',
     'P.C.V',
     'W.B.C (TOTAL)',
+    'NEUTROPHILS',
+    'LYMPHOCYTES',
+    'EOSINOPHILS',
+    'MONOCYTES',
+    'BASOPHILS',
     'PLATELETS COUNT'
   ];
 
@@ -95,6 +100,11 @@ export default function EnterResults() {
       'Total R.B.C COUNT': 'million/μL',
       'P.C.V': '%',
       'W.B.C (TOTAL)': '/μL',
+      'NEUTROPHILS': '%',
+      'LYMPHOCYTES': '%',
+      'EOSINOPHILS': '%',
+      'MONOCYTES': '%',
+      'BASOPHILS': '%',
       'PLATELETS COUNT': '/μL',
       'FBS (Fasting Blood Sugar)': 'mg/dL',
       'RBS (Random Blood Sugar)': 'mg/dL',
@@ -119,6 +129,11 @@ export default function EnterResults() {
       'Total R.B.C COUNT': '4.5-5.5 million/μL (F), 4.7-6.1 million/μL (M)',
       'P.C.V': '36-46% (F), 41-50% (M)',
       'W.B.C (TOTAL)': '4,000-11,000 /μL',
+      'NEUTROPHILS': '50-70%',
+      'LYMPHOCYTES': '20-40%',
+      'EOSINOPHILS': '1-4%',
+      'MONOCYTES': '2-8%',
+      'BASOPHILS': '0.5-1%',
       'PLATELETS COUNT': '150,000-450,000 /μL',
       'FBS (Fasting Blood Sugar)': '70-100 mg/dL',
       'RBS (Random Blood Sugar)': '<140 mg/dL',
@@ -176,6 +191,27 @@ export default function EnterResults() {
         if (numValue < 100000) return 'low';
         if (numValue < 50000) return 'critical';
         if (numValue > 500000) return 'high';
+        return 'normal';
+      case 'NEUTROPHILS':
+        if (numValue < 50) return 'low';
+        if (numValue > 70) return 'high';
+        return 'normal';
+      case 'LYMPHOCYTES':
+        if (numValue < 20) return 'low';
+        if (numValue > 40) return 'high';
+        return 'normal';
+      case 'EOSINOPHILS':
+        if (numValue < 1) return 'low';
+        if (numValue > 4) return 'high';
+        if (numValue > 8) return 'critical';
+        return 'normal';
+      case 'MONOCYTES':
+        if (numValue < 2) return 'low';
+        if (numValue > 8) return 'high';
+        return 'normal';
+      case 'BASOPHILS':
+        if (numValue < 0.5) return 'low';
+        if (numValue > 1) return 'high';
         return 'normal';
       default:
         return 'normal';
