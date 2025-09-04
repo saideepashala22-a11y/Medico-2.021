@@ -529,7 +529,10 @@ export default function EnterResults() {
                           </div>
                         </CardHeader>
                         <CardContent className="p-6">
-                          <div className="grid grid-cols-3 gap-4">
+                          <div className={`grid gap-4 ${
+                            (result.testName === 'a. RBC\'s' || result.testName === 'b. WBC\'s' || 
+                             result.testName === 'c. PLATELETS') ? 'grid-cols-2' : 'grid-cols-3'
+                          }`}>
                             <div>
                               <Label htmlFor={`value-${index}`}>
                                 Result Value *
@@ -566,16 +569,19 @@ export default function EnterResults() {
                                 readOnly={result.testName === 'P.C.V' || result.testName === 'Total R.B.C COUNT'}
                               />
                             </div>
-                            <div>
-                              <Label htmlFor={`unit-${index}`}>Unit</Label>
-                              <Input
-                                id={`unit-${index}`}
-                                value={result.unit}
-                                onChange={(e) => updateResult(index, 'unit', e.target.value)}
-                                placeholder="units"
-                                className="mt-1"
-                              />
-                            </div>
+                            {(result.testName !== 'a. RBC\'s' && result.testName !== 'b. WBC\'s' && 
+                              result.testName !== 'c. PLATELETS') && (
+                              <div>
+                                <Label htmlFor={`unit-${index}`}>Unit</Label>
+                                <Input
+                                  id={`unit-${index}`}
+                                  value={result.unit}
+                                  onChange={(e) => updateResult(index, 'unit', e.target.value)}
+                                  placeholder="units"
+                                  className="mt-1"
+                                />
+                              </div>
+                            )}
                             <div>
                               <Label>Normal Range</Label>
                               <p className="text-sm text-gray-600 pt-3">{result.normalRange}</p>
