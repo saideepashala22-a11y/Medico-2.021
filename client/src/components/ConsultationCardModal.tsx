@@ -153,11 +153,7 @@ export function ConsultationCardModal({ isOpen, onClose, patientInfo }: Consulta
       const boxWidth = (pageWidth - 3 * margin) / 2;
       const boxHeight = 20; // Reduced height for max notes space
       
-      // Left box - Doctor Signature & Stamp
-      pdf.setDrawColor(100, 100, 100);
-      pdf.setLineWidth(0.5);
-      pdf.rect(margin, footerY, boxWidth, boxHeight, 'S');
-      
+      // Left section - Doctor Signature & Stamp (no box)
       pdf.setFontSize(8);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(0, 0, 0);
@@ -168,9 +164,8 @@ export function ConsultationCardModal({ isOpen, onClose, patientInfo }: Consulta
       pdf.setTextColor(80, 80, 80);
       pdf.text('Date: ______________', margin + 2, footerY + 15);
       
-      // Right box - Next Appointment
+      // Right section - Next Appointment (no box)
       const rightBoxX = margin + boxWidth + margin;
-      pdf.rect(rightBoxX, footerY, boxWidth, boxHeight, 'S');
       
       pdf.setFontSize(8);
       pdf.setFont('helvetica', 'bold');
