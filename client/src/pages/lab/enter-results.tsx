@@ -191,6 +191,35 @@ export default function EnterResults() {
       // Auto-determine status when value changes
       if (field === 'value') {
         updated[index].status = determineStatus(value, updated[index].testName);
+        
+        // Auto-calculate PCV and RBC count when Hemoglobin is entered
+        if (updated[index].testName === 'HAEMOGLOBIN' && value && !isNaN(parseFloat(value))) {
+          const hbValue = parseFloat(value);
+          
+          // Find PCV and RBC count indices
+          const pcvIndex = updated.findIndex(result => result.testName === 'P.C.V');
+          const rbcIndex = updated.findIndex(result => result.testName === 'Total R.B.C COUNT');
+          
+          // Calculate and update PCV (Hb × 3)
+          if (pcvIndex !== -1) {
+            const calculatedPCV = (hbValue * 3).toFixed(1);
+            updated[pcvIndex] = {
+              ...updated[pcvIndex],
+              value: calculatedPCV,
+              status: determineStatus(calculatedPCV, 'P.C.V')
+            };
+          }
+          
+          // Calculate and update RBC count (Hb ÷ 3)
+          if (rbcIndex !== -1) {
+            const calculatedRBC = (hbValue / 3).toFixed(2);
+            updated[rbcIndex] = {
+              ...updated[rbcIndex],
+              value: calculatedRBC,
+              status: determineStatus(calculatedRBC, 'Total R.B.C COUNT')
+            };
+          }
+        }
       }
       
       return updated;
@@ -432,15 +461,31 @@ export default function EnterResults() {
                         <CardContent className="p-6">
                           <div className="grid grid-cols-3 gap-4">
                             <div>
-                              <Label htmlFor={`value-${index}`}>Result Value *</Label>
+                              <Label htmlFor={`value-${index}`}>
+                                Result Value *
+                                {(result.testName === 'P.C.V' || result.testName === 'Total R.B.C COUNT') && (
+                                  <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                    Auto-calculated
+                                  </span>
+                                )}
+                              </Label>
                               <Input
                                 id={`value-${index}`}
                                 type="number"
                                 step="0.01"
                                 value={result.value}
                                 onChange={(e) => updateResult(index, 'value', e.target.value)}
-                                placeholder="Enter value"
-                                className="mt-1"
+                                placeholder={
+                                  result.testName === 'P.C.V' ? 'Will auto-calculate from Hb' :
+                                  result.testName === 'Total R.B.C COUNT' ? 'Will auto-calculate from Hb' :
+                                  'Enter value'
+                                }
+                                className={`mt-1 ${
+                                  (result.testName === 'P.C.V' || result.testName === 'Total R.B.C COUNT') 
+                                    ? 'bg-blue-50 border-blue-200' 
+                                    : ''
+                                }`}
+                                readOnly={result.testName === 'P.C.V' || result.testName === 'Total R.B.C COUNT'}
                               />
                             </div>
                             <div>
