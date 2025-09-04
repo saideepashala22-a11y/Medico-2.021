@@ -187,9 +187,9 @@ export default function Dashboard() {
         </div>
       </nav>
       
-      <div className="flex">
+      <div className="flex pt-16 lg:pt-0">
         {/* Sidebar Navigation */}
-        <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 mt-16 lg:mt-0`}>
+        <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 lg:shadow-none border-r border-gray-200 dark:border-gray-700`}>
           <div className="flex flex-col h-full">
             <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
               <nav className="mt-5 flex-1 px-2 space-y-1">
@@ -248,7 +248,7 @@ export default function Dashboard() {
 
         {/* Main Dashboard Content */}
         <main 
-          className="flex-1 lg:ml-64 relative"
+          className="flex-1 lg:pl-6 relative"
           onClick={() => {
             if (sidebarOpen && window.innerWidth < 1024) {
               setSidebarOpen(false);
