@@ -31,6 +31,17 @@ export default function LabReport() {
   const params = useParams();
   const labTestId = params.labTestId;
 
+  // Fetch current doctor for dynamic referral
+  const { data: currentDoctor } = useQuery<{
+    id: string;
+    name: string;
+    email?: string;
+    specialization?: string;
+  }>({
+    queryKey: ['/api/current-doctor'],
+    staleTime: 30 * 1000, // Cache for 30 seconds
+  });
+
   // Fetch lab test details
   const { data: labTest, isLoading } = useQuery<{
     id: string;
@@ -155,8 +166,11 @@ export default function LabReport() {
         120,
         94,
       );
+      // Use patient's referring doctor, or fall back to current selected doctor, or default
+      const referringDoctor = labTest.patient.referringDoctor || 
+                              (currentDoctor?.name ? `Dr. ${currentDoctor.name}` : "Dr. Consulting Physician");
       doc.text(
-        `Referring Doctor: ${labTest.patient.referringDoctor || "Dr. Consulting Physician"}`,
+        `Referring Doctor: ${referringDoctor}`,
         120,
         101,
       );
@@ -466,7 +480,9 @@ export default function LabReport() {
                 <Download className="mr-2 h-4 w-4" />
                 Download PDF
               </Button>
-              <span className="text-sm text-gray-600">{user?.name}</span>
+              <span className="text-sm text-gray-600">
+                {currentDoctor?.name ? `Dr. ${currentDoctor.name}` : user?.name || 'Loading...'}
+              </span>
             </div>
           </div>
         </div>
