@@ -100,8 +100,8 @@ export default function EnterResults() {
   // Get default units for common tests
   const getDefaultUnit = (testName: string): string => {
     const units: Record<string, string> = {
-      'HAEMOGLOBIN': 'g/dL',
-      'Total R.B.C COUNT': 'million/μL',
+      'HAEMOGLOBIN': 'gms%',
+      'Total R.B.C COUNT': 'Mill/Cumm%',
       'P.C.V': '%',
       'W.B.C (TOTAL)': '/μL',
       'NEUTROPHILS': '%',
@@ -133,9 +133,9 @@ export default function EnterResults() {
   // Get normal ranges for common tests
   const getNormalRange = (testName: string): string => {
     const ranges: Record<string, string> = {
-      'HAEMOGLOBIN': '12.0-15.5 g/dL (F), 13.5-17.5 g/dL (M)',
-      'Total R.B.C COUNT': '4.5-5.5 million/μL (F), 4.7-6.1 million/μL (M)',
-      'P.C.V': '36-46% (F), 41-50% (M)',
+      'HAEMOGLOBIN': '(M) 13.5 - 18 gms%|(F) 11.5 - 16 gms%',
+      'Total R.B.C COUNT': '(M) 4.5 - 6.0 Mill/Cumm%|(F) 3.5 - 5.5 Mill/Cumm%',
+      'P.C.V': '(M) 40-54%|(F) 36-41%',
       'W.B.C (TOTAL)': '4,000-11,000 /μL',
       'NEUTROPHILS': '50-70%',
       'LYMPHOCYTES': '20-40%',

@@ -209,12 +209,17 @@ export default function LabReport() {
                 // Unit
                 doc.text(testResult.unit || "units", 120, yPos + 2);
 
-                // Reference range
-                doc.text(
-                  testResult.normalRange || "Consult reference",
-                  140,
-                  yPos + 2,
-                );
+                // Reference range - handle gender-specific ranges
+                const normalRange = testResult.normalRange || "Consult reference";
+                if (normalRange.includes('|')) {
+                  // Split gender-specific ranges
+                  const [maleRange, femaleRange] = normalRange.split('|');
+                  doc.text(maleRange.trim(), 140, yPos + 2);
+                  doc.text(femaleRange.trim(), 140, yPos + 6);
+                  yPos += 4; // Extra space for two-line reference
+                } else {
+                  doc.text(normalRange, 140, yPos + 2);
+                }
 
                 yPos += 8;
               }
