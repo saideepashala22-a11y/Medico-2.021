@@ -297,7 +297,7 @@ export default function EnterResults() {
           
           // Calculate and update RBC count (Hb ÷ 3)
           if (rbcIndex !== -1) {
-            const calculatedRBC = (hbValue / 3).toFixed(2);
+            const calculatedRBC = (hbValue / 3).toFixed(1);
             updated[rbcIndex] = {
               ...updated[rbcIndex],
               value: calculatedRBC,
