@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useParams } from 'wouter';
+import { useLocation, useRoute } from 'wouter';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,11 +15,16 @@ import { ExcelUpload } from '@/components/ExcelUpload';
 
 export default function MedicineForm() {
   const [location, navigate] = useLocation();
-  const params = useParams();
+  
+  // Try both routes - edit and new
+  const [editMatch, editParams] = useRoute('/pharmacy/medicine/edit/:id');
+  const [newMatch, newParams] = useRoute('/pharmacy/medicine/new');
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const isEdit = params?.id;
+  const isEdit = editMatch && editParams?.id;
+  const params = editParams;
   
   const [formData, setFormData] = useState({
     medicineName: '',
