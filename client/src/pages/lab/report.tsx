@@ -206,29 +206,35 @@ export default function LabReport() {
                 doc.text(String(testResult.value), 90, yPos + 2);
                 doc.setFont("helvetica", "normal");
 
-                // Unit - convert old formats to new formats
-                let displayUnit = testResult.unit || "units";
+                // Unit - convert old formats to new formats, skip units for descriptive assessments
+                const isDescriptiveTest = testResult.testName === "a. RBC's" || 
+                                        testResult.testName === "b. WBC's" || 
+                                        testResult.testName === "c. PLATELETS";
                 
-                // Convert old unit formats to new ones
-                if (testResult.testName === "Total R.B.C COUNT") {
-                  if (displayUnit.includes("million") || displayUnit.includes("μL")) {
-                    displayUnit = "Mill/Cumm";
+                if (!isDescriptiveTest) {
+                  let displayUnit = testResult.unit || "units";
+                  
+                  // Convert old unit formats to new ones
+                  if (testResult.testName === "Total R.B.C COUNT") {
+                    if (displayUnit.includes("million") || displayUnit.includes("μL")) {
+                      displayUnit = "Mill/Cumm";
+                    }
+                  } else if (testResult.testName === "HAEMOGLOBIN") {
+                    if (displayUnit === "g/dL") {
+                      displayUnit = "gms%";
+                    }
+                  } else if (testResult.testName === "W.B.C (TOTAL)") {
+                    if (displayUnit.includes("μL")) {
+                      displayUnit = "/Cumm";
+                    }
+                  } else if (testResult.testName === "PLATELETS COUNT") {
+                    if (displayUnit.includes("μL") || displayUnit.includes("/μL")) {
+                      displayUnit = "Lakhs/Cumm";
+                    }
                   }
-                } else if (testResult.testName === "HAEMOGLOBIN") {
-                  if (displayUnit === "g/dL") {
-                    displayUnit = "gms%";
-                  }
-                } else if (testResult.testName === "W.B.C (TOTAL)") {
-                  if (displayUnit.includes("μL")) {
-                    displayUnit = "/Cumm";
-                  }
-                } else if (testResult.testName === "PLATELETS COUNT") {
-                  if (displayUnit.includes("μL") || displayUnit.includes("/μL")) {
-                    displayUnit = "Lakhs/Cumm";
-                  }
+                  
+                  doc.text(displayUnit, 120, yPos + 2);
                 }
-                
-                doc.text(displayUnit, 120, yPos + 2);
 
                 // Reference range - handle gender-specific ranges
                 let normalRange = testResult.normalRange || "Consult reference";
