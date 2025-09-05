@@ -23,7 +23,7 @@ export default function MedicineForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const isEdit = editMatch && editParams?.id;
+  const isEdit = !!(editMatch && editParams?.id);
   const params = editParams;
   
   // Debug logging
@@ -58,7 +58,7 @@ export default function MedicineForm() {
       console.log('API response:', data);
       return data;
     },
-    enabled: !!params?.id && isEdit,
+    enabled: Boolean(params?.id && isEdit),
     staleTime: 0,
     refetchOnWindowFocus: false,
   });
