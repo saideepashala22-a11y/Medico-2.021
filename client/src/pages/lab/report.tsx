@@ -163,7 +163,7 @@ export default function LabReport() {
       let yPos = 125;
       doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
-      doc.text("INVESTIGATION RESULTS", 20, yPos);
+      doc.text("COMPLETE BLOOD PICTURE", 20, yPos);
 
       yPos += 8;
 
