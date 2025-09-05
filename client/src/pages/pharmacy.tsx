@@ -532,7 +532,8 @@ export default function Pharmacy() {
                 </div>
               )}
 
-              {/* Medicine Selection */}
+              {/* Medicine Selection - Only show after patient selection */}
+              {selectedPatient && (
               <div className="border rounded-lg p-4">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="font-medium text-gray-900">Add Medicines</h3>
@@ -679,6 +680,7 @@ export default function Pharmacy() {
                   </div>
                 )}
               </div>
+              )}
             </CardContent>
           </Card>
 
