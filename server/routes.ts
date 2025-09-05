@@ -938,23 +938,7 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
     }
   });
 
-  // Get single medicine by ID
-  app.get('/api/medicines/:id', authenticateToken, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const medicine = await storage.getMedicine(id);
-      
-      if (!medicine) {
-        return res.status(404).json({ message: 'Medicine not found' });
-      }
-      
-      res.json(medicine);
-    } catch (error) {
-      console.error('Error fetching medicine:', error);
-      res.status(500).json({ message: 'Failed to fetch medicine' });
-    }
-  });
-
+  // Specific routes MUST come before parametric routes
   app.get('/api/medicines/active', authenticateToken, async (req, res) => {
     try {
       const medicines = await storage.getActiveMedicines();
@@ -976,6 +960,66 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
     } catch (error) {
       console.error('Error searching medicines:', error);
       res.status(500).json({ message: 'Failed to search medicines' });
+    }
+  });
+
+  // Excel template endpoint - must come before :id route
+  app.get('/api/medicines/excel-template', authenticateToken, async (req, res) => {
+    try {
+      // Create sample data for template
+      const templateData = [
+        {
+          'Medicine Name': 'Paracetamol',
+          'Batch Number': 'BATCH001',
+          'Quantity': '100',
+          'Units': 'tablets',
+          'MRP': '25.50',
+          'Manufacture Date': '2024-01-15',
+          'Expiry Date': '2026-01-15',
+          'Manufacturer': 'Generic Pharma Ltd',
+          'Category': 'tablets',
+          'Description': 'Pain relief medication'
+        }
+      ];
+      
+      // Create workbook and worksheet
+      const XLSX = require('xlsx');
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(templateData);
+      
+      // Add the worksheet to the workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Medicine Template');
+      
+      // Generate Excel file buffer
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+      
+      // Set headers for file download
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=medicine-template.xlsx');
+      res.setHeader('Content-Length', excelBuffer.length);
+      
+      // Send the Excel file
+      res.send(excelBuffer);
+    } catch (error) {
+      console.error('Error generating Excel template:', error);
+      res.status(500).json({ message: 'Failed to generate template' });
+    }
+  });
+
+  // Get single medicine by ID - MUST come after specific routes
+  app.get('/api/medicines/:id', authenticateToken, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const medicine = await storage.getMedicine(id);
+      
+      if (!medicine) {
+        return res.status(404).json({ message: 'Medicine not found' });
+      }
+      
+      res.json(medicine);
+    } catch (error) {
+      console.error('Error fetching medicine:', error);
+      res.status(500).json({ message: 'Failed to fetch medicine' });
     }
   });
 
@@ -1206,69 +1250,6 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
     }
   });
 
-  // Download Excel template endpoint
-  app.get('/api/medicines/excel-template', authenticateToken, async (req, res) => {
-    try {
-      // Create sample data for template
-      const templateData = [
-        {
-          'Medicine Name': 'Paracetamol',
-          'Batch Number': 'PCM001',
-          'Quantity': 100,
-          'Units': 'tablets',
-          'MRP': '50.00',
-          'Manufacture Date': '01/01/2024',
-          'Expiry Date': '01/01/2026',
-          'Manufacturer': 'XYZ Pharma',
-          'Category': 'tablets',
-          'Description': 'Pain relief medication'
-        },
-        {
-          'Medicine Name': 'Cough Syrup',
-          'Batch Number': 'CS002',
-          'Quantity': 50,
-          'Units': 'bottles',
-          'MRP': '120.00',
-          'Manufacture Date': '15/02/2024',
-          'Expiry Date': '15/02/2026',
-          'Manufacturer': 'ABC Pharma',
-          'Category': 'syrup',
-          'Description': 'Cough and cold relief'
-        }
-      ];
-
-      // Create workbook and worksheet
-      const workbook = xlsx.utils.book_new();
-      const worksheet = xlsx.utils.json_to_sheet(templateData);
-
-      // Set column widths
-      worksheet['!cols'] = [
-        { wch: 20 }, // Medicine Name
-        { wch: 15 }, // Batch Number
-        { wch: 10 }, // Quantity
-        { wch: 12 }, // Units
-        { wch: 10 }, // MRP
-        { wch: 15 }, // Manufacture Date
-        { wch: 15 }, // Expiry Date
-        { wch: 15 }, // Manufacturer
-        { wch: 12 }, // Category
-        { wch: 25 }  // Description
-      ];
-
-      xlsx.utils.book_append_sheet(workbook, worksheet, 'Medicines');
-
-      // Generate Excel buffer
-      const excelBuffer = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
-
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', 'attachment; filename=medicine-template.xlsx');
-      res.send(excelBuffer);
-
-    } catch (error) {
-      console.error('Template download error:', error);
-      res.status(500).json({ message: 'Failed to generate template' });
-    }
-  });
 
   // Hospital Settings routes
   app.get('/api/hospital-settings', authenticateToken, async (req, res) => {

@@ -47,20 +47,10 @@ export default function MedicineForm() {
     retry: 1,
   });
 
-  console.log('🔧 Debug Info:', { 
-    isEdit, 
-    'params?.id': params?.id,
-    'existingMedicine': existingMedicine,
-    'status': status,
-    'error': error?.message,
-    'isLoading': isLoadingMedicine
-  });
 
   // Populate form with existing data when editing
   useEffect(() => {
-    console.log('📝 UseEffect triggered:', { existingMedicine, isEdit });
     if (existingMedicine && isEdit && typeof existingMedicine === 'object') {
-      console.log('✅ Populating form with:', existingMedicine);
       setFormData({
         medicineName: (existingMedicine as any).medicineName || '',
         batchNumber: (existingMedicine as any).batchNumber || '',
