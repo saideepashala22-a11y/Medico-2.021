@@ -26,6 +26,14 @@ export default function MedicineForm() {
   const isEdit = !!(editMatch && editParams?.id);
   const params = editParams;
   
+  console.log('🚀 Route Debug:', {
+    editMatch,
+    editParams, 
+    isEdit,
+    'params?.id': params?.id,
+    'Boolean(params?.id && isEdit)': Boolean(params?.id && isEdit)
+  });
+  
   
   const [formData, setFormData] = useState({
     medicineName: '',
