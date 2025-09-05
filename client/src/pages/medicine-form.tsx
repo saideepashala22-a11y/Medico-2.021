@@ -43,19 +43,24 @@ export default function MedicineForm() {
   });
 
   // Fetch existing medicine data for editing
-  const { data: existingMedicine, isLoading: isLoadingMedicine } = useQuery({
-    queryKey: ['/api/medicines', params?.id],
+  const { data: existingMedicine, isLoading: isLoadingMedicine, error } = useQuery({
+    queryKey: ['medicine-detail', params?.id],
     queryFn: async () => {
       if (!params?.id) return null;
+      console.log('Fetching medicine with ID:', params.id);
       const response = await fetch(`/api/medicines/${params.id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });
       if (!response.ok) throw new Error('Failed to fetch medicine');
-      return response.json();
+      const data = await response.json();
+      console.log('API response:', data);
+      return data;
     },
-    enabled: !!params?.id,
+    enabled: !!params?.id && isEdit,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
   });
 
   // Populate form with existing data when editing
