@@ -1078,32 +1078,36 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
           medicineData.category = row['Category'] || row['category'] || row['type'] || row['Type'] || 'tablets';
           medicineData.description = row['Description'] || row['description'] || row['desc'] || '';
 
-          // Handle dates with proper validation
+          // Handle dates with proper validation - only set if valid
           const mfgDate = row['Manufacture Date'] || row['manufacture_date'] || row['mfg_date'];
-          if (mfgDate && mfgDate.toString().trim() !== '') {
+          if (mfgDate && mfgDate.toString().trim() !== '' && mfgDate !== 'null' && mfgDate !== 'undefined') {
             try {
               const date = new Date(mfgDate);
               // Check if the date is valid and not "Invalid Date"
-              if (!isNaN(date.getTime()) && date.getFullYear() > 1900) {
+              if (!isNaN(date.getTime()) && date.getFullYear() > 1900 && date.getFullYear() < 2100) {
                 medicineData.manufactureDate = date;
               }
+              // If invalid, don't set the field at all
             } catch (e) {
-              // Invalid date, skip silently
+              // Invalid date, don't set the field
             }
           }
+          // If no valid date, don't set manufactureDate field at all
 
           const expDate = row['Expiry Date'] || row['expiry_date'] || row['exp_date'];
-          if (expDate && expDate.toString().trim() !== '') {
+          if (expDate && expDate.toString().trim() !== '' && expDate !== 'null' && expDate !== 'undefined') {
             try {
               const date = new Date(expDate);
               // Check if the date is valid and not "Invalid Date"
-              if (!isNaN(date.getTime()) && date.getFullYear() > 1900) {
+              if (!isNaN(date.getTime()) && date.getFullYear() > 1900 && date.getFullYear() < 2100) {
                 medicineData.expiryDate = date;
               }
+              // If invalid, don't set the field at all
             } catch (e) {
-              // Invalid date, skip silently
+              // Invalid date, don't set the field
             }
           }
+          // If no valid date, don't set expiryDate field at all
 
           // Validate required fields
           if (!medicineData.medicineName?.trim()) {
