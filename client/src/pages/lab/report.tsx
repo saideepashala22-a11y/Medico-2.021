@@ -165,7 +165,7 @@ export default function LabReport() {
       doc.setFont("helvetica", "bold");
       doc.text("COMPLETE BLOOD PICTURE", 20, yPos);
 
-      yPos += 8;
+      yPos += 10;
 
       // Table Headers (simplified without borders)
 
@@ -176,7 +176,7 @@ export default function LabReport() {
       doc.text("UNIT", 120, yPos + 8);
       doc.text("REFERENCE RANGE", 140, yPos + 8);
 
-      yPos += 12;
+      yPos += 18; // More space after headers
 
       // Test Results Data
       doc.setFont("helvetica", "normal");
@@ -261,12 +261,12 @@ export default function LabReport() {
                   const [maleRange, femaleRange] = normalRange.split('|');
                   doc.text(maleRange.trim(), 140, yPos + 2);
                   doc.text(femaleRange.trim(), 140, yPos + 6);
-                  yPos += 4; // Extra space for two-line reference
+                  yPos += 6; // Extra space for two-line reference
                 } else {
                   doc.text(normalRange, 140, yPos + 2);
                 }
 
-                yPos += 8;
+                yPos += 12; // Increased spacing between rows
               }
             });
           }
