@@ -61,16 +61,30 @@ export default function MedicineForm() {
         const response = await fetch(`/api/medicines/${params.id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
           },
         });
         console.log('📡 Response status:', response.status, response.ok);
+        console.log('📡 Response headers:', response.headers.get('content-type'));
+        
         if (!response.ok) {
           console.error('❌ API call failed:', response.status, response.statusText);
           throw new Error(`Failed to fetch medicine: ${response.status}`);
         }
-        const data = await response.json();
-        console.log('✅ API Response Data:', data);
-        return data;
+        
+        // Get text first to see what we're actually receiving
+        const responseText = await response.text();
+        console.log('📋 Raw response text (first 200 chars):', responseText.substring(0, 200));
+        
+        try {
+          const data = JSON.parse(responseText);
+          console.log('✅ API Response Data:', data);
+          return data;
+        } catch (parseError) {
+          console.error('💥 JSON Parse Error:', parseError);
+          console.error('📋 Full response text:', responseText);
+          throw new Error(`Invalid JSON response: ${parseError.message}`);
+        }
       } catch (err) {
         console.error('💥 Fetch error:', err);
         throw err;
