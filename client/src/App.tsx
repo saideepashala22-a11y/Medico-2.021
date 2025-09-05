@@ -22,6 +22,7 @@ import Consultation from "@/pages/consultation";
 import SurgicalCaseSheets from "@/pages/surgical-case-sheets";
 import Settings from "@/pages/settings";
 import DoctorsManagement from "@/pages/doctors";
+import MedicineForm from "@/pages/medicine-form";
 import { Loader2 } from "lucide-react";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -119,6 +120,18 @@ function Router() {
       <Route path="/pharmacy">
         <ProtectedRoute>
           <Pharmacy />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/pharmacy/medicine/new">
+        <ProtectedRoute>
+          <MedicineForm />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/pharmacy/medicine/edit/:id">
+        <ProtectedRoute>
+          <MedicineForm />
         </ProtectedRoute>
       </Route>
       

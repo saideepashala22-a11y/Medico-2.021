@@ -1,15 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { useLocation } from 'wouter';
 import { 
   Plus, 
   Search, 
@@ -19,9 +17,7 @@ import {
   Calendar,
   DollarSign,
   Hash,
-  Pill,
-  Save,
-  X
+  Pill
 } from 'lucide-react';
 
 interface MedicineInventory {
@@ -48,107 +44,16 @@ interface PharmacyInventoryModalProps {
 export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [location, navigate] = useLocation();
   
   const [searchTerm, setSearchTerm] = useState('');
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [editingMedicine, setEditingMedicine] = useState<MedicineInventory | null>(null);
-  
-  const [formData, setFormData] = useState({
-    medicineName: '',
-    batchNumber: '',
-    quantity: '',
-    units: 'tablets',
-    mrp: '',
-    manufactureDate: '',
-    expiryDate: '',
-    manufacturer: '',
-    category: 'tablets',
-    description: '',
-  });
 
   // Fetch all medicines
-  const { data: medicines, isLoading, refetch } = useQuery({
+  const { data: medicines, isLoading } = useQuery({
     queryKey: ['/api/medicines'],
     enabled: isOpen,
     refetchOnWindowFocus: true,
     staleTime: 0, // Always refetch when needed
-  });
-
-  // Refetch medicines when modal opens to ensure fresh data
-  useEffect(() => {
-    if (isOpen) {
-      refetch();
-    }
-  }, [isOpen, refetch]);
-
-  // Create medicine mutation
-  const createMedicineMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/medicines', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to create medicine');
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/medicines'] });
-      resetForm();
-      setShowAddForm(false);
-      toast({
-        title: 'Success',
-        description: 'Medicine added to inventory successfully',
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to add medicine',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  // Update medicine mutation
-  const updateMedicineMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/medicines/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to update medicine');
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/medicines'] });
-      resetForm();
-      setEditingMedicine(null);
-      toast({
-        title: 'Success',
-        description: 'Medicine updated successfully',
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to update medicine',
-        variant: 'destructive',
-      });
-    },
   });
 
   // Delete medicine mutation
@@ -182,68 +87,12 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
     },
   });
 
-  const resetForm = () => {
-    setFormData({
-      medicineName: '',
-      batchNumber: '',
-      quantity: '',
-      units: 'tablets',
-      mrp: '',
-      manufactureDate: '',
-      expiryDate: '',
-      manufacturer: '',
-      category: 'tablets',
-      description: '',
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.medicineName || !formData.batchNumber || !formData.quantity || !formData.mrp) {
-      toast({
-        title: 'Error',
-        description: 'Please fill in all required fields',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const medicineData = {
-      medicineName: formData.medicineName,
-      batchNumber: formData.batchNumber,
-      quantity: parseInt(formData.quantity),
-      units: formData.units,
-      mrp: formData.mrp, // Keep as string
-      manufactureDate: formData.manufactureDate || undefined,
-      expiryDate: formData.expiryDate || undefined,
-      manufacturer: formData.manufacturer || undefined,
-      category: formData.category || undefined,
-      description: formData.description || undefined,
-    };
-
-    if (editingMedicine) {
-      updateMedicineMutation.mutate({ id: editingMedicine.id, data: medicineData });
-    } else {
-      createMedicineMutation.mutate(medicineData);
-    }
-  };
-
   const handleEdit = (medicine: MedicineInventory) => {
-    setFormData({
-      medicineName: medicine.medicineName,
-      batchNumber: medicine.batchNumber,
-      quantity: medicine.quantity.toString(),
-      units: medicine.units || 'tablets',
-      mrp: medicine.mrp.toString(),
-      manufactureDate: medicine.manufactureDate ? medicine.manufactureDate.split('T')[0] : '',
-      expiryDate: medicine.expiryDate ? medicine.expiryDate.split('T')[0] : '',
-      manufacturer: medicine.manufacturer || '',
-      category: medicine.category || 'tablets',
-      description: medicine.description || '',
-    });
-    setEditingMedicine(medicine);
-    setShowAddForm(true);
+    navigate(`/pharmacy/medicine/edit/${medicine.id}`);
+  };
+
+  const handleAddMedicine = () => {
+    navigate('/pharmacy/medicine/new');
   };
 
   const handleDelete = (id: string) => {
@@ -285,11 +134,7 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
             </div>
             
             <Button
-              onClick={() => {
-                resetForm();
-                setEditingMedicine(null);
-                setShowAddForm(true);
-              }}
+              onClick={handleAddMedicine}
               className="bg-medical-primary hover:bg-medical-primary-dark"
               data-testid="add-medicine-button"
             >
@@ -297,188 +142,6 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
               Add Medicine
             </Button>
           </div>
-
-          {/* Add/Edit Medicine Form */}
-          {showAddForm && (
-            <Card className="border-medical-primary">
-              <CardHeader>
-                <CardTitle className="text-medical-primary">
-                  {editingMedicine ? 'Edit Medicine' : 'Add New Medicine'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor="medicineName">Medicine Name *</Label>
-                      <Input
-                        id="medicineName"
-                        value={formData.medicineName}
-                        onChange={(e) => setFormData(prev => ({ ...prev, medicineName: e.target.value }))}
-                        placeholder="Enter medicine name"
-                        required
-                        data-testid="input-medicine-name"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="batchNumber">Batch Number *</Label>
-                      <Input
-                        id="batchNumber"
-                        value={formData.batchNumber}
-                        onChange={(e) => setFormData(prev => ({ ...prev, batchNumber: e.target.value }))}
-                        placeholder="Enter batch number"
-                        required
-                        data-testid="input-batch-number"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="quantity">Quantity *</Label>
-                      <Input
-                        id="quantity"
-                        type="number"
-                        value={formData.quantity}
-                        onChange={(e) => setFormData(prev => ({ ...prev, quantity: e.target.value }))}
-                        placeholder="Enter quantity"
-                        required
-                        min="0"
-                        data-testid="input-quantity"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor="units">Units *</Label>
-                      <Select value={formData.units} onValueChange={(value) => setFormData(prev => ({ ...prev, units: value }))}>
-                        <SelectTrigger data-testid="select-units">
-                          <SelectValue placeholder="Select units" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="tablets">Tablets</SelectItem>
-                          <SelectItem value="capsules">Capsules</SelectItem>
-                          <SelectItem value="ml">ML (Milliliters)</SelectItem>
-                          <SelectItem value="grams">Grams</SelectItem>
-                          <SelectItem value="bottles">Bottles</SelectItem>
-                          <SelectItem value="vials">Vials</SelectItem>
-                          <SelectItem value="strips">Strips</SelectItem>
-                          <SelectItem value="boxes">Boxes</SelectItem>
-                          <SelectItem value="pieces">Pieces</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="mrp">MRP (₹) *</Label>
-                      <Input
-                        id="mrp"
-                        type="number"
-                        step="0.01"
-                        value={formData.mrp}
-                        onChange={(e) => setFormData(prev => ({ ...prev, mrp: e.target.value }))}
-                        placeholder="Enter MRP"
-                        required
-                        min="0"
-                        data-testid="input-mrp"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="manufactureDate">Manufacture Date</Label>
-                      <Input
-                        id="manufactureDate"
-                        type="date"
-                        value={formData.manufactureDate}
-                        onChange={(e) => setFormData(prev => ({ ...prev, manufactureDate: e.target.value }))}
-                        data-testid="input-manufacture-date"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="expiryDate">Expiry Date</Label>
-                      <Input
-                        id="expiryDate"
-                        type="date"
-                        value={formData.expiryDate}
-                        onChange={(e) => setFormData(prev => ({ ...prev, expiryDate: e.target.value }))}
-                        data-testid="input-expiry-date"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor="category">Category</Label>
-                      <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
-                        <SelectTrigger data-testid="select-category">
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="tablets">Tablets</SelectItem>
-                          <SelectItem value="capsules">Capsules</SelectItem>
-                          <SelectItem value="syrup">Syrup</SelectItem>
-                          <SelectItem value="injection">Injection</SelectItem>
-                          <SelectItem value="ointment">Ointment</SelectItem>
-                          <SelectItem value="drops">Drops</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="manufacturer">Manufacturer</Label>
-                    <Input
-                      id="manufacturer"
-                      value={formData.manufacturer}
-                      onChange={(e) => setFormData(prev => ({ ...prev, manufacturer: e.target.value }))}
-                      placeholder="Enter manufacturer name"
-                      data-testid="input-manufacturer"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="description">Description</Label>
-                    <Input
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                      placeholder="Enter description (optional)"
-                      data-testid="input-description"
-                    />
-                  </div>
-                  
-                  <div className="flex gap-3 pt-4">
-                    <Button
-                      type="submit"
-                      className="bg-medical-primary hover:bg-medical-primary-dark"
-                      disabled={createMedicineMutation.isPending || updateMedicineMutation.isPending}
-                      data-testid="save-medicine-button"
-                    >
-                      <Save className="h-4 w-4 mr-2" />
-                      {editingMedicine ? 'Update Medicine' : 'Add Medicine'}
-                    </Button>
-                    
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setShowAddForm(false);
-                        setEditingMedicine(null);
-                        resetForm();
-                      }}
-                      data-testid="cancel-button"
-                    >
-                      <X className="h-4 w-4 mr-2" />
-                      Cancel
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Medicine Inventory Table */}
           <Card>
@@ -593,14 +256,16 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
                   </Table>
                 </div>
               ) : (
-                <div className="text-center py-12">
-                  <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 text-lg">
-                    {searchTerm ? 'No medicines found matching your search' : 'No medicines in inventory yet'}
-                  </p>
-                  <p className="text-gray-400 text-sm mt-2">
-                    {searchTerm ? 'Try a different search term' : 'Add your first medicine to get started'}
-                  </p>
+                <div className="text-center py-8">
+                  <Package className="mx-auto h-12 w-12 text-gray-300 mb-4" />
+                  <p className="text-gray-500 mb-4">No medicines in inventory</p>
+                  <Button
+                    onClick={handleAddMedicine}
+                    className="bg-medical-primary hover:bg-medical-primary-dark"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Your First Medicine
+                  </Button>
                 </div>
               )}
             </CardContent>
