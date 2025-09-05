@@ -50,6 +50,9 @@ export default function EnterResults() {
     'HAEMOGLOBIN',
     'Total R.B.C COUNT',
     'P.C.V',
+    'MCV',
+    'MCH', 
+    'MCHC',
     'W.B.C (TOTAL)',
     'NEUTROPHILS',
     'LYMPHOCYTES',
@@ -103,6 +106,9 @@ export default function EnterResults() {
       'HAEMOGLOBIN': 'gms%',
       'Total R.B.C COUNT': 'Mill/Cumm',
       'P.C.V': 'Vol%',
+      'MCV': 'fL',
+      'MCH': 'pg',
+      'MCHC': 'g/dL',
       'W.B.C (TOTAL)': '/Cumm',
       'NEUTROPHILS': '%',
       'LYMPHOCYTES': '%',
@@ -136,6 +142,9 @@ export default function EnterResults() {
       'HAEMOGLOBIN': '(M) 13.5 - 18 gms%|(F) 11.5 - 16 gms%',
       'Total R.B.C COUNT': '(M) 4.5 - 6.0 Mill/Cumm|(F) 3.5 - 5.5 Mill/Cumm',
       'P.C.V': '(M) 40-54%|(F) 36-41%',
+      'MCV': '80 - 100 fL',
+      'MCH': '27 - 33 pg',
+      'MCHC': '32 - 36 g/dL',
       'W.B.C (TOTAL)': '4000-11000/Cumm',
       'NEUTROPHILS': '50-70%',
       'LYMPHOCYTES': '20-40%',
@@ -241,6 +250,18 @@ export default function EnterResults() {
         if (numValue < 0.5) return 'low';
         if (numValue > 1) return 'high';
         return 'normal';
+      case 'MCV':
+        if (numValue < 80) return 'low';
+        if (numValue > 100) return 'high';
+        return 'normal';
+      case 'MCH':
+        if (numValue < 27) return 'low';
+        if (numValue > 33) return 'high';
+        return 'normal';
+      case 'MCHC':
+        if (numValue < 32) return 'low';
+        if (numValue > 36) return 'high';
+        return 'normal';
       default:
         return 'normal';
     }
@@ -284,6 +305,55 @@ export default function EnterResults() {
             };
           }
         }
+        
+        // Calculate MCV, MCH, MCHC when required values are available
+        const calculateBloodIndices = () => {
+          const hbResult = updated.find(result => result.testName === 'HAEMOGLOBIN');
+          const rbcResult = updated.find(result => result.testName === 'Total R.B.C COUNT');
+          const pcvResult = updated.find(result => result.testName === 'P.C.V');
+          
+          const hbValue = hbResult?.value ? parseFloat(hbResult.value) : null;
+          const rbcValue = rbcResult?.value ? parseFloat(rbcResult.value) : null;
+          const pcvValue = pcvResult?.value ? parseFloat(pcvResult.value) : null;
+          
+          if (hbValue && rbcValue && pcvValue) {
+            // MCV = (PCV × 10) ÷ RBC
+            const mcvIndex = updated.findIndex(result => result.testName === 'MCV');
+            if (mcvIndex !== -1) {
+              const calculatedMCV = ((pcvValue * 10) / rbcValue).toFixed(1);
+              updated[mcvIndex] = {
+                ...updated[mcvIndex],
+                value: calculatedMCV,
+                status: determineStatus(calculatedMCV, 'MCV')
+              };
+            }
+            
+            // MCH = (Hb × 10) ÷ RBC  
+            const mchIndex = updated.findIndex(result => result.testName === 'MCH');
+            if (mchIndex !== -1) {
+              const calculatedMCH = ((hbValue * 10) / rbcValue).toFixed(1);
+              updated[mchIndex] = {
+                ...updated[mchIndex],
+                value: calculatedMCH,
+                status: determineStatus(calculatedMCH, 'MCH')
+              };
+            }
+            
+            // MCHC = (Hb × 100) ÷ PCV
+            const mchcIndex = updated.findIndex(result => result.testName === 'MCHC');
+            if (mchcIndex !== -1) {
+              const calculatedMCHC = ((hbValue * 100) / pcvValue).toFixed(1);
+              updated[mchcIndex] = {
+                ...updated[mchcIndex],
+                value: calculatedMCHC,
+                status: determineStatus(calculatedMCHC, 'MCHC')
+              };
+            }
+          }
+        };
+        
+        // Always try to calculate blood indices after any value change
+        calculateBloodIndices();
       }
       
       return updated;
@@ -489,6 +559,98 @@ export default function EnterResults() {
                   </Alert>
                 </div>
               )}
+
+              {/* Blood Indices Calculation Display */}
+              {(() => {
+                const hbResult = results.find(result => result.testName === 'HAEMOGLOBIN');
+                const rbcResult = results.find(result => result.testName === 'Total R.B.C COUNT');
+                const pcvResult = results.find(result => result.testName === 'P.C.V');
+                const mcvResult = results.find(result => result.testName === 'MCV');
+                const mchResult = results.find(result => result.testName === 'MCH');
+                const mchcResult = results.find(result => result.testName === 'MCHC');
+                
+                const hbValue = hbResult?.value ? parseFloat(hbResult.value) : null;
+                const rbcValue = rbcResult?.value ? parseFloat(rbcResult.value) : null;
+                const pcvValue = pcvResult?.value ? parseFloat(pcvResult.value) : null;
+                
+                const showCalculations = hbValue && rbcValue && pcvValue;
+                
+                if (!showCalculations) return null;
+                
+                return (
+                  <Card className="mb-8 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+                    <CardHeader className="bg-blue-100 border-b border-blue-200">
+                      <CardTitle className="flex items-center text-blue-900">
+                        <TestTube className="h-5 w-5 mr-2" />
+                        Blood Indices Calculations
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* MCV Calculation */}
+                        <div className="bg-white p-4 rounded-lg border border-blue-200">
+                          <h4 className="font-semibold text-blue-900 mb-2">MCV (Mean Corpuscular Volume)</h4>
+                          <div className="text-sm space-y-1">
+                            <p className="text-gray-600">Formula: (PCV × 10) ÷ RBC</p>
+                            <p className="text-gray-800">Calculation: ({pcvValue} × 10) ÷ {rbcValue}</p>
+                            <p className="text-gray-800">= {(pcvValue * 10).toFixed(1)} ÷ {rbcValue}</p>
+                            <p className="font-semibold text-blue-900">= {mcvResult?.value} fL</p>
+                            <p className="text-xs text-gray-500">Normal: 80-100 fL</p>
+                            <Badge className={
+                              mcvResult?.status === 'normal' ? 'bg-green-100 text-green-800' :
+                              mcvResult?.status === 'high' ? 'bg-yellow-100 text-yellow-800' :
+                              mcvResult?.status === 'low' ? 'bg-blue-100 text-blue-800' :
+                              'bg-red-100 text-red-800'
+                            }>
+                              {mcvResult?.status ? mcvResult.status.charAt(0).toUpperCase() + mcvResult.status.slice(1) : 'Unknown'}
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        {/* MCH Calculation */}
+                        <div className="bg-white p-4 rounded-lg border border-blue-200">
+                          <h4 className="font-semibold text-blue-900 mb-2">MCH (Mean Corpuscular Hemoglobin)</h4>
+                          <div className="text-sm space-y-1">
+                            <p className="text-gray-600">Formula: (Hb × 10) ÷ RBC</p>
+                            <p className="text-gray-800">Calculation: ({hbValue} × 10) ÷ {rbcValue}</p>
+                            <p className="text-gray-800">= {(hbValue * 10).toFixed(1)} ÷ {rbcValue}</p>
+                            <p className="font-semibold text-blue-900">= {mchResult?.value} pg</p>
+                            <p className="text-xs text-gray-500">Normal: 27-33 pg</p>
+                            <Badge className={
+                              mchResult?.status === 'normal' ? 'bg-green-100 text-green-800' :
+                              mchResult?.status === 'high' ? 'bg-yellow-100 text-yellow-800' :
+                              mchResult?.status === 'low' ? 'bg-blue-100 text-blue-800' :
+                              'bg-red-100 text-red-800'
+                            }>
+                              {mchResult?.status ? mchResult.status.charAt(0).toUpperCase() + mchResult.status.slice(1) : 'Unknown'}
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        {/* MCHC Calculation */}
+                        <div className="bg-white p-4 rounded-lg border border-blue-200">
+                          <h4 className="font-semibold text-blue-900 mb-2">MCHC (Mean Corpuscular Hemoglobin Concentration)</h4>
+                          <div className="text-sm space-y-1">
+                            <p className="text-gray-600">Formula: (Hb × 100) ÷ PCV</p>
+                            <p className="text-gray-800">Calculation: ({hbValue} × 100) ÷ {pcvValue}</p>
+                            <p className="text-gray-800">= {(hbValue * 100).toFixed(1)} ÷ {pcvValue}</p>
+                            <p className="font-semibold text-blue-900">= {mchcResult?.value} g/dL</p>
+                            <p className="text-xs text-gray-500">Normal: 32-36 g/dL</p>
+                            <Badge className={
+                              mchcResult?.status === 'normal' ? 'bg-green-100 text-green-800' :
+                              mchcResult?.status === 'high' ? 'bg-yellow-100 text-yellow-800' :
+                              mchcResult?.status === 'low' ? 'bg-blue-100 text-blue-800' :
+                              'bg-red-100 text-red-800'
+                            }>
+                              {mchcResult?.status ? mchcResult.status.charAt(0).toUpperCase() + mchcResult.status.slice(1) : 'Unknown'}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })()}
               
               {/* Individual test cards with clear separation */}
               <div className="space-y-8">
@@ -536,7 +698,8 @@ export default function EnterResults() {
                             <div>
                               <Label htmlFor={`value-${index}`}>
                                 Result Value *
-                                {(result.testName === 'P.C.V' || result.testName === 'Total R.B.C COUNT') && (
+                                {(result.testName === 'P.C.V' || result.testName === 'Total R.B.C COUNT' || 
+                                  result.testName === 'MCV' || result.testName === 'MCH' || result.testName === 'MCHC') && (
                                   <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
                                     Auto-calculated
                                   </span>
@@ -555,6 +718,9 @@ export default function EnterResults() {
                                 placeholder={
                                   result.testName === 'P.C.V' ? 'Will auto-calculate from Hb' :
                                   result.testName === 'Total R.B.C COUNT' ? 'Will auto-calculate from Hb' :
+                                  result.testName === 'MCV' ? 'Auto-calculates from PCV & RBC' :
+                                  result.testName === 'MCH' ? 'Auto-calculates from Hb & RBC' :
+                                  result.testName === 'MCHC' ? 'Auto-calculates from Hb & PCV' :
                                   result.testName === 'a. RBC\'s' ? 'RBC morphology' :
                                   result.testName === 'b. WBC\'s' ? 'WBC assessment' :
                                   result.testName === 'c. PLATELETS' ? 'Platelet adequacy' :
@@ -562,11 +728,15 @@ export default function EnterResults() {
                                   'Enter value'
                                 }
                                 className={`mt-1 ${
-                                  (result.testName === 'P.C.V' || result.testName === 'Total R.B.C COUNT') 
+                                  (result.testName === 'P.C.V' || result.testName === 'Total R.B.C COUNT' || 
+                                   result.testName === 'MCV' || result.testName === 'MCH' || result.testName === 'MCHC') 
                                     ? 'bg-blue-50 border-blue-200' 
                                     : ''
                                 }`}
-                                readOnly={result.testName === 'P.C.V' || result.testName === 'Total R.B.C COUNT'}
+                                readOnly={
+                                  result.testName === 'P.C.V' || result.testName === 'Total R.B.C COUNT' || 
+                                  result.testName === 'MCV' || result.testName === 'MCH' || result.testName === 'MCHC'
+                                }
                               />
                             </div>
                             {(result.testName !== 'a. RBC\'s' && result.testName !== 'b. WBC\'s' && 
