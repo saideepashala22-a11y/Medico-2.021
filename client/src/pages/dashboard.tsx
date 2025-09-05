@@ -76,6 +76,53 @@ export default function Dashboard() {
     staleTime: 60000, // 1 minute
   });
 
+  // Fetch recent activities for notifications
+  const { data: activities } = useQuery<Array<{
+    id: string;
+    type: string;
+    title: string;
+    description: string;
+    createdAt: string;
+  }>>({
+    queryKey: ['/api/activities/recent'],
+    staleTime: 30 * 1000, // Cache for 30 seconds
+    refetchInterval: 60 * 1000, // Auto-refresh every minute
+  });
+
+  // Helper function to get icon and color for activity types
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'patient_registered':
+        return { icon: UserPlus, color: 'green' };
+      case 'lab_test_completed':
+        return { icon: TestTube, color: 'blue' };
+      case 'prescription_created':
+        return { icon: Pill, color: 'orange' };
+      case 'discharge_summary':
+        return { icon: FileCheck, color: 'purple' };
+      default:
+        return { icon: Activity, color: 'gray' };
+    }
+  };
+
+  // Helper function to format time ago
+  const formatTimeAgo = (dateString: string) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    if (minutes < 60) {
+      return `${minutes} minutes ago`;
+    } else if (hours < 24) {
+      return `${hours} hours ago`;
+    } else {
+      return `${days} days ago`;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Top Navigation Bar */}
@@ -282,77 +329,28 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className={`p-4 space-y-4 overflow-y-auto ${showAllNotifications ? 'max-h-96' : 'max-h-64'}`}>
-                {showAllNotifications && (
-                  <>
-                    {/* Additional notifications when expanded */}
-                    <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center">
-                        <Calendar className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                {activities && activities.length > 0 ? (
+                  activities.slice(0, showAllNotifications ? 10 : 3).map((activity) => {
+                    const { icon: Icon, color } = getActivityIcon(activity.type);
+                    return (
+                      <div key={activity.id} className="flex items-start space-x-3">
+                        <div className={`w-8 h-8 bg-${color}-100 dark:bg-${color}-900/20 rounded-full flex items-center justify-center`}>
+                          <Icon className={`h-4 w-4 text-${color}-600 dark:text-${color}-400`} />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">{activity.title}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{activity.description}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{formatTimeAgo(activity.createdAt)}</p>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">Appointment scheduled</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Dr. Smith scheduled for tomorrow 10 AM</p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">8 hours ago</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center">
-                        <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">Critical lab results</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Patient #205 requires immediate attention</p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">12 hours ago</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/20 rounded-full flex items-center justify-center">
-                        <Clock className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">Medication reminder</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Update inventory for Ward 2</p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">1 day ago</p>
-                      </div>
-                    </div>
-                  </>
+                    );
+                  })
+                ) : (
+                  <div className="text-center py-8">
+                    <Activity className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm text-gray-500 dark:text-gray-400">No recent activities</p>
+                  </div>
                 )}
-                
-                {/* Original 3 notifications */}
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
-                    <UserPlus className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">New patient registered</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">John Doe has been admitted to Ward 3</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">2 hours ago</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
-                    <TestTube className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">Lab test completed</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Blood work results ready for Patient #102</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">4 hours ago</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center">
-                    <FileText className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">Discharge summary ready</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Mary Smith's discharge summary is ready for review</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">6 hours ago</p>
-                  </div>
-                </div>
               </div>
               <div className="p-4 border-t border-gray-200 dark:border-gray-700">
                 {!showAllNotifications ? (

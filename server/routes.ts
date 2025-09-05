@@ -733,6 +733,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const registration = await storage.createPatientsRegistration(registrationData);
+      
+      // Log activity for new patient registration
+      await storage.createActivity({
+        type: 'patient_registered',
+        title: 'New patient registered',
+        description: `${registration.fullName} (${registration.mruNumber}) has been registered`,
+        entityId: registration.id,
+        entityType: 'patient',
+        userId: req.user.id,
+      });
+      
       res.status(201).json(registration);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -1076,6 +1087,18 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
         return res.status(400).json({ message: 'Validation error', errors: error.errors });
       }
       res.status(500).json({ message: 'Failed to update hospital settings' });
+    }
+  });
+
+  // Activities endpoints
+  app.get('/api/activities/recent', authenticateToken, async (req: any, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit) : 10;
+      const activities = await storage.getRecentActivities(limit);
+      res.json(activities);
+    } catch (error) {
+      console.error('Error fetching recent activities:', error);
+      res.status(500).json({ message: 'Failed to fetch activities' });
     }
   });
 

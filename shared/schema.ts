@@ -466,6 +466,33 @@ export const insertMedicineInventorySchema = createInsertSchema(medicineInventor
 export type InsertMedicineInventory = z.infer<typeof insertMedicineInventorySchema>;
 export type MedicineInventory = typeof medicineInventory.$inferSelect;
 
+// Activities/Notifications Table
+export const activities = pgTable("activities", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  type: text("type").notNull(), // 'patient_registered', 'lab_test_completed', 'prescription_created', etc.
+  title: text("title").notNull(), // Display title for the notification
+  description: text("description").notNull(), // Detailed description
+  entityId: varchar("entity_id"), // ID of the related entity (patient, lab test, etc.)
+  entityType: text("entity_type"), // Type of entity ('patient', 'lab_test', 'prescription', etc.)
+  userId: varchar("user_id").references(() => users.id), // User who triggered the activity
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const activitiesRelations = relations(activities, ({ one }) => ({
+  user: one(users, {
+    fields: [activities.userId],
+    references: [users.id],
+  }),
+}));
+
+export const insertActivitySchema = createInsertSchema(activities).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertActivity = z.infer<typeof insertActivitySchema>;
+export type Activity = typeof activities.$inferSelect;
+
 // Hospital Settings Table
 export const hospitalSettings = pgTable("hospital_settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

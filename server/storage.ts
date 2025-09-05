@@ -1,11 +1,12 @@
 import { 
-  users, patients, labTests, prescriptions, dischargeSummaries, medicalHistory, patientProfiles, consultations, labTestDefinitions, surgicalCaseSheets, patientsRegistration, medicineInventory, hospitalSettings,
+  users, patients, labTests, prescriptions, dischargeSummaries, medicalHistory, patientProfiles, consultations, labTestDefinitions, surgicalCaseSheets, patientsRegistration, medicineInventory, hospitalSettings, activities,
   type User, type InsertUser, type Patient, type InsertPatient,
   type LabTest, type InsertLabTest, type Prescription, type InsertPrescription,
   type DischargeSummary, type InsertDischargeSummary, type MedicalHistory, type InsertMedicalHistory,
   type PatientProfile, type InsertPatientProfile, type Consultation, type InsertConsultation,
   type SurgicalCaseSheet, type InsertSurgicalCaseSheet, type PatientsRegistration, type InsertPatientsRegistration,
   type MedicineInventory, type InsertMedicineInventory, type HospitalSettings, type InsertHospitalSettings,
+  type Activity, type InsertActivity,
   insertLabTestDefinitionSchema
 } from "@shared/schema";
 import { db } from "./db";
@@ -145,6 +146,10 @@ export interface IStorage {
   getHospitalSettings(): Promise<HospitalSettings>;
   updateHospitalSettings(updates: Partial<InsertHospitalSettings>): Promise<HospitalSettings>;
   createHospitalSettings(settings: InsertHospitalSettings & { createdBy: string }): Promise<HospitalSettings>;
+  
+  // Activities/Notifications
+  createActivity(activity: InsertActivity): Promise<Activity>;
+  getRecentActivities(limit?: number): Promise<Activity[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1107,6 +1112,24 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return created;
+  }
+
+  // Activities/Notifications Methods
+  async createActivity(activity: InsertActivity): Promise<Activity> {
+    const [created] = await db.insert(activities)
+      .values(activity)
+      .returning();
+    
+    return created;
+  }
+
+  async getRecentActivities(limit: number = 10): Promise<Activity[]> {
+    const recentActivities = await db.select()
+      .from(activities)
+      .orderBy(desc(activities.createdAt))
+      .limit(limit);
+    
+    return recentActivities;
   }
 }
 
