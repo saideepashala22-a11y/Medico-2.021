@@ -175,7 +175,6 @@ export default function LabReport() {
       doc.text("VALUE", 90, yPos + 8);
       doc.text("UNIT", 120, yPos + 8);
       doc.text("REFERENCE RANGE", 140, yPos + 8);
-      doc.text("FLAG", 180, yPos + 8);
 
       yPos += 12;
 
@@ -216,25 +215,6 @@ export default function LabReport() {
                   140,
                   yPos + 2,
                 );
-
-                // Flag (Normal/Abnormal)
-                doc.setFont("helvetica", "bold");
-                const status = testResult.status || "normal";
-                if (status === "normal") {
-                  doc.setTextColor(0, 128, 0); // Green
-                  doc.text("NORMAL", 180, yPos + 2);
-                } else if (status === "high") {
-                  doc.setTextColor(255, 140, 0); // Orange
-                  doc.text("HIGH", 180, yPos + 2);
-                } else if (status === "low") {
-                  doc.setTextColor(0, 0, 255); // Blue
-                  doc.text("LOW", 180, yPos + 2);
-                } else if (status === "critical") {
-                  doc.setTextColor(255, 0, 0); // Red
-                  doc.text("CRITICAL", 180, yPos + 2);
-                }
-                doc.setTextColor(0, 0, 0); // Reset to black
-                doc.setFont("helvetica", "normal");
 
                 yPos += 8;
               }
