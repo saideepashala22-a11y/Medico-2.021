@@ -26,6 +26,9 @@ export default function MedicineForm() {
   const isEdit = editMatch && editParams?.id;
   const params = editParams;
   
+  // Debug logging
+  console.log('Route debug:', { editMatch, editParams, newMatch, location, isEdit });
+  
   const [formData, setFormData] = useState({
     medicineName: '',
     batchNumber: '',
@@ -57,21 +60,22 @@ export default function MedicineForm() {
 
   // Populate form with existing data when editing
   useEffect(() => {
-    if (existingMedicine) {
+    if (existingMedicine && isEdit) {
+      console.log('Populating form with medicine data:', existingMedicine);
       setFormData({
-        medicineName: existingMedicine.medicineName,
-        batchNumber: existingMedicine.batchNumber,
-        quantity: existingMedicine.quantity.toString(),
+        medicineName: existingMedicine.medicineName || '',
+        batchNumber: existingMedicine.batchNumber || '',
+        quantity: existingMedicine.quantity?.toString() || '',
         units: existingMedicine.units || 'tablets',
-        mrp: existingMedicine.mrp.toString(),
-        manufactureDate: existingMedicine.manufactureDate ? existingMedicine.manufactureDate.split('T')[0] : '',
-        expiryDate: existingMedicine.expiryDate ? existingMedicine.expiryDate.split('T')[0] : '',
+        mrp: existingMedicine.mrp?.toString() || '',
+        manufactureDate: existingMedicine.manufactureDate ? new Date(existingMedicine.manufactureDate).toISOString().split('T')[0] : '',
+        expiryDate: existingMedicine.expiryDate ? new Date(existingMedicine.expiryDate).toISOString().split('T')[0] : '',
         manufacturer: existingMedicine.manufacturer || '',
         category: existingMedicine.category || 'tablets',
         description: existingMedicine.description || '',
       });
     }
-  }, [existingMedicine]);
+  }, [existingMedicine, isEdit]);
 
   const createMedicineMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -169,13 +173,17 @@ export default function MedicineForm() {
     navigate('/pharmacy');
   };
 
-  if (isLoadingMedicine) {
+  if (isLoadingMedicine && isEdit) {
     return (
       <div className="container mx-auto p-6">
         <div className="text-center py-8">Loading medicine details...</div>
       </div>
     );
   }
+
+  // Debug: show current form data in console
+  console.log('Current form data:', formData);
+  console.log('Existing medicine data:', existingMedicine);
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
