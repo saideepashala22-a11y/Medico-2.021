@@ -102,7 +102,7 @@ export default function EnterResults() {
     const units: Record<string, string> = {
       'HAEMOGLOBIN': 'gms%',
       'Total R.B.C COUNT': 'Mill/Cumm',
-      'P.C.V': '%',
+      'P.C.V': 'Vol%',
       'W.B.C (TOTAL)': '/Cumm',
       'NEUTROPHILS': '%',
       'LYMPHOCYTES': '%',

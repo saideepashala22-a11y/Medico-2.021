@@ -231,6 +231,10 @@ export default function LabReport() {
                     if (displayUnit.includes("μL") || displayUnit.includes("/μL")) {
                       displayUnit = "Lakhs/Cumm";
                     }
+                  } else if (testResult.testName === "P.C.V") {
+                    if (displayUnit === "%") {
+                      displayUnit = "Vol%";
+                    }
                   }
                   
                   doc.text(displayUnit, 120, yPos + 2);
