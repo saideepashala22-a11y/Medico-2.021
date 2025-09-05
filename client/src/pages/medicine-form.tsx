@@ -48,28 +48,43 @@ export default function MedicineForm() {
     description: '',
   });
 
-  // Fetch existing medicine data for editing
-  const { data: existingMedicine, isLoading: isLoadingMedicine, error } = useQuery({
+  // Fetch existing medicine data for editing  
+  const { data: existingMedicine, isLoading: isLoadingMedicine, error, status } = useQuery({
     queryKey: ['medicine-detail', params?.id],
     queryFn: async () => {
-      if (!params?.id) return null;
-      console.log('🔍 Making API call for medicine ID:', params.id);
-      const response = await fetch(`/api/medicines/${params.id}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      if (!response.ok) {
-        console.error('❌ API call failed:', response.status, response.statusText);
-        throw new Error('Failed to fetch medicine');
+      if (!params?.id) {
+        console.log('⚠️ No params.id, returning null');
+        return null;
       }
-      const data = await response.json();
-      console.log('✅ API Response Data:', data);
-      return data;
+      console.log('🔍 Making API call for medicine ID:', params.id);
+      try {
+        const response = await fetch(`/api/medicines/${params.id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        console.log('📡 Response status:', response.status, response.ok);
+        if (!response.ok) {
+          console.error('❌ API call failed:', response.status, response.statusText);
+          throw new Error(`Failed to fetch medicine: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('✅ API Response Data:', data);
+        return data;
+      } catch (err) {
+        console.error('💥 Fetch error:', err);
+        throw err;
+      }
     },
     enabled: Boolean(params?.id && isEdit),
-    staleTime: 0,
-    refetchOnWindowFocus: false,
+    retry: false,
+  });
+  
+  console.log('🔧 React Query Status:', { 
+    status, 
+    isLoading: isLoadingMedicine, 
+    hasData: !!existingMedicine, 
+    error: error?.message 
   });
 
   // Populate form with existing data when editing
