@@ -3,7 +3,6 @@ import { useAuth } from '@/hooks/use-auth-simple';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Hospital, Loader2 } from 'lucide-react';
@@ -14,7 +13,6 @@ export default function Login() {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
-    role: '',
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
@@ -23,7 +21,7 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.username || !formData.password || !formData.role) {
+    if (!formData.username || !formData.password) {
       toast({
         title: 'Error',
         description: 'Please fill in all fields',
@@ -34,7 +32,7 @@ export default function Login() {
 
     setIsLoading(true);
     try {
-      await login(formData.username, formData.password, formData.role);
+      await login(formData.username, formData.password, 'doctor');
       toast({
         title: 'Success',
         description: 'Logged in successfully',
@@ -89,19 +87,6 @@ export default function Login() {
                 autoComplete="new-password"
                 required
               />
-            </div>
-            
-            <div>
-              <Label htmlFor="role">Role</Label>
-              <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="doctor">Doctor/Admin</SelectItem>
-                  <SelectItem value="staff">Staff</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
             
             <Button 
