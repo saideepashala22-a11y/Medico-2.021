@@ -152,99 +152,110 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
               {isLoading ? (
                 <div className="text-center py-8">Loading inventory...</div>
               ) : filteredMedicines && filteredMedicines.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <Table>
+                <div className="w-full">
+                  <Table className="w-full table-fixed">
                     <TableHeader>
-                      <TableRow>
-                        <TableHead>Medicine Name</TableHead>
-                        <TableHead>Batch Number</TableHead>
-                        <TableHead>Quantity</TableHead>
-                        <TableHead>Units</TableHead>
-                        <TableHead>MRP</TableHead>
-                        <TableHead>Manufacture Date</TableHead>
-                        <TableHead>Expiry Date</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Actions</TableHead>
+                      <TableRow className="text-xs">
+                        <TableHead className="w-[22%] px-2 py-2">Medicine Name</TableHead>
+                        <TableHead className="w-[12%] px-2 py-2">Batch</TableHead>
+                        <TableHead className="w-[8%] px-2 py-2 text-center">Qty</TableHead>
+                        <TableHead className="w-[8%] px-2 py-2 text-center">Units</TableHead>
+                        <TableHead className="w-[10%] px-2 py-2">MRP</TableHead>
+                        <TableHead className="w-[10%] px-2 py-2 hidden sm:table-cell">Mfg Date</TableHead>
+                        <TableHead className="w-[10%] px-2 py-2">Expiry</TableHead>
+                        <TableHead className="w-[8%] px-2 py-2 hidden md:table-cell">Category</TableHead>
+                        <TableHead className="w-[7%] px-2 py-2 text-center">Status</TableHead>
+                        <TableHead className="w-[5%] px-2 py-2 text-center">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredMedicines.map((medicine: MedicineInventory) => (
-                        <TableRow key={medicine.id}>
-                          <TableCell className="font-medium">
-                            <div className="flex items-center gap-2">
-                              <Pill className="h-4 w-4 text-medical-primary" />
-                              {medicine.medicineName}
+                        <TableRow key={medicine.id} className="text-xs">
+                          <TableCell className="font-medium px-2 py-2">
+                            <div className="flex items-center gap-1 truncate">
+                              <Pill className="h-3 w-3 text-medical-primary flex-shrink-0" />
+                              <span className="truncate" title={medicine.medicineName}>
+                                {medicine.medicineName}
+                              </span>
                             </div>
                           </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <Hash className="h-3 w-3 text-gray-400" />
-                              {medicine.batchNumber}
+                          <TableCell className="px-2 py-2">
+                            <div className="flex items-center gap-1 truncate">
+                              <Hash className="h-2 w-2 text-gray-400 flex-shrink-0" />
+                              <span className="truncate" title={medicine.batchNumber}>
+                                {medicine.batchNumber}
+                              </span>
                             </div>
                           </TableCell>
-                          <TableCell>
-                            <Badge variant={medicine.quantity < 10 ? "destructive" : "default"}>
+                          <TableCell className="px-2 py-2 text-center">
+                            <Badge 
+                              variant={medicine.quantity === 0 ? "destructive" : medicine.quantity < 10 ? "secondary" : "default"}
+                              className="text-xs px-1 py-0"
+                            >
                               {medicine.quantity}
                             </Badge>
                           </TableCell>
-                          <TableCell>
-                            <Badge variant="secondary">
-                              {medicine.units || 'tablets'}
+                          <TableCell className="px-2 py-2 text-center">
+                            <Badge variant="secondary" className="text-xs px-1 py-0">
+                              {medicine.units || 'tabs'}
                             </Badge>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="px-2 py-2">
                             <div className="flex items-center gap-1">
-                              <DollarSign className="h-3 w-3 text-green-600" />
-                              ₹{medicine.mrp}
+                              <span className="text-green-600">₹</span>
+                              <span>{medicine.mrp}</span>
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="px-2 py-2 hidden sm:table-cell">
                             {medicine.manufactureDate ? (
-                              <div className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3 text-blue-400" />
-                                {new Date(medicine.manufactureDate).toLocaleDateString()}
-                              </div>
+                              <span className="text-xs">
+                                {new Date(medicine.manufactureDate).toLocaleDateString('en-GB')}
+                              </span>
                             ) : (
-                              'N/A'
+                              <span className="text-gray-400">N/A</span>
                             )}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="px-2 py-2">
                             {medicine.expiryDate ? (
-                              <div className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3 text-gray-400" />
-                                {new Date(medicine.expiryDate).toLocaleDateString()}
-                              </div>
+                              <span className="text-xs">
+                                {new Date(medicine.expiryDate).toLocaleDateString('en-GB')}
+                              </span>
                             ) : (
-                              'N/A'
+                              <span className="text-gray-400">N/A</span>
                             )}
                           </TableCell>
-                          <TableCell>
-                            <Badge variant="outline">
+                          <TableCell className="px-2 py-2 hidden md:table-cell">
+                            <Badge variant="outline" className="text-xs px-1 py-0 truncate">
                               {medicine.category || 'N/A'}
                             </Badge>
                           </TableCell>
-                          <TableCell>
-                            <Badge variant={medicine.isActive ? "default" : "secondary"}>
+                          <TableCell className="px-2 py-2 text-center">
+                            <Badge 
+                              variant={medicine.isActive ? "default" : "secondary"}
+                              className="text-xs px-1 py-0"
+                            >
                               {medicine.isActive ? 'Active' : 'Inactive'}
                             </Badge>
                           </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
+                          <TableCell className="px-1 py-2">
+                            <div className="flex gap-1 justify-center">
                               <Button
                                 size="sm"
-                                variant="outline"
+                                variant="ghost"
                                 onClick={() => handleEdit(medicine)}
                                 data-testid={`edit-medicine-${medicine.id}`}
+                                className="h-6 w-6 p-0"
+                                title="Edit Medicine"
                               >
                                 <Edit className="h-3 w-3" />
                               </Button>
                               <Button
                                 size="sm"
-                                variant="outline"
+                                variant="ghost"
                                 onClick={() => handleDelete(medicine.id)}
-                                className="text-red-600 hover:text-red-700"
+                                className="h-6 w-6 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                                 data-testid={`delete-medicine-${medicine.id}`}
+                                title="Delete Medicine"
                               >
                                 <Trash2 className="h-3 w-3" />
                               </Button>
