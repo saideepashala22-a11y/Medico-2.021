@@ -210,9 +210,23 @@ export default function LabReport() {
                 doc.text(testResult.unit || "units", 120, yPos + 2);
 
                 // Reference range - handle gender-specific ranges
-                const normalRange = testResult.normalRange || "Consult reference";
+                let normalRange = testResult.normalRange || "Consult reference";
+                
+                // Convert old format "(F), (M)" to new format "(M)|(F)" 
+                if (normalRange.includes('(F)') && normalRange.includes('(M)')) {
+                  // Extract male and female ranges from old format
+                  const femaleMatch = normalRange.match(/([^,]+\(F\)[^,]*)/);
+                  const maleMatch = normalRange.match(/([^,]+\(M\)[^,]*)/);
+                  
+                  if (femaleMatch && maleMatch) {
+                    const femaleRange = femaleMatch[1].trim();
+                    const maleRange = maleMatch[1].trim();
+                    normalRange = `${maleRange}|${femaleRange}`;
+                  }
+                }
+                
                 if (normalRange.includes('|')) {
-                  // Split gender-specific ranges
+                  // Split gender-specific ranges (male first, female second)
                   const [maleRange, femaleRange] = normalRange.split('|');
                   doc.text(maleRange.trim(), 140, yPos + 2);
                   doc.text(femaleRange.trim(), 140, yPos + 6);

@@ -154,7 +154,7 @@ export default function EnterResults() {
       'TOTAL CHOLESTEROL': '<200 mg/dL',
       'SERUM TRIGLYCERIDES': '<150 mg/dL',
       'PLATELET COUNT': '150,000-450,000 /μL',
-      'ESR (Erythrocyte Sedimentation Rate)': '<20 mm/hr (F), <15 mm/hr (M)',
+      'ESR (Erythrocyte Sedimentation Rate)': '(M) <15 mm/hr|(F) <20 mm/hr',
       'SERUM URIC ACID': '3.4-7.0 mg/dL',
       'SERUM CALCIUM': '8.5-10.5 mg/dL',
       'SERUM SODIUM': '136-145 mEq/L',
