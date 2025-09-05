@@ -3,12 +3,33 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import multer from "multer";
+import xlsx from "xlsx";
 import { insertUserSchema, insertPatientSchema, insertLabTestSchema, insertPrescriptionSchema, insertDischargeSummarySchema, insertMedicalHistorySchema, insertPatientProfileSchema, insertConsultationSchema, insertLabTestDefinitionSchema, insertSurgicalCaseSheetSchema, insertPatientsRegistrationSchema, insertMedicineInventorySchema, insertHospitalSettingsSchema, type User } from "@shared/schema";
 import { z } from "zod";
 import { generateChatResponse, generateMedicalAssistance } from "./gemini";
 import { sendOTP, generateOTP } from "./twilioService";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+
+// Configure multer for file uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel'
+    ];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only Excel files are allowed'));
+    }
+  }
+});
 
 // Middleware to verify JWT token
 function authenticateToken(req: any, res: any, next: any) {
@@ -1006,6 +1027,221 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
     } catch (error) {
       console.error('Error processing medicine return:', error);
       res.status(500).json({ message: 'Failed to process medicine return' });
+    }
+  });
+
+  // Excel upload endpoint for bulk medicine import
+  app.post('/api/medicines/upload-excel', authenticateToken, upload.single('excel'), async (req: any, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded' });
+      }
+
+      // Parse Excel file
+      const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = xlsx.utils.sheet_to_json(worksheet);
+
+      if (!jsonData || jsonData.length === 0) {
+        return res.status(400).json({ message: 'Excel file is empty or invalid' });
+      }
+
+      const results = {
+        success: true,
+        totalRows: jsonData.length,
+        imported: 0,
+        duplicates: 0,
+        errors: [] as Array<{ row: number; field: string; message: string }>
+      };
+
+      const medicinesData = [];
+
+      // Process each row
+      for (let i = 0; i < jsonData.length; i++) {
+        const row = jsonData[i] as any;
+        const rowNumber = i + 2; // Excel rows start from 2 (header is row 1)
+
+        try {
+          // Map Excel columns to our schema (flexible column names)
+          const medicineData: any = {};
+
+          // Required fields with flexible column names
+          medicineData.medicineName = row['Medicine Name'] || row['medicine_name'] || row['name'] || row['Medicine'] || '';
+          medicineData.batchNumber = row['Batch Number'] || row['batch_number'] || row['batch'] || row['Batch'] || '';
+          medicineData.quantity = parseFloat(row['Quantity'] || row['quantity'] || row['qty'] || '0');
+          medicineData.units = row['Units'] || row['units'] || row['unit'] || 'tablets';
+          medicineData.mrp = row['MRP'] || row['mrp'] || row['price'] || row['Price'] || '';
+
+          // Optional fields
+          medicineData.manufacturer = row['Manufacturer'] || row['manufacturer'] || row['mfg'] || '';
+          medicineData.category = row['Category'] || row['category'] || row['type'] || row['Type'] || 'tablets';
+          medicineData.description = row['Description'] || row['description'] || row['desc'] || '';
+
+          // Handle dates
+          if (row['Manufacture Date'] || row['manufacture_date'] || row['mfg_date']) {
+            const mfgDate = row['Manufacture Date'] || row['manufacture_date'] || row['mfg_date'];
+            if (mfgDate) {
+              try {
+                medicineData.manufactureDate = new Date(mfgDate);
+              } catch (e) {
+                // Invalid date, skip
+              }
+            }
+          }
+
+          if (row['Expiry Date'] || row['expiry_date'] || row['exp_date']) {
+            const expDate = row['Expiry Date'] || row['expiry_date'] || row['exp_date'];
+            if (expDate) {
+              try {
+                medicineData.expiryDate = new Date(expDate);
+              } catch (e) {
+                // Invalid date, skip
+              }
+            }
+          }
+
+          // Validate required fields
+          if (!medicineData.medicineName?.trim()) {
+            results.errors.push({
+              row: rowNumber,
+              field: 'Medicine Name',
+              message: 'Medicine name is required'
+            });
+            continue;
+          }
+
+          if (!medicineData.batchNumber?.trim()) {
+            results.errors.push({
+              row: rowNumber,
+              field: 'Batch Number',
+              message: 'Batch number is required'
+            });
+            continue;
+          }
+
+          if (!medicineData.quantity || medicineData.quantity <= 0) {
+            results.errors.push({
+              row: rowNumber,
+              field: 'Quantity',
+              message: 'Valid quantity is required'
+            });
+            continue;
+          }
+
+          if (!medicineData.mrp?.toString()?.trim()) {
+            results.errors.push({
+              row: rowNumber,
+              field: 'MRP',
+              message: 'MRP is required'
+            });
+            continue;
+          }
+
+          // Validate schema
+          const validatedData = insertMedicineInventorySchema.parse(medicineData);
+          medicinesData.push({
+            ...validatedData,
+            createdBy: req.user.id
+          });
+
+        } catch (error) {
+          console.error('Validation error for row', rowNumber, ':', error);
+          results.errors.push({
+            row: rowNumber,
+            field: 'General',
+            message: error instanceof z.ZodError ? error.errors[0].message : 'Invalid data format'
+          });
+        }
+      }
+
+      // Bulk create medicines (this will handle duplicates)
+      if (medicinesData.length > 0) {
+        try {
+          const bulkResult = await storage.bulkCreateMedicines(medicinesData);
+          results.imported = bulkResult.imported;
+          results.duplicates = bulkResult.duplicates;
+        } catch (error) {
+          console.error('Bulk create error:', error);
+          results.errors.push({
+            row: 0,
+            field: 'Database',
+            message: 'Failed to save medicines to database'
+          });
+        }
+      }
+
+      res.json(results);
+    } catch (error) {
+      console.error('Excel upload error:', error);
+      res.status(500).json({ 
+        message: 'Failed to process Excel file',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Download Excel template endpoint
+  app.get('/api/medicines/excel-template', authenticateToken, async (req, res) => {
+    try {
+      // Create sample data for template
+      const templateData = [
+        {
+          'Medicine Name': 'Paracetamol',
+          'Batch Number': 'PCM001',
+          'Quantity': 100,
+          'Units': 'tablets',
+          'MRP': '50.00',
+          'Manufacture Date': '01/01/2024',
+          'Expiry Date': '01/01/2026',
+          'Manufacturer': 'XYZ Pharma',
+          'Category': 'tablets',
+          'Description': 'Pain relief medication'
+        },
+        {
+          'Medicine Name': 'Cough Syrup',
+          'Batch Number': 'CS002',
+          'Quantity': 50,
+          'Units': 'bottles',
+          'MRP': '120.00',
+          'Manufacture Date': '15/02/2024',
+          'Expiry Date': '15/02/2026',
+          'Manufacturer': 'ABC Pharma',
+          'Category': 'syrup',
+          'Description': 'Cough and cold relief'
+        }
+      ];
+
+      // Create workbook and worksheet
+      const workbook = xlsx.utils.book_new();
+      const worksheet = xlsx.utils.json_to_sheet(templateData);
+
+      // Set column widths
+      worksheet['!cols'] = [
+        { wch: 20 }, // Medicine Name
+        { wch: 15 }, // Batch Number
+        { wch: 10 }, // Quantity
+        { wch: 12 }, // Units
+        { wch: 10 }, // MRP
+        { wch: 15 }, // Manufacture Date
+        { wch: 15 }, // Expiry Date
+        { wch: 15 }, // Manufacturer
+        { wch: 12 }, // Category
+        { wch: 25 }  // Description
+      ];
+
+      xlsx.utils.book_append_sheet(workbook, worksheet, 'Medicines');
+
+      // Generate Excel buffer
+      const excelBuffer = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=medicine-template.xlsx');
+      res.send(excelBuffer);
+
+    } catch (error) {
+      console.error('Template download error:', error);
+      res.status(500).json({ message: 'Failed to generate template' });
     }
   });
 

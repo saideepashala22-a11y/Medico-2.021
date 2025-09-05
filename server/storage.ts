@@ -106,6 +106,7 @@ export interface IStorage {
   updateMedicine(id: string, updates: Partial<MedicineInventory>): Promise<MedicineInventory>;
   deleteMedicine(id: string): Promise<void>;
   searchMedicines(query: string): Promise<MedicineInventory[]>;
+  bulkCreateMedicines(medicines: Array<InsertMedicineInventory & { createdBy: string }>): Promise<{ imported: number; duplicates: number }>;
   
   // Stats
   getStats(): Promise<{
@@ -1053,6 +1054,43 @@ export class DatabaseStorage implements IStorage {
         )
       )
       .orderBy(medicineInventory.medicineName);
+  }
+
+  async bulkCreateMedicines(medicines: Array<InsertMedicineInventory & { createdBy: string }>): Promise<{ imported: number; duplicates: number }> {
+    let imported = 0;
+    let duplicates = 0;
+
+    for (const medicine of medicines) {
+      try {
+        // Check for duplicates based on medicine name and batch number
+        const [existing] = await db.select()
+          .from(medicineInventory)
+          .where(
+            and(
+              eq(medicineInventory.medicineName, medicine.medicineName),
+              eq(medicineInventory.batchNumber, medicine.batchNumber)
+            )
+          )
+          .limit(1);
+
+        if (existing) {
+          duplicates++;
+          console.log(`Duplicate found: ${medicine.medicineName} - ${medicine.batchNumber}`);
+          continue;
+        }
+
+        // Create the medicine if no duplicate found
+        await db.insert(medicineInventory)
+          .values([medicine]);
+        
+        imported++;
+      } catch (error) {
+        console.error(`Error creating medicine ${medicine.medicineName}:`, error);
+        // Continue processing other medicines even if one fails
+      }
+    }
+
+    return { imported, duplicates };
   }
 
   // Hospital Settings Implementation
