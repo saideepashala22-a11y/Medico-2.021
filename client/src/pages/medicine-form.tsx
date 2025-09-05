@@ -26,8 +26,6 @@ export default function MedicineForm() {
   const isEdit = !!(editMatch && editParams?.id);
   const params = editParams;
   
-  // Debug logging
-  console.log('Route debug:', { editMatch, editParams, newMatch, location, isEdit });
   
   const [formData, setFormData] = useState({
     medicineName: '',
@@ -47,7 +45,6 @@ export default function MedicineForm() {
     queryKey: ['medicine-detail', params?.id],
     queryFn: async () => {
       if (!params?.id) return null;
-      console.log('Fetching medicine with ID:', params.id);
       const response = await fetch(`/api/medicines/${params.id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -55,7 +52,6 @@ export default function MedicineForm() {
       });
       if (!response.ok) throw new Error('Failed to fetch medicine');
       const data = await response.json();
-      console.log('API response:', data);
       return data;
     },
     enabled: Boolean(params?.id && isEdit),
@@ -66,7 +62,6 @@ export default function MedicineForm() {
   // Populate form with existing data when editing
   useEffect(() => {
     if (existingMedicine && isEdit) {
-      console.log('Populating form with medicine data:', existingMedicine);
       setFormData({
         medicineName: existingMedicine.medicineName || '',
         batchNumber: existingMedicine.batchNumber || '',
