@@ -973,6 +973,31 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
     }
   });
 
+  // Medicine returns endpoint - for patients returning medicines to pharmacy
+  app.post('/api/medicines/return', authenticateToken, async (req: any, res) => {
+    try {
+      const { medicineId, quantityReturned, notes } = req.body;
+      
+      // Validate input
+      if (!medicineId || !quantityReturned || quantityReturned <= 0) {
+        return res.status(400).json({ message: 'Medicine ID and valid quantity are required' });
+      }
+      
+      // Update medicine quantity by adding the returned quantity
+      const updatedMedicine = await storage.updateMedicineQuantity(medicineId, quantityReturned);
+      
+      res.json({
+        message: 'Medicine returned successfully',
+        medicine: updatedMedicine,
+        quantityAdded: quantityReturned,
+        newQuantity: updatedMedicine.quantity
+      });
+    } catch (error) {
+      console.error('Error processing medicine return:', error);
+      res.status(500).json({ message: 'Failed to process medicine return' });
+    }
+  });
+
   // Hospital Settings routes
   app.get('/api/hospital-settings', authenticateToken, async (req, res) => {
     try {

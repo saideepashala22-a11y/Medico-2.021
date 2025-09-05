@@ -40,6 +40,13 @@ export default function Pharmacy() {
   const [viewingPrescription, setViewingPrescription] = useState<any>(null);
   const [billSearch, setBillSearch] = useState('');
   const [billSearchResults, setBillSearchResults] = useState<any[]>([]);
+  
+  // Medicine Returns State
+  const [returnForm, setReturnForm] = useState({
+    medicineId: '',
+    quantityReturned: 1,
+    notes: ''
+  });
 
   const { data: patientSearchResults } = useQuery({
     queryKey: ['/api/patients/search', patientSearch],
@@ -149,6 +156,38 @@ export default function Pharmacy() {
     },
   });
 
+  // Medicine Return Mutation
+  const processMedicineReturnMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('POST', '/api/medicines/return', data);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      // Refresh medicines data to show updated inventory
+      queryClient.refetchQueries({ queryKey: ['/api/medicines/active'] });
+      queryClient.refetchQueries({ queryKey: ['/api/medicines'] });
+      
+      toast({
+        title: 'Success',
+        description: `Medicine returned successfully. New stock: ${data.newQuantity}`,
+      });
+      
+      // Reset return form
+      setReturnForm({
+        medicineId: '',
+        quantityReturned: 1,
+        notes: ''
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to process medicine return',
+        variant: 'destructive',
+      });
+    },
+  });
+
   const addMedicine = () => {
     setMedicines([...medicines, {
       medicineId: '',
@@ -233,6 +272,32 @@ export default function Pharmacy() {
     };
 
     createPrescriptionMutation.mutate(prescriptionData);
+  };
+
+  const handleProcessReturn = () => {
+    if (!returnForm.medicineId) {
+      toast({
+        title: 'Error',
+        description: 'Please select a medicine',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (returnForm.quantityReturned <= 0) {
+      toast({
+        title: 'Error',
+        description: 'Please enter a valid quantity',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    processMedicineReturnMutation.mutate({
+      medicineId: returnForm.medicineId,
+      quantityReturned: returnForm.quantityReturned,
+      notes: returnForm.notes
+    });
   };
 
 
@@ -572,6 +637,93 @@ export default function Pharmacy() {
                     </div>
                   </div>
                 )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Medicine Returns Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <span>Medicine Returns</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Medicine Return Form */}
+              <div className="border rounded-lg p-4">
+                <h3 className="font-medium text-gray-900 mb-4">Return Medicine to Inventory</h3>
+                <div className="space-y-4">
+                  <div>
+                    <Label>Select Medicine</Label>
+                    <Select 
+                      value={returnForm.medicineId} 
+                      onValueChange={(value) => setReturnForm({...returnForm, medicineId: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose medicine to return" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(availableMedicines || []).map((med: any) => (
+                          <SelectItem key={med.id} value={med.id}>
+                            {med.medicineName} - Current Stock: {med.quantity}
+                          </SelectItem>
+                        ))}
+                        {(!availableMedicines || availableMedicines.length === 0) && (
+                          <SelectItem value="" disabled>
+                            No medicines available
+                          </SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label>Quantity Returned</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={returnForm.quantityReturned}
+                      onChange={(e) => setReturnForm({...returnForm, quantityReturned: parseInt(e.target.value) || 1})}
+                      placeholder="Enter quantity returned"
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Notes (Optional)</Label>
+                    <Input
+                      value={returnForm.notes}
+                      onChange={(e) => setReturnForm({...returnForm, notes: e.target.value})}
+                      placeholder="Reason for return, condition, etc."
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <Button 
+                    onClick={handleProcessReturn}
+                    disabled={processMedicineReturnMutation.isPending}
+                    className="w-full bg-medical-primary hover:bg-medical-primary-dark"
+                    data-testid="process-return-button"
+                  >
+                    {processMedicineReturnMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing Return...
+                      </>
+                    ) : (
+                      'Process Return'
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Recent Returns Summary */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="font-medium text-gray-900 mb-3">Return Summary</h3>
+                <div className="text-sm text-gray-600">
+                  <p>Returns help maintain accurate inventory levels</p>
+                  <p>Returned medicines are automatically added back to stock</p>
+                </div>
               </div>
             </CardContent>
           </Card>
