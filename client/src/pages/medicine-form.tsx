@@ -45,13 +45,18 @@ export default function MedicineForm() {
     queryKey: ['medicine-detail', params?.id],
     queryFn: async () => {
       if (!params?.id) return null;
+      console.log('🔍 Making API call for medicine ID:', params.id);
       const response = await fetch(`/api/medicines/${params.id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      if (!response.ok) throw new Error('Failed to fetch medicine');
+      if (!response.ok) {
+        console.error('❌ API call failed:', response.status, response.statusText);
+        throw new Error('Failed to fetch medicine');
+      }
       const data = await response.json();
+      console.log('✅ API Response Data:', data);
       return data;
     },
     enabled: Boolean(params?.id && isEdit),
