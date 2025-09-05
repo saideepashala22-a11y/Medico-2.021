@@ -29,7 +29,9 @@ interface MedicineInventory {
   medicineName: string;
   batchNumber: string;
   quantity: number;
+  units: string;
   mrp: number;
+  manufactureDate?: string;
   expiryDate?: string;
   manufacturer?: string;
   category?: string;
@@ -55,7 +57,9 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
     medicineName: '',
     batchNumber: '',
     quantity: '',
+    units: 'tablets',
     mrp: '',
+    manufactureDate: '',
     expiryDate: '',
     manufacturer: '',
     category: 'tablets',
@@ -183,7 +187,9 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
       medicineName: '',
       batchNumber: '',
       quantity: '',
+      units: 'tablets',
       mrp: '',
+      manufactureDate: '',
       expiryDate: '',
       manufacturer: '',
       category: 'tablets',
@@ -207,7 +213,9 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
       medicineName: formData.medicineName,
       batchNumber: formData.batchNumber,
       quantity: parseInt(formData.quantity),
+      units: formData.units,
       mrp: formData.mrp, // Keep as string
+      manufactureDate: formData.manufactureDate || undefined,
       expiryDate: formData.expiryDate || undefined,
       manufacturer: formData.manufacturer || undefined,
       category: formData.category || undefined,
@@ -226,7 +234,9 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
       medicineName: medicine.medicineName,
       batchNumber: medicine.batchNumber,
       quantity: medicine.quantity.toString(),
+      units: medicine.units || 'tablets',
       mrp: medicine.mrp.toString(),
+      manufactureDate: medicine.manufactureDate ? medicine.manufactureDate.split('T')[0] : '',
       expiryDate: medicine.expiryDate ? medicine.expiryDate.split('T')[0] : '',
       manufacturer: medicine.manufacturer || '',
       category: medicine.category || 'tablets',
@@ -340,6 +350,27 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
+                      <Label htmlFor="units">Units *</Label>
+                      <Select value={formData.units} onValueChange={(value) => setFormData(prev => ({ ...prev, units: value }))}>
+                        <SelectTrigger data-testid="select-units">
+                          <SelectValue placeholder="Select units" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="tablets">Tablets</SelectItem>
+                          <SelectItem value="capsules">Capsules</SelectItem>
+                          <SelectItem value="ml">ML (Milliliters)</SelectItem>
+                          <SelectItem value="grams">Grams</SelectItem>
+                          <SelectItem value="bottles">Bottles</SelectItem>
+                          <SelectItem value="vials">Vials</SelectItem>
+                          <SelectItem value="strips">Strips</SelectItem>
+                          <SelectItem value="boxes">Boxes</SelectItem>
+                          <SelectItem value="pieces">Pieces</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
                       <Label htmlFor="mrp">MRP (₹) *</Label>
                       <Input
                         id="mrp"
@@ -355,6 +386,17 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
                     </div>
                     
                     <div>
+                      <Label htmlFor="manufactureDate">Manufacture Date</Label>
+                      <Input
+                        id="manufactureDate"
+                        type="date"
+                        value={formData.manufactureDate}
+                        onChange={(e) => setFormData(prev => ({ ...prev, manufactureDate: e.target.value }))}
+                        data-testid="input-manufacture-date"
+                      />
+                    </div>
+                    
+                    <div>
                       <Label htmlFor="expiryDate">Expiry Date</Label>
                       <Input
                         id="expiryDate"
@@ -364,7 +406,9 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
                         data-testid="input-expiry-date"
                       />
                     </div>
-                    
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="category">Category</Label>
                       <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
@@ -452,9 +496,11 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
                         <TableHead>Medicine Name</TableHead>
                         <TableHead>Batch Number</TableHead>
                         <TableHead>Quantity</TableHead>
+                        <TableHead>Units</TableHead>
                         <TableHead>MRP</TableHead>
-                        <TableHead>Category</TableHead>
+                        <TableHead>Manufacture Date</TableHead>
                         <TableHead>Expiry Date</TableHead>
+                        <TableHead>Category</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
@@ -476,7 +522,12 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
                           </TableCell>
                           <TableCell>
                             <Badge variant={medicine.quantity < 10 ? "destructive" : "default"}>
-                              {medicine.quantity} units
+                              {medicine.quantity}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">
+                              {medicine.units || 'tablets'}
                             </Badge>
                           </TableCell>
                           <TableCell>
@@ -486,9 +537,14 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline">
-                              {medicine.category || 'N/A'}
-                            </Badge>
+                            {medicine.manufactureDate ? (
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3 text-blue-400" />
+                                {new Date(medicine.manufactureDate).toLocaleDateString()}
+                              </div>
+                            ) : (
+                              'N/A'
+                            )}
                           </TableCell>
                           <TableCell>
                             {medicine.expiryDate ? (
@@ -499,6 +555,11 @@ export function PharmacyInventoryModal({ isOpen, onClose }: PharmacyInventoryMod
                             ) : (
                               'N/A'
                             )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">
+                              {medicine.category || 'N/A'}
+                            </Badge>
                           </TableCell>
                           <TableCell>
                             <Badge variant={medicine.isActive ? "default" : "secondary"}>

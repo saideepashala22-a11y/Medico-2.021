@@ -109,7 +109,9 @@ export const medicineInventory = pgTable("medicine_inventory", {
   medicineName: text("medicine_name").notNull(),
   batchNumber: text("batch_number").notNull(),
   quantity: integer("quantity").notNull().default(0),
+  units: text("units").notNull().default("tablets"), // tablets, ml, grams, capsules, etc.
   mrp: decimal("mrp", { precision: 10, scale: 2 }).notNull(),
+  manufactureDate: timestamp("manufacture_date"),
   expiryDate: timestamp("expiry_date"),
   manufacturer: text("manufacturer"),
   category: text("category"), // 'tablets', 'syrup', 'injection', etc.
@@ -460,6 +462,7 @@ export const insertMedicineInventorySchema = createInsertSchema(medicineInventor
 }).extend({
   mrp: z.string(),
   quantity: z.number(),
+  manufactureDate: z.coerce.date().nullable().optional(),
   expiryDate: z.coerce.date().nullable().optional(),
 });
 
