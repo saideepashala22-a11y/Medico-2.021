@@ -167,16 +167,12 @@ export default function LabReport() {
 
       yPos += 8;
 
-      // Table Headers with background
-      doc.setFillColor(240, 240, 240);
-      doc.rect(15, yPos, pageWidth - 30, 12, "F");
-      doc.setLineWidth(0.3);
-      doc.rect(15, yPos, pageWidth - 30, 12);
+      // Table Headers (simplified without borders)
 
       doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
-      doc.text("TEST NAME", 20, yPos + 8);
-      doc.text("RESULT", 90, yPos + 8);
+      doc.text("INVESTIGATION", 20, yPos + 8);
+      doc.text("VALUE", 90, yPos + 8);
       doc.text("UNIT", 120, yPos + 8);
       doc.text("REFERENCE RANGE", 140, yPos + 8);
       doc.text("FLAG", 180, yPos + 8);
@@ -201,11 +197,6 @@ export default function LabReport() {
 
             results.forEach((testResult, index) => {
               if (testResult.value && testResult.value.trim() !== "") {
-                // Draw row with alternating background
-                if (index % 2 === 0) {
-                  doc.setFillColor(248, 249, 250);
-                  doc.rect(15, yPos - 3, pageWidth - 30, 8, "F");
-                }
 
                 // Test name
                 doc.setFont("helvetica", "normal");
