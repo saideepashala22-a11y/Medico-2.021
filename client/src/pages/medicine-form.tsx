@@ -50,7 +50,7 @@ export default function MedicineForm() {
 
   // Fetch existing medicine data for editing  
   const { data: existingMedicine, isLoading: isLoadingMedicine, error, status } = useQuery<MedicineInventory>({
-    queryKey: ['/api/medicines', params?.id],
+    queryKey: [`/api/medicines/${params?.id}`],
     enabled: Boolean(params?.id && isEdit),
     retry: 1,
   });
