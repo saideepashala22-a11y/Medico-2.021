@@ -16,6 +16,17 @@ export default function Lab() {
   const [searchQuery, setSearchQuery] = useState("");
   const [, setLocation] = useLocation();
 
+  // Fetch current doctor instead of using logged-in user
+  const { data: currentDoctor } = useQuery<{
+    id: string;
+    name: string;
+    email?: string;
+    specialization?: string;
+  }>({
+    queryKey: ['/api/current-doctor'],
+    staleTime: 30 * 1000, // Cache for 30 seconds
+  });
+
   const { data: recentTests, isLoading: testsLoading } = useQuery<any[]>({
     queryKey: ['/api/lab-tests/recent'],
   });
@@ -70,7 +81,9 @@ export default function Lab() {
               <span className="text-xl font-bold text-gray-900">Laboratory Management</span>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">{user?.name}</span>
+              <span className="text-sm text-gray-600">
+                {currentDoctor?.name ? `Dr. ${currentDoctor.name}` : user?.name || 'Loading...'}
+              </span>
             </div>
           </div>
         </div>

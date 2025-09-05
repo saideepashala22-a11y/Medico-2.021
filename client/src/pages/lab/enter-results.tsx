@@ -30,6 +30,17 @@ export default function EnterResults() {
   const [, params] = useRoute('/lab/enter-results/:testId');
   const testId = params?.testId;
 
+  // Fetch current doctor instead of using logged-in user
+  const { data: currentDoctor } = useQuery<{
+    id: string;
+    name: string;
+    email?: string;
+    specialization?: string;
+  }>({
+    queryKey: ['/api/current-doctor'],
+    staleTime: 30 * 1000, // Cache for 30 seconds
+  });
+
   const [results, setResults] = useState<TestResult[]>([]);
   const [technician, setTechnician] = useState(user?.name || '');
   const [notes, setNotes] = useState('');
@@ -461,7 +472,9 @@ export default function EnterResults() {
               <h1 className="text-xl font-semibold">Enter Test Results</h1>
             </div>
             <div className="text-sm">
-              <span className="font-medium">{user?.name}</span>
+              <span className="font-medium">
+                {currentDoctor?.name ? `Dr. ${currentDoctor.name}` : user?.name || 'Loading...'}
+              </span>
             </div>
           </div>
         </div>
