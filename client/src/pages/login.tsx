@@ -131,10 +131,6 @@ export default function Login() {
               Forgot Password?
             </button>
           </div>
-          
-          <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500">Demo Credentials: doctor/admin123 or staff/staff123</p>
-          </div>
         </CardContent>
       </Card>
       
