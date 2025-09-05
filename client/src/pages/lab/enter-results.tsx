@@ -473,7 +473,9 @@ export default function EnterResults() {
             </div>
             <div className="text-sm">
               <span className="font-medium">
-                {currentDoctor?.name ? `Dr. ${currentDoctor.name}` : user?.name || 'Loading...'}
+                {currentDoctor?.name 
+                  ? (currentDoctor.name.startsWith('Dr.') ? currentDoctor.name : `Dr. ${currentDoctor.name}`)
+                  : user?.name || 'Loading...'}
               </span>
             </div>
           </div>

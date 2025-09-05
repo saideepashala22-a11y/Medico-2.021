@@ -167,8 +167,19 @@ export default function LabReport() {
         94,
       );
       // Use patient's referring doctor, or fall back to current selected doctor, or default
-      const referringDoctor = labTest.patient.referringDoctor || 
-                              (currentDoctor?.name ? `Dr. ${currentDoctor.name}` : "Dr. Consulting Physician");
+      const getReferringDoctor = () => {
+        if (labTest.patient.referringDoctor) {
+          return labTest.patient.referringDoctor;
+        }
+        if (currentDoctor?.name) {
+          // Check if name already starts with "Dr." to avoid duplication
+          return currentDoctor.name.startsWith('Dr.') 
+            ? currentDoctor.name 
+            : `Dr. ${currentDoctor.name}`;
+        }
+        return "Dr. Consulting Physician";
+      };
+      const referringDoctor = getReferringDoctor();
       doc.text(
         `Referring Doctor: ${referringDoctor}`,
         120,
@@ -481,7 +492,9 @@ export default function LabReport() {
                 Download PDF
               </Button>
               <span className="text-sm text-gray-600">
-                {currentDoctor?.name ? `Dr. ${currentDoctor.name}` : user?.name || 'Loading...'}
+                {currentDoctor?.name 
+                  ? (currentDoctor.name.startsWith('Dr.') ? currentDoctor.name : `Dr. ${currentDoctor.name}`)
+                  : user?.name || 'Loading...'}
               </span>
             </div>
           </div>

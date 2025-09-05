@@ -82,7 +82,9 @@ export default function Lab() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">
-                {currentDoctor?.name ? `Dr. ${currentDoctor.name}` : user?.name || 'Loading...'}
+                {currentDoctor?.name 
+                  ? (currentDoctor.name.startsWith('Dr.') ? currentDoctor.name : `Dr. ${currentDoctor.name}`)
+                  : user?.name || 'Loading...'}
               </span>
             </div>
           </div>
