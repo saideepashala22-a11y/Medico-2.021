@@ -1078,26 +1078,30 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
           medicineData.category = row['Category'] || row['category'] || row['type'] || row['Type'] || 'tablets';
           medicineData.description = row['Description'] || row['description'] || row['desc'] || '';
 
-          // Handle dates
-          if (row['Manufacture Date'] || row['manufacture_date'] || row['mfg_date']) {
-            const mfgDate = row['Manufacture Date'] || row['manufacture_date'] || row['mfg_date'];
-            if (mfgDate) {
-              try {
-                medicineData.manufactureDate = new Date(mfgDate);
-              } catch (e) {
-                // Invalid date, skip
+          // Handle dates with proper validation
+          const mfgDate = row['Manufacture Date'] || row['manufacture_date'] || row['mfg_date'];
+          if (mfgDate && mfgDate.toString().trim() !== '') {
+            try {
+              const date = new Date(mfgDate);
+              // Check if the date is valid and not "Invalid Date"
+              if (!isNaN(date.getTime()) && date.getFullYear() > 1900) {
+                medicineData.manufactureDate = date;
               }
+            } catch (e) {
+              // Invalid date, skip silently
             }
           }
 
-          if (row['Expiry Date'] || row['expiry_date'] || row['exp_date']) {
-            const expDate = row['Expiry Date'] || row['expiry_date'] || row['exp_date'];
-            if (expDate) {
-              try {
-                medicineData.expiryDate = new Date(expDate);
-              } catch (e) {
-                // Invalid date, skip
+          const expDate = row['Expiry Date'] || row['expiry_date'] || row['exp_date'];
+          if (expDate && expDate.toString().trim() !== '') {
+            try {
+              const date = new Date(expDate);
+              // Check if the date is valid and not "Invalid Date"
+              if (!isNaN(date.getTime()) && date.getFullYear() > 1900) {
+                medicineData.expiryDate = date;
               }
+            } catch (e) {
+              // Invalid date, skip silently
             }
           }
 
