@@ -83,7 +83,9 @@ export default function LabReport() {
       doc.setFontSize(18);
       doc.setFont("helvetica", "bold");
       const hospitalName = hospitalSettings?.hospitalName || "NAKSHATRA HOSPITAL";
-      doc.text(hospitalName, pageWidth / 2, 15, { align: "center" });
+      // Convert hospital name to diagnostics name for lab reports
+      const diagnosticsName = hospitalName.replace(/\bHOSPITAL\b/i, "DIAGNOSTICS");
+      doc.text(diagnosticsName, pageWidth / 2, 15, { align: "center" });
 
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
