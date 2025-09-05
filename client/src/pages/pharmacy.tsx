@@ -114,6 +114,22 @@ export default function Pharmacy() {
     },
   });
 
+  // Fetch all medicines to check for out-of-stock items
+  const { data: allMedicines } = useQuery({
+    queryKey: ['/api/medicines'],
+    queryFn: async () => {
+      const response = await fetch('/api/medicines', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      return response.json();
+    },
+  });
+
+  // Find out-of-stock medicines (quantity = 0)
+  const outOfStockMedicines = allMedicines?.filter((medicine: any) => medicine.quantity === 0) || [];
+
   const createPrescriptionMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await apiRequest('POST', '/api/prescriptions', data);
@@ -414,6 +430,31 @@ export default function Pharmacy() {
           </div>
         </div>
       </nav>
+
+      {/* Out of Stock Scrolling Banner */}
+      {outOfStockMedicines.length > 0 && (
+        <div className="bg-red-600 text-white py-2 overflow-hidden">
+          <div className="whitespace-nowrap animate-scroll">
+            <span className="inline-flex items-center px-4">
+              <span className="font-bold mr-2">⚠️ OUT OF STOCK:</span>
+              {outOfStockMedicines.map((medicine: any, index: number) => (
+                <span key={medicine.id} className="mx-4">
+                  {medicine.medicineName} (Batch: {medicine.batchNumber})
+                  {index < outOfStockMedicines.length - 1 && ' •'}
+                </span>
+              ))}
+              <span className="mx-8">•</span>
+              {/* Repeat for continuous scroll */}
+              {outOfStockMedicines.map((medicine: any, index: number) => (
+                <span key={`${medicine.id}-repeat`} className="mx-4">
+                  {medicine.medicineName} (Batch: {medicine.batchNumber})
+                  {index < outOfStockMedicines.length - 1 && ' •'}
+                </span>
+              ))}
+            </span>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
