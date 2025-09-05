@@ -49,49 +49,10 @@ export default function MedicineForm() {
   });
 
   // Fetch existing medicine data for editing  
-  const { data: existingMedicine, isLoading: isLoadingMedicine, error, status } = useQuery({
-    queryKey: ['medicine-detail', params?.id],
-    queryFn: async () => {
-      if (!params?.id) {
-        console.log('⚠️ No params.id, returning null');
-        return null;
-      }
-      console.log('🔍 Making API call for medicine ID:', params.id);
-      try {
-        const response = await fetch(`/api/medicines/${params.id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        console.log('📡 Response status:', response.status, response.ok);
-        console.log('📡 Response headers:', response.headers.get('content-type'));
-        
-        if (!response.ok) {
-          console.error('❌ API call failed:', response.status, response.statusText);
-          throw new Error(`Failed to fetch medicine: ${response.status}`);
-        }
-        
-        // Get text first to see what we're actually receiving
-        const responseText = await response.text();
-        console.log('📋 Raw response text (first 200 chars):', responseText.substring(0, 200));
-        
-        try {
-          const data = JSON.parse(responseText);
-          console.log('✅ API Response Data:', data);
-          return data;
-        } catch (parseError) {
-          console.error('💥 JSON Parse Error:', parseError);
-          console.error('📋 Full response text:', responseText);
-          throw new Error(`Invalid JSON response: ${parseError.message}`);
-        }
-      } catch (err) {
-        console.error('💥 Fetch error:', err);
-        throw err;
-      }
-    },
+  const { data: existingMedicine, isLoading: isLoadingMedicine, error, status } = useQuery<MedicineInventory>({
+    queryKey: ['/api/medicines', params?.id],
     enabled: Boolean(params?.id && isEdit),
-    retry: false,
+    retry: 1,
   });
   
   console.log('🔧 React Query Status:', { 
@@ -103,18 +64,19 @@ export default function MedicineForm() {
 
   // Populate form with existing data when editing
   useEffect(() => {
-    if (existingMedicine && isEdit) {
+    if (existingMedicine && isEdit && typeof existingMedicine === 'object') {
+      console.log('✅ Populating form with medicine data:', existingMedicine);
       setFormData({
-        medicineName: existingMedicine.medicineName || '',
-        batchNumber: existingMedicine.batchNumber || '',
-        quantity: existingMedicine.quantity?.toString() || '',
-        units: existingMedicine.units || 'tablets',
-        mrp: existingMedicine.mrp?.toString() || '',
-        manufactureDate: existingMedicine.manufactureDate ? new Date(existingMedicine.manufactureDate).toISOString().split('T')[0] : '',
-        expiryDate: existingMedicine.expiryDate ? new Date(existingMedicine.expiryDate).toISOString().split('T')[0] : '',
-        manufacturer: existingMedicine.manufacturer || '',
-        category: existingMedicine.category || 'tablets',
-        description: existingMedicine.description || '',
+        medicineName: (existingMedicine as any).medicineName || '',
+        batchNumber: (existingMedicine as any).batchNumber || '',
+        quantity: (existingMedicine as any).quantity?.toString() || '',
+        units: (existingMedicine as any).units || 'tablets',
+        mrp: (existingMedicine as any).mrp?.toString() || '',
+        manufactureDate: (existingMedicine as any).manufactureDate ? new Date((existingMedicine as any).manufactureDate).toISOString().split('T')[0] : '',
+        expiryDate: (existingMedicine as any).expiryDate ? new Date((existingMedicine as any).expiryDate).toISOString().split('T')[0] : '',
+        manufacturer: (existingMedicine as any).manufacturer || '',
+        category: (existingMedicine as any).category || 'tablets',
+        description: (existingMedicine as any).description || '',
       });
     }
   }, [existingMedicine, isEdit]);
