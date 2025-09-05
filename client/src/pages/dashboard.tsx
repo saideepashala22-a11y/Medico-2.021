@@ -89,19 +89,39 @@ export default function Dashboard() {
     refetchInterval: 60 * 1000, // Auto-refresh every minute
   });
 
-  // Helper function to get icon and color for activity types
+  // Helper function to get icon and styling for activity types
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'patient_registered':
-        return { icon: UserPlus, color: 'green' };
+        return { 
+          icon: UserPlus, 
+          bgClass: 'bg-green-100 dark:bg-green-900/20',
+          iconClass: 'text-green-600 dark:text-green-400'
+        };
       case 'lab_test_completed':
-        return { icon: TestTube, color: 'blue' };
+        return { 
+          icon: TestTube, 
+          bgClass: 'bg-blue-100 dark:bg-blue-900/20',
+          iconClass: 'text-blue-600 dark:text-blue-400'
+        };
       case 'prescription_created':
-        return { icon: Pill, color: 'orange' };
+        return { 
+          icon: Pill, 
+          bgClass: 'bg-orange-100 dark:bg-orange-900/20',
+          iconClass: 'text-orange-600 dark:text-orange-400'
+        };
       case 'discharge_summary':
-        return { icon: FileCheck, color: 'purple' };
+        return { 
+          icon: FileCheck, 
+          bgClass: 'bg-purple-100 dark:bg-purple-900/20',
+          iconClass: 'text-purple-600 dark:text-purple-400'
+        };
       default:
-        return { icon: Activity, color: 'gray' };
+        return { 
+          icon: Activity, 
+          bgClass: 'bg-gray-100 dark:bg-gray-900/20',
+          iconClass: 'text-gray-600 dark:text-gray-400'
+        };
     }
   };
 
@@ -331,11 +351,11 @@ export default function Dashboard() {
               <div className={`p-4 space-y-4 overflow-y-auto ${showAllNotifications ? 'max-h-96' : 'max-h-64'}`}>
                 {activities && activities.length > 0 ? (
                   activities.slice(0, showAllNotifications ? 10 : 3).map((activity) => {
-                    const { icon: Icon, color } = getActivityIcon(activity.type);
+                    const { icon: Icon, bgClass, iconClass } = getActivityIcon(activity.type);
                     return (
                       <div key={activity.id} className="flex items-start space-x-3">
-                        <div className={`w-8 h-8 bg-${color}-100 dark:bg-${color}-900/20 rounded-full flex items-center justify-center`}>
-                          <Icon className={`h-4 w-4 text-${color}-600 dark:text-${color}-400`} />
+                        <div className={`w-8 h-8 ${bgClass} rounded-full flex items-center justify-center`}>
+                          <Icon className={`h-4 w-4 ${iconClass}`} />
                         </div>
                         <div className="flex-1">
                           <p className="text-sm font-medium text-gray-900 dark:text-white">{activity.title}</p>
@@ -661,36 +681,29 @@ export default function Dashboard() {
               <Card className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl border-0">
                 <CardContent className="p-6">
                   <div className="space-y-4">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
-                        <UserPlus className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    {activities && activities.length > 0 ? (
+                      activities.slice(0, 3).map((activity) => {
+                        const { icon: Icon, bgClass, iconClass } = getActivityIcon(activity.type);
+                        return (
+                          <div key={activity.id} className="flex items-center space-x-4">
+                            <div className={`w-10 h-10 ${bgClass} rounded-full flex items-center justify-center`}>
+                              <Icon className={`h-5 w-5 ${iconClass}`} />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-900 dark:text-white">{activity.title}</p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">{activity.description}</p>
+                            </div>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">{formatTimeAgo(activity.createdAt)}</span>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="text-center py-8">
+                        <Activity className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500 dark:text-gray-400">No recent activities</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Recent patient registrations and other activities will appear here</p>
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">New patient registered</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">John Doe admitted to Ward 3</p>
-                      </div>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">2 hours ago</span>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
-                        <TestTube className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">Lab test completed</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Blood work results for Patient #102</p>
-                      </div>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">4 hours ago</span>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center">
-                        <FileText className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">Discharge summary created</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Patient Mary Smith ready for discharge</p>
-                      </div>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">6 hours ago</span>
-                    </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
