@@ -663,13 +663,14 @@ export default function Pharmacy() {
                         <SelectValue placeholder="Choose medicine to return" />
                       </SelectTrigger>
                       <SelectContent>
-                        {(availableMedicines || []).map((med: any) => (
-                          <SelectItem key={med.id} value={med.id}>
-                            {med.medicineName} - Current Stock: {med.quantity}
-                          </SelectItem>
-                        ))}
-                        {(!availableMedicines || availableMedicines.length === 0) && (
-                          <SelectItem value="" disabled>
+                        {(availableMedicines && availableMedicines.length > 0) ? (
+                          availableMedicines.map((med: any) => (
+                            <SelectItem key={med.id} value={med.id}>
+                              {med.medicineName} - Current Stock: {med.quantity}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="no-medicines" disabled>
                             No medicines available
                           </SelectItem>
                         )}
