@@ -122,15 +122,45 @@ export function ExcelUpload({ onSuccess }: ExcelUploadProps) {
     }
   };
 
-  const downloadTemplate = () => {
-    // Create a sample template for download
-    const templateUrl = '/api/medicines/excel-template';
-    const link = document.createElement('a');
-    link.href = templateUrl;
-    link.download = 'medicine-template.xlsx';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const downloadTemplate = async () => {
+    try {
+      const response = await fetch('/api/medicines/excel-template', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to download template');
+      }
+      
+      // Get the file as a blob
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'medicine-template.xlsx';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up the URL object
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Template Downloaded',
+        description: 'Excel template has been downloaded successfully',
+      });
+    } catch (error) {
+      toast({
+        title: 'Download Failed',
+        description: 'Failed to download Excel template',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
