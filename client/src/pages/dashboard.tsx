@@ -6,7 +6,7 @@ import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { ChatWidget } from '@/components/ChatWidget';
 import { StatCard } from '@/components/StatCard';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { ThemeSelector } from '@/components/ThemeSelector';
 import { useState } from 'react';
 import { 
   Hospital, 
@@ -160,7 +160,7 @@ export default function Dashboard() {
                 <Menu className="h-5 w-5" />
               </Button>
               <div className="flex-shrink-0 flex items-center">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                <div className="w-8 h-8 bg-theme-primary rounded-lg flex items-center justify-center mr-3">
                   <Hospital className="text-white text-lg" />
                 </div>
                 <span className="text-xl font-bold text-gray-900 dark:text-white">
@@ -198,7 +198,7 @@ export default function Dashboard() {
                 <Bell className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">3</span>
               </Button>
-              <ThemeToggle />
+              <ThemeSelector />
               <div className="relative">
                 <Button 
                   variant="ghost" 
