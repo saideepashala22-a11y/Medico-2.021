@@ -26,14 +26,6 @@ export default function MedicineForm() {
   const isEdit = !!(editMatch && editParams?.id);
   const params = editParams;
   
-  console.log('🚀 Route Debug:', {
-    editMatch,
-    editParams, 
-    isEdit,
-    'params?.id': params?.id,
-    'Boolean(params?.id && isEdit)': Boolean(params?.id && isEdit)
-  });
-  
   
   const [formData, setFormData] = useState({
     medicineName: '',
@@ -54,18 +46,10 @@ export default function MedicineForm() {
     enabled: Boolean(params?.id && isEdit),
     retry: 1,
   });
-  
-  console.log('🔧 React Query Status:', { 
-    status, 
-    isLoading: isLoadingMedicine, 
-    hasData: !!existingMedicine, 
-    error: error?.message 
-  });
 
   // Populate form with existing data when editing
   useEffect(() => {
     if (existingMedicine && isEdit && typeof existingMedicine === 'object') {
-      console.log('✅ Populating form with medicine data:', existingMedicine);
       setFormData({
         medicineName: (existingMedicine as any).medicineName || '',
         batchNumber: (existingMedicine as any).batchNumber || '',
@@ -185,9 +169,6 @@ export default function MedicineForm() {
     );
   }
 
-  // Debug: show current form data in console
-  console.log('Current form data:', formData);
-  console.log('Existing medicine data:', existingMedicine);
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">

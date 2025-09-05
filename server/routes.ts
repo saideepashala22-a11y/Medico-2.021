@@ -938,6 +938,23 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
     }
   });
 
+  // Get single medicine by ID
+  app.get('/api/medicines/:id', authenticateToken, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const medicine = await storage.getMedicine(id);
+      
+      if (!medicine) {
+        return res.status(404).json({ message: 'Medicine not found' });
+      }
+      
+      res.json(medicine);
+    } catch (error) {
+      console.error('Error fetching medicine:', error);
+      res.status(500).json({ message: 'Failed to fetch medicine' });
+    }
+  });
+
   app.get('/api/medicines/active', authenticateToken, async (req, res) => {
     try {
       const medicines = await storage.getActiveMedicines();
