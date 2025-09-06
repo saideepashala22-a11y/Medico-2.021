@@ -64,6 +64,9 @@ export default function PatientRegistration() {
         autoGender = 'male';
       } else if (['mrs', 'ms', 'miss'].includes(value.toLowerCase())) {
         autoGender = 'female';
+      } else if (['baby', 'baby of'].includes(value.toLowerCase())) {
+        // For babies, keep existing gender selection or leave it for user to choose
+        autoGender = prev.gender;
       }
       return { ...prev, salutation: value, gender: autoGender };
     });
@@ -218,6 +221,7 @@ export default function PatientRegistration() {
                       <SelectItem value="miss">Miss</SelectItem>
                       <SelectItem value="master">Master</SelectItem>
                       <SelectItem value="baby">Baby</SelectItem>
+                      <SelectItem value="baby of">Baby of</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

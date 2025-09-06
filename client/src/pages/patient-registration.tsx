@@ -196,6 +196,7 @@ export default function PatientRegistration() {
       { value: 'Dr.', label: 'Dr.' },
       { value: 'Master', label: 'Master' },
       { value: 'Baby', label: 'Baby' },
+      { value: 'Baby of', label: 'Baby of' },
       { value: 'Miss', label: 'Miss' }
     ];
 
@@ -299,6 +300,7 @@ export default function PatientRegistration() {
         break;
       case 'Dr.':
       case 'Baby':
+      case 'Baby of':
         // Keep existing gender or leave empty for user to choose
         autoGender = formData.gender;
         break;
