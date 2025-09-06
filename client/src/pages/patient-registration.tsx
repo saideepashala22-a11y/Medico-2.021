@@ -713,11 +713,13 @@ export default function PatientRegistration() {
       pdf.setFontSize(6);
       pdf.setFont('helvetica', 'italic');
       pdf.setTextColor(120, 120, 120);
-      const generatedText = `Generated on ${new Date().toLocaleDateString('en-IN')} | Nakshatra Hospital Management System`;
+      const hospitalName = hospitalSettings?.name || 'NAKSHATRA HOSPITAL';
+      const generatedText = `Generated on ${new Date().toLocaleDateString('en-IN')} | ${hospitalName}`;
       pdf.text(generatedText, pageWidth / 2, pageHeight - 5, { align: 'center' });
       
       // Save the PDF
-      pdf.save(`Nakshatra_Hospital_Consultation_Card_${patient.mru}_${new Date().toISOString().split('T')[0]}.pdf`);
+      const hospitalNameForFile = (hospitalSettings?.name || 'Nakshatra Hospital').replace(/\s+/g, '_');
+      pdf.save(`${hospitalNameForFile}_Consultation_Card_${patient.mru}_${new Date().toISOString().split('T')[0]}.pdf`);
       
       toast({
         title: 'Success',
