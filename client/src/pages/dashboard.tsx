@@ -434,7 +434,7 @@ export default function Dashboard() {
           <div className="py-8 px-4 sm:px-6 lg:px-8">
             {/* Welcome Section */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome Back, Dr. {currentDoctor?.name || user?.name || user?.username}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome Back, {currentDoctor?.name || `Dr. ${user?.name || user?.username}`}</h1>
               <p className="text-gray-600 dark:text-gray-300 mt-2">Here's what's happening at your hospital today</p>
             </div>
             
