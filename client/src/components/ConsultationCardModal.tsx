@@ -226,9 +226,9 @@ export function ConsultationCardModal({
 
       // Save the PDF
       const hospitalNameForFile = (hospitalSettings.name || "Nakshatra Hospital").replace(/\s+/g, "_");
-      pdf.save(
-        `${hospitalNameForFile}_Consultation_Card_${patientInfo.mruNumber}_${new Date().toISOString().split("T")[0]}.pdf`,
-      );
+      const fileName = `${hospitalNameForFile}_Consultation_Card_${patientInfo.mruNumber}_${new Date().toISOString().split("T")[0]}.pdf`;
+      
+      pdf.save(fileName);
     } catch (error) {
       console.error("Error generating consultation card:", error);
     } finally {

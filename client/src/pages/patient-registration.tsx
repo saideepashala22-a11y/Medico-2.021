@@ -567,6 +567,14 @@ export default function PatientRegistration() {
     setIsDownloading(patient.id);
     
     try {
+      // Fetch hospital settings for dynamic data
+      const hospitalResponse = await fetch('/api/hospital-settings', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      const hospitalSettings = await hospitalResponse.json();
+
       const pdf = new jsPDF();
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
@@ -582,7 +590,7 @@ export default function PatientRegistration() {
       pdf.setTextColor(255, 255, 255);
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('NAKSHATRA HOSPITAL', pageWidth / 2, 15, { align: 'center' });
+      pdf.text(hospitalSettings?.name || 'NAKSHATRA HOSPITAL', pageWidth / 2, 15, { align: 'center' });
       
       // Subtitle - centered
       pdf.setFontSize(9);

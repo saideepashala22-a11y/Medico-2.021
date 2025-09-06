@@ -1,12 +1,12 @@
 import jsPDF from 'jspdf';
 import { Patient, LabTest, Prescription, DischargeSummary } from '@shared/schema';
 
-export function generateLabReportPDF(patient: Patient, labTest: LabTest & { results?: any }) {
+export function generateLabReportPDF(patient: Patient, labTest: LabTest & { results?: any }, hospitalSettings?: any) {
   const doc = new jsPDF();
   
   // Header
   doc.setFontSize(20);
-  doc.text('Hospital Management System', 105, 20, { align: 'center' });
+  doc.text(hospitalSettings?.name || 'Hospital Management System', 105, 20, { align: 'center' });
   doc.setFontSize(16);
   doc.text('Laboratory Report', 105, 30, { align: 'center' });
   
@@ -45,12 +45,12 @@ export function generateLabReportPDF(patient: Patient, labTest: LabTest & { resu
   doc.save(`${patient.name}_lab_report.pdf`);
 }
 
-export function generatePrescriptionPDF(patient: Patient, prescription: Prescription) {
+export function generatePrescriptionPDF(patient: Patient, prescription: Prescription, hospitalSettings?: any) {
   const doc = new jsPDF();
   
   // Header
   doc.setFontSize(20);
-  doc.text('Hospital Management System', 105, 20, { align: 'center' });
+  doc.text(hospitalSettings?.name || 'Hospital Management System', 105, 20, { align: 'center' });
   doc.setFontSize(16);
   doc.text('Pharmacy Bill', 105, 30, { align: 'center' });
   

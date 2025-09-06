@@ -44,6 +44,11 @@ export default function SurgicalCaseSheets() {
     queryKey: ['/api/patients'],
   });
 
+  // Fetch hospital settings for dynamic hospital name
+  const { data: hospitalSettings } = useQuery({
+    queryKey: ['/api/hospital-settings'],
+  });
+
   // Debug patients data
   console.log('Patients data:', patients);
   console.log('Patients loading:', patientsLoading);
@@ -579,7 +584,7 @@ export default function SurgicalCaseSheets() {
       // Hospital Header
       pdf.setFontSize(18);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('NAKSHATRA HOSPITAL', 105, yPos, { align: 'center' });
+      pdf.text((hospitalSettings as any)?.name || 'NAKSHATRA HOSPITAL', 105, yPos, { align: 'center' });
       yPos += 7;
       
       pdf.setFontSize(10);
