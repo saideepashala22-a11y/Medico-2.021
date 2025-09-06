@@ -107,6 +107,8 @@ export interface IStorage {
   deleteMedicine(id: string): Promise<void>;
   searchMedicines(query: string): Promise<MedicineInventory[]>;
   bulkCreateMedicines(medicines: Array<InsertMedicineInventory & { createdBy: string }>): Promise<{ imported: number; duplicates: number }>;
+  checkMedicineStock(medicineId: string, requiredQuantity: number): Promise<boolean>;
+  updateMedicineQuantity(id: string, quantityChange: number): Promise<MedicineInventory>;
   
   // Stats
   getStats(): Promise<{
