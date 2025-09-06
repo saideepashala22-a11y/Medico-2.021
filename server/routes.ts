@@ -1155,20 +1155,22 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
           }
           // If no valid date, don't set manufactureDate field at all
 
+          // Handle Expiry Date - now required
           const expDate = row['Expiry Date'] || row['expiry_date'] || row['exp_date'];
+          let hasValidExpiryDate = false;
+          
           if (expDate && expDate.toString().trim() !== '' && expDate !== 'null' && expDate !== 'undefined') {
             try {
               const date = new Date(expDate);
               // Check if the date is valid and not "Invalid Date"
               if (!isNaN(date.getTime()) && date.getFullYear() > 1900 && date.getFullYear() < 2100) {
                 medicineData.expiryDate = date;
+                hasValidExpiryDate = true;
               }
-              // If invalid, don't set the field at all
             } catch (e) {
-              // Invalid date, don't set the field
+              // Invalid date
             }
           }
-          // If no valid date, don't set expiryDate field at all
 
           // Validate required fields
           if (!medicineData.medicineName?.trim()) {
@@ -1203,6 +1205,16 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
               row: rowNumber,
               field: 'MRP',
               message: 'MRP is required'
+            });
+            continue;
+          }
+
+          // Validate required Expiry Date
+          if (!hasValidExpiryDate) {
+            results.errors.push({
+              row: rowNumber,
+              field: 'Expiry Date',
+              message: 'Valid Expiry Date is required'
             });
             continue;
           }
