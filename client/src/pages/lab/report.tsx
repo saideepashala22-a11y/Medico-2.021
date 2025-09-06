@@ -187,7 +187,7 @@ export default function LabReport() {
       );
 
       // Test Results Table Header
-      let yPos = 125;
+      let yPos = 115;
       doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
       doc.text("COMPLETE BLOOD PICTURE", 20, yPos);
