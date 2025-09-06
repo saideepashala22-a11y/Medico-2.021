@@ -138,45 +138,45 @@ export default function LabReport() {
 
       // Patient Information Box
       doc.setLineWidth(0.3);
-      doc.rect(15, 65, pageWidth - 30, 40);
+      doc.rect(15, 55, pageWidth - 30, 40);
 
       doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
-      doc.text("PATIENT DETAILS", 20, 72);
+      doc.text("PATIENT DETAILS", 20, 62);
 
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
-      doc.text(`Patient ID: ${labTest.patient.mruNumber || "N/A"}`, 20, 80);
-      doc.text(`Patient Name: ${labTest.patient.fullName || "N/A"}`, 20, 87);
+      doc.text(`Patient ID: ${labTest.patient.mruNumber || "N/A"}`, 20, 70);
+      doc.text(`Patient Name: ${labTest.patient.fullName || "N/A"}`, 20, 77);
       doc.text(
         `Age/Gender: ${labTest.patient.age || "N/A"} Years / ${labTest.patient.gender || "N/A"}`,
         20,
-        94,
+        84,
       );
       if (labTest.patient.contactPhone) {
-        doc.text(`Contact: ${labTest.patient.contactPhone}`, 20, 101);
+        doc.text(`Contact: ${labTest.patient.contactPhone}`, 20, 91);
       }
 
       // Test Information (Right side of patient box)
       doc.setFont("helvetica", "bold");
-      doc.text("TEST DETAILS", 120, 72);
+      doc.text("TEST DETAILS", 120, 62);
 
       doc.setFont("helvetica", "normal");
       const testDate = new Date(labTest.createdAt);
       doc.text(
         `Collection Date: ${testDate.toLocaleDateString("en-IN")}`,
         120,
-        80,
+        70,
       );
       doc.text(
         `Report Date: ${new Date().toLocaleDateString("en-IN")}`,
         120,
-        87,
+        77,
       );
       doc.text(
         `Lab No: LAB-${labTest.id.substring(0, 8).toUpperCase()}`,
         120,
-        94,
+        84,
       );
       // Use patient's referring doctor, or fall back to current selected doctor, or default
       const getReferringDoctor = () => {
@@ -192,7 +192,7 @@ export default function LabReport() {
         return "Dr. Consulting Physician";
       };
       const referringDoctor = getReferringDoctor();
-      doc.text(`Referring Doctor: ${referringDoctor}`, 120, 101);
+      doc.text(`Referring Doctor: ${referringDoctor}`, 120, 91);
 
       // Test Results Table Header
       let yPos = 115;
@@ -200,7 +200,7 @@ export default function LabReport() {
       doc.setFont("helvetica", "bold");
       doc.text("COMPLETE BLOOD PICTURE", 20, yPos);
 
-      yPos += 8;
+      yPos += 6;
 
       // Table Headers (simplified without borders)
 
