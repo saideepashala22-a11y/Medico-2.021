@@ -132,7 +132,7 @@ export default function LabReport() {
       // Document Title
       doc.setFontSize(14);
       doc.setFont("helvetica", "bold");
-      doc.text("LABORATORY INVESTIGATION REPORT", pageWidth / 2, 55, {
+      doc.text("LABORATORY INVESTIGATION REPORT", pageWidth / 2, 51, {
         align: "center",
       });
 
@@ -195,7 +195,7 @@ export default function LabReport() {
       doc.text(`Referring Doctor: ${referringDoctor}`, 120, 91);
 
       // Test Results Table Header
-      let yPos = 115;
+      let yPos = 105;
       doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
       doc.text("COMPLETE BLOOD PICTURE", 20, yPos);
@@ -206,7 +206,7 @@ export default function LabReport() {
 
       doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
-      doc.text("INVESTIGATION", 20, yPos + 8);
+      doc.text("INVESTIGATION", 20, yPos + 6);
       doc.text("VALUE", 90, yPos + 8);
       doc.text("UNIT", 120, yPos + 8);
       doc.text("REFERENCE RANGE", 140, yPos + 8);
