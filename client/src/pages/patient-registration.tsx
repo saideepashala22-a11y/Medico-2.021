@@ -174,17 +174,30 @@ export default function PatientRegistration() {
     return visitId;
   };
 
-  // Calculate age from date of birth
-  const calculateAge = (dateOfBirth: string): number => {
-    if (!dateOfBirth) return 0;
+  // Calculate age from date of birth (returns days for babies, years for others)
+  const calculateAge = (dateOfBirth: string, salutation: string = ''): { value: number, unit: string } => {
+    if (!dateOfBirth) return { value: 0, unit: 'years' };
+    
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
+    
+    // Check if this is a baby
+    const isBaby = salutation === 'Baby' || salutation === 'Baby of';
+    
+    if (isBaby) {
+      // Calculate age in days for babies
+      const diffTime = Math.abs(today.getTime() - birthDate.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return { value: diffDays, unit: 'days' };
+    } else {
+      // Calculate age in years for others
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return { value: age, unit: 'years' };
     }
-    return age;
   };
 
   // Get age-appropriate salutation options
@@ -224,16 +237,17 @@ export default function PatientRegistration() {
 
   // Handle date of birth change
   const handleDateOfBirthChange = (value: string) => {
-    const calculatedAge = calculateAge(value);
+    const ageResult = calculateAge(value, formData.salutation);
     setFormData(prev => ({ 
       ...prev, 
       dateOfBirth: value,
-      age: calculatedAge.toString()
+      age: ageResult.value.toString(),
+      ageUnit: ageResult.unit
     }));
-    setAge(calculatedAge);
+    setAge(ageResult.value);
     
     // Auto-suggest salutation based on age and gender
-    const suggested = getSuggestedSalutation(calculatedAge, formData.gender);
+    const suggested = getSuggestedSalutation(ageResult.value, formData.gender);
     if (suggested && !formData.salutation) {
       setFormData(prev => ({ ...prev, salutation: suggested }));
     }
@@ -267,16 +281,17 @@ export default function PatientRegistration() {
     const dateString = newDate.toISOString().split('T')[0];
     
     // Update form data and calculate age
-    const calculatedAge = calculateAge(dateString);
+    const ageResult = calculateAge(dateString, formData.salutation);
     setFormData(prev => ({ 
       ...prev, 
       dateOfBirth: dateString,
-      age: calculatedAge.toString()
+      age: ageResult.value.toString(),
+      ageUnit: ageResult.unit
     }));
-    setAge(calculatedAge);
+    setAge(ageResult.value);
     
     // Auto-suggest salutation based on age and gender
-    const suggested = getSuggestedSalutation(calculatedAge, formData.gender);
+    const suggested = getSuggestedSalutation(ageResult.value, formData.gender);
     if (suggested && !formData.salutation) {
       setFormData(prev => ({ ...prev, salutation: suggested }));
     }
@@ -285,6 +300,18 @@ export default function PatientRegistration() {
   // Handle salutation change
   const handleSalutationChange = (value: string) => {
     setFormData(prev => ({ ...prev, salutation: value }));
+    
+    // Recalculate age with new unit if date of birth exists
+    if (formData.dateOfBirth) {
+      const ageResult = calculateAge(formData.dateOfBirth, value);
+      setFormData(prev => ({ 
+        ...prev, 
+        salutation: value,
+        age: ageResult.value.toString(),
+        ageUnit: ageResult.unit
+      }));
+      setAge(ageResult.value);
+    }
     
     // Auto-select gender based on salutation
     let autoGender = '';
