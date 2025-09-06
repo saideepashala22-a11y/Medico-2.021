@@ -48,6 +48,14 @@ export function ConsultationCardModal({
     setIsDownloading(true);
 
     try {
+      // Fetch hospital settings for dynamic data
+      const hospitalResponse = await fetch('/api/hospital-settings', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      const hospitalSettings = await hospitalResponse.json();
+
       const pdf = new jsPDF();
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
@@ -55,20 +63,27 @@ export function ConsultationCardModal({
 
       let yPos = 15;
 
-      // 1. COMPACT HEADER - Dark blue background
+      // 1. EXPANDED HEADER - Dark blue background with address
       pdf.setFillColor(25, 55, 109); // Dark blue
-      pdf.rect(0, 0, pageWidth, 28, "F");
+      pdf.rect(0, 0, pageWidth, 35, "F");
 
       // Hospital name - centered, bold, white
       pdf.setTextColor(255, 255, 255);
       pdf.setFontSize(16);
       pdf.setFont("helvetica", "bold");
-      pdf.text("NAKSHATRA HOSPITAL", pageWidth / 2, 15, { align: "center" });
+      pdf.text(hospitalSettings.name || "NAKSHATRA HOSPITAL", pageWidth / 2, 15, { align: "center" });
+
+      // Hospital address - centered, smaller font
+      pdf.setFontSize(8);
+      pdf.setFont("helvetica", "normal");
+      pdf.text(hospitalSettings.address || "123 Medical District, Healthcare City, State - 123456", pageWidth / 2, 23, {
+        align: "center",
+      });
 
       // Subtitle - centered
       pdf.setFontSize(9);
       pdf.setFont("helvetica", "normal");
-      pdf.text("Patient Consultation Card", pageWidth / 2, 23, {
+      pdf.text("Patient Consultation Card", pageWidth / 2, 30, {
         align: "center",
       });
 
@@ -77,11 +92,11 @@ export function ConsultationCardModal({
       pdf.setFontSize(9);
       pdf.setFont("helvetica", "normal");
       const currentDate = new Date().toLocaleDateString("en-IN");
-      pdf.text(`Date: ${currentDate}`, pageWidth - margin, 35, {
+      pdf.text(`Date: ${currentDate}`, pageWidth - margin, 42, {
         align: "right",
       });
 
-      yPos = 42;
+      yPos = 49;
 
       // 2. COMPACT PATIENT INFORMATION - 2 row grid
       pdf.setFontSize(10);
@@ -203,14 +218,15 @@ export function ConsultationCardModal({
       pdf.setFontSize(6);
       pdf.setFont("helvetica", "italic");
       pdf.setTextColor(120, 120, 120);
-      const generatedText = `Generated on ${new Date().toLocaleDateString("en-IN")} | Nakshatra Hospital Management System`;
+      const generatedText = `Generated on ${new Date().toLocaleDateString("en-IN")} | ${hospitalSettings.name || "Nakshatra Hospital"} Management System`;
       pdf.text(generatedText, pageWidth / 2, pageHeight - 5, {
         align: "center",
       });
 
       // Save the PDF
+      const hospitalName = (hospitalSettings.name || "Nakshatra Hospital").replace(/\s+/g, "_");
       pdf.save(
-        `Nakshatra_Hospital_Consultation_Card_${patientInfo.mruNumber}_${new Date().toISOString().split("T")[0]}.pdf`,
+        `${hospitalName}_Consultation_Card_${patientInfo.mruNumber}_${new Date().toISOString().split("T")[0]}.pdf`,
       );
     } catch (error) {
       console.error("Error generating consultation card:", error);
