@@ -14,7 +14,7 @@ import {
   Stethoscope,
 } from "lucide-react";
 import jsPDF from "jspdf";
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const testNames = {
   cbc: "Complete Blood Count (CBC)",
@@ -38,7 +38,7 @@ export default function LabReport() {
     email?: string;
     specialization?: string;
   }>({
-    queryKey: ['/api/current-doctor'],
+    queryKey: ["/api/current-doctor"],
     staleTime: 30 * 1000, // Cache for 30 seconds
   });
 
@@ -78,7 +78,7 @@ export default function LabReport() {
     email?: string;
     accreditation?: string;
   }>({
-    queryKey: ['/api/hospital-settings'],
+    queryKey: ["/api/hospital-settings"],
     staleTime: 0, // Always fetch fresh data for PDFs
   });
 
@@ -93,24 +93,36 @@ export default function LabReport() {
       // Professional Medical Header with Hospital Branding
       doc.setFontSize(18);
       doc.setFont("helvetica", "bold");
-      const hospitalName = hospitalSettings?.hospitalName || "NAKSHATRA HOSPITAL";
+      const hospitalName =
+        hospitalSettings?.hospitalName || "NAKSHATRA HOSPITAL";
       // Convert hospital name to diagnostics name for lab reports
-      const diagnosticsName = hospitalName.replace(/\bHOSPITAL\b/i, "DIAGNOSTICS");
+      const diagnosticsName = hospitalName.replace(
+        /\bHOSPITAL\b/i,
+        "DIAGNOSTICS",
+      );
       doc.text(diagnosticsName, pageWidth / 2, 15, { align: "center" });
 
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
-      const subtitle = hospitalSettings?.hospitalSubtitle || "Multi Specialty Hospital & Research Centre";
+      const subtitle =
+        hospitalSettings?.hospitalSubtitle ||
+        "Multi Specialty Hospital & Research Centre";
       doc.text(subtitle, pageWidth / 2, 22, { align: "center" });
-      
-      const address = hospitalSettings?.address || "123 Medical District, Healthcare City, State - 123456";
+
+      const address =
+        hospitalSettings?.address ||
+        "123 Medical District, Healthcare City, State - 123456";
       doc.text(address, pageWidth / 2, 28, { align: "center" });
-      
+
       const phone = hospitalSettings?.phone || "+91-1234567890";
       const email = hospitalSettings?.email || "info@nakshatrahospital.com";
-      doc.text(`Phone: ${phone} | Email: ${email}`, pageWidth / 2, 34, { align: "center" });
-      
-      const accreditation = hospitalSettings?.accreditation || "NABL Accredited Laboratory | ISO 15189:2012 Certified";
+      doc.text(`Phone: ${phone} | Email: ${email}`, pageWidth / 2, 34, {
+        align: "center",
+      });
+
+      const accreditation =
+        hospitalSettings?.accreditation ||
+        "NABL Accredited Laboratory | ISO 15189:2012 Certified";
       doc.text(accreditation, pageWidth / 2, 40, { align: "center" });
 
       // Horizontal line under header
@@ -173,18 +185,14 @@ export default function LabReport() {
         }
         if (currentDoctor?.name) {
           // Check if name already starts with "Dr." to avoid duplication
-          return currentDoctor.name.startsWith('Dr.') 
-            ? currentDoctor.name 
+          return currentDoctor.name.startsWith("Dr.")
+            ? currentDoctor.name
             : `Dr. ${currentDoctor.name}`;
         }
         return "Dr. Consulting Physician";
       };
       const referringDoctor = getReferringDoctor();
-      doc.text(
-        `Referring Doctor: ${referringDoctor}`,
-        120,
-        101,
-      );
+      doc.text(`Referring Doctor: ${referringDoctor}`, 120, 101);
 
       // Test Results Table Header
       let yPos = 115;
@@ -192,7 +200,7 @@ export default function LabReport() {
       doc.setFont("helvetica", "bold");
       doc.text("COMPLETE BLOOD PICTURE", 20, yPos);
 
-      yPos += 10;
+      yPos += 8;
 
       // Table Headers (simplified without borders)
 
@@ -223,7 +231,6 @@ export default function LabReport() {
 
             results.forEach((testResult, index) => {
               if (testResult.value && testResult.value.trim() !== "") {
-
                 // Test name
                 doc.setFont("helvetica", "normal");
                 doc.text(testResult.testName || "Unknown Test", 20, yPos + 2);
@@ -234,16 +241,20 @@ export default function LabReport() {
                 doc.setFont("helvetica", "normal");
 
                 // Unit - convert old formats to new formats, skip units for descriptive assessments
-                const isDescriptiveTest = testResult.testName === "a. RBC's" || 
-                                        testResult.testName === "b. WBC's" || 
-                                        testResult.testName === "c. PLATELETS";
-                
+                const isDescriptiveTest =
+                  testResult.testName === "a. RBC's" ||
+                  testResult.testName === "b. WBC's" ||
+                  testResult.testName === "c. PLATELETS";
+
                 if (!isDescriptiveTest) {
                   let displayUnit = testResult.unit || "units";
-                  
+
                   // Convert old unit formats to new ones
                   if (testResult.testName === "Total R.B.C COUNT") {
-                    if (displayUnit.includes("million") || displayUnit.includes("μL")) {
+                    if (
+                      displayUnit.includes("million") ||
+                      displayUnit.includes("μL")
+                    ) {
                       displayUnit = "Mill/Cumm";
                     }
                   } else if (testResult.testName === "HAEMOGLOBIN") {
@@ -255,7 +266,10 @@ export default function LabReport() {
                       displayUnit = "/Cumm";
                     }
                   } else if (testResult.testName === "PLATELETS COUNT") {
-                    if (displayUnit.includes("μL") || displayUnit.includes("/μL")) {
+                    if (
+                      displayUnit.includes("μL") ||
+                      displayUnit.includes("/μL")
+                    ) {
                       displayUnit = "Lakhs/Cumm";
                     }
                   } else if (testResult.testName === "P.C.V") {
@@ -263,29 +277,32 @@ export default function LabReport() {
                       displayUnit = "Vol%";
                     }
                   }
-                  
+
                   doc.text(displayUnit, 120, yPos + 2);
                 }
 
                 // Reference range - handle gender-specific ranges
                 let normalRange = testResult.normalRange || "Consult reference";
-                
-                // Convert old format "(F), (M)" to new format "(M)|(F)" 
-                if (normalRange.includes('(F)') && normalRange.includes('(M)')) {
+
+                // Convert old format "(F), (M)" to new format "(M)|(F)"
+                if (
+                  normalRange.includes("(F)") &&
+                  normalRange.includes("(M)")
+                ) {
                   // Extract male and female ranges from old format
                   const femaleMatch = normalRange.match(/([^,]+\(F\)[^,]*)/);
                   const maleMatch = normalRange.match(/([^,]+\(M\)[^,]*)/);
-                  
+
                   if (femaleMatch && maleMatch) {
                     const femaleRange = femaleMatch[1].trim();
                     const maleRange = maleMatch[1].trim();
                     normalRange = `${maleRange}|${femaleRange}`;
                   }
                 }
-                
-                if (normalRange.includes('|')) {
+
+                if (normalRange.includes("|")) {
                   // Split gender-specific ranges (male first, female second)
-                  const [maleRange, femaleRange] = normalRange.split('|');
+                  const [maleRange, femaleRange] = normalRange.split("|");
                   doc.text(maleRange.trim(), 140, yPos + 2);
                   doc.text(femaleRange.trim(), 140, yPos + 6);
                   yPos += 6; // Extra space for two-line reference
@@ -376,7 +393,8 @@ export default function LabReport() {
       doc.setFontSize(8);
       doc.text("Medical Laboratory Technologist", 125, yPos);
       yPos += 6;
-      const signatureHospitalName = hospitalSettings?.hospitalName || "NAKSHATRA HOSPITAL";
+      const signatureHospitalName =
+        hospitalSettings?.hospitalName || "NAKSHATRA HOSPITAL";
       doc.text(signatureHospitalName, 135, yPos);
 
       // Report Footer (at the very end)
@@ -492,9 +510,11 @@ export default function LabReport() {
                 Download PDF
               </Button>
               <span className="text-sm text-gray-600">
-                {currentDoctor?.name 
-                  ? (currentDoctor.name.startsWith('Dr.') ? currentDoctor.name : `Dr. ${currentDoctor.name}`)
-                  : user?.name || 'Loading...'}
+                {currentDoctor?.name
+                  ? currentDoctor.name.startsWith("Dr.")
+                    ? currentDoctor.name
+                    : `Dr. ${currentDoctor.name}`
+                  : user?.name || "Loading..."}
               </span>
             </div>
           </div>
