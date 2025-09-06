@@ -296,11 +296,11 @@ export default function PatientRegistration() {
       case 'Mrs.':
       case 'Ms.':
       case 'Miss':
+      case 'Baby':
+      case 'Baby of':
         autoGender = 'female';
         break;
       case 'Dr.':
-      case 'Baby':
-      case 'Baby of':
         // Keep existing gender or leave empty for user to choose
         autoGender = formData.gender;
         break;

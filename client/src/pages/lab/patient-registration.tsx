@@ -62,11 +62,8 @@ export default function PatientRegistration() {
       let autoGender = prev.gender;
       if (['mr', 'master'].includes(value.toLowerCase())) {
         autoGender = 'male';
-      } else if (['mrs', 'ms', 'miss'].includes(value.toLowerCase())) {
+      } else if (['mrs', 'ms', 'miss', 'baby', 'baby of'].includes(value.toLowerCase())) {
         autoGender = 'female';
-      } else if (['baby', 'baby of'].includes(value.toLowerCase())) {
-        // For babies, keep existing gender selection or leave it for user to choose
-        autoGender = prev.gender;
       }
       return { ...prev, salutation: value, gender: autoGender };
     });
