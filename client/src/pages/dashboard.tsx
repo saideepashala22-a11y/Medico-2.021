@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ChatWidget } from '@/components/ChatWidget';
 import { StatCard } from '@/components/StatCard';
 import { ThemeSelector } from '@/components/ThemeSelector';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { 
   Hospital, 
   LogOut, 
@@ -44,6 +44,24 @@ export default function Dashboard() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [showAllNotifications, setShowAllNotifications] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+
+    if (userMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [userMenuOpen]);
 
   // Cache stats for 30 seconds to avoid constant refetching
   const { data: stats, isLoading } = useQuery({
@@ -199,7 +217,7 @@ export default function Dashboard() {
                 <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">3</span>
               </Button>
               <ThemeSelector />
-              <div className="relative">
+              <div className="relative" ref={userMenuRef}>
                 <Button 
                   variant="ghost" 
                   size="sm"
