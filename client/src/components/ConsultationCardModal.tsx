@@ -218,15 +218,16 @@ export function ConsultationCardModal({
       pdf.setFontSize(6);
       pdf.setFont("helvetica", "italic");
       pdf.setTextColor(120, 120, 120);
-      const generatedText = `Generated on ${new Date().toLocaleDateString("en-IN")} | ${hospitalSettings.name || "Nakshatra Hospital"} Management System`;
+      const hospitalName = hospitalSettings.name || "NAKSHATRA HOSPITAL";
+      const generatedText = `Generated on ${new Date().toLocaleDateString("en-IN")} | ${hospitalName}`;
       pdf.text(generatedText, pageWidth / 2, pageHeight - 5, {
         align: "center",
       });
 
       // Save the PDF
-      const hospitalName = (hospitalSettings.name || "Nakshatra Hospital").replace(/\s+/g, "_");
+      const hospitalNameForFile = (hospitalSettings.name || "Nakshatra Hospital").replace(/\s+/g, "_");
       pdf.save(
-        `${hospitalName}_Consultation_Card_${patientInfo.mruNumber}_${new Date().toISOString().split("T")[0]}.pdf`,
+        `${hospitalNameForFile}_Consultation_Card_${patientInfo.mruNumber}_${new Date().toISOString().split("T")[0]}.pdf`,
       );
     } catch (error) {
       console.error("Error generating consultation card:", error);
