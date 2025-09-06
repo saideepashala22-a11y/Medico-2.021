@@ -307,8 +307,8 @@ export function ExcelUpload({ onSuccess }: ExcelUploadProps) {
         <div className="text-xs text-gray-600 space-y-1 mt-4 p-4 bg-gray-50 rounded">
           <p className="font-medium">Excel Format Requirements:</p>
           <ul className="list-disc list-inside space-y-1 ml-2">
-            <li>Required columns: Medicine Name, Batch Number, Quantity, Units, MRP</li>
-            <li>Optional columns: Manufacture Date, Expiry Date, Manufacturer, Category, Description</li>
+            <li>Required columns: Medicine Name, Batch Number, Quantity, MRP, Expiry Date</li>
+            <li>Optional columns: Units, Manufacture Date, Manufacturer, Category, Description</li>
             <li>Date format: DD/MM/YYYY or MM/DD/YYYY</li>
             <li>Duplicates based on Medicine Name + Batch Number will be skipped</li>
             <li>Maximum file size: 10MB</li>
