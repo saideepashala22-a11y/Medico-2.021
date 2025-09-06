@@ -983,15 +983,14 @@ ${context || 'Nakshatra Hospital HMS assistance'}`;
       ];
       
       // Create workbook and worksheet
-      const XLSX = require('xlsx');
-      const workbook = XLSX.utils.book_new();
-      const worksheet = XLSX.utils.json_to_sheet(templateData);
+      const workbook = xlsx.utils.book_new();
+      const worksheet = xlsx.utils.json_to_sheet(templateData);
       
       // Add the worksheet to the workbook
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Medicine Template');
+      xlsx.utils.book_append_sheet(workbook, worksheet, 'Medicine Template');
       
       // Generate Excel file buffer
-      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+      const excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'buffer' });
       
       // Set headers for file download
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
