@@ -947,13 +947,17 @@ export default function PatientRegistration() {
                     </div>
                     
                     {age > 0 && (
-                      <p className="text-xs text-green-600 font-medium">Age: {age} years</p>
+                      <p className="text-xs text-green-600 font-medium">
+                        Age: {age} {formData.ageUnit}
+                      </p>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="age">Age (Years) *</Label>
+                  <Label htmlFor="age">
+                    Age ({formData.ageUnit === 'days' ? 'Days' : 'Years'}) *
+                  </Label>
                   <Input
                     id="age"
                     type="number"
@@ -1171,7 +1175,7 @@ export default function PatientRegistration() {
                           )}
                         </td>
                         <td className="border border-gray-300 px-4 py-3 text-sm">
-                          {patient.age} yrs, {patient.gender}
+                          {patient.age} {(patient.salutation === 'Baby' || patient.salutation === 'Baby of') ? 'days' : 'yrs'}, {patient.gender}
                         </td>
                         <td className="border border-gray-300 px-4 py-3 text-sm">
                           <div>{patient.contactPhone}</div>
