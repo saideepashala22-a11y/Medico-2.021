@@ -53,9 +53,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post('/api/auth/login', async (req, res) => {
     try {
+      // Check if database is available
+      if (!process.env.SUPABASE_URL) {
+        return res.status(503).json({
+          message: 'Database not configured. Please connect to Supabase to enable authentication.',
+          requiresSetup: true
+        });
+      }
+
       const { username, password, role } = req.body;
       
-      const user = await storage.getUserByUsername(username);
+      let user;
+      try {
+        user = await storage.getUserByUsername(username);
+      } catch (dbError) {
+        console.error('Database error during login:', dbError);
+        return res.status(503).json({
+          message: 'Database connection failed. Please connect to Supabase.',
+          requiresSetup: true
+        });
+      }
+      
       if (!user) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
@@ -85,7 +103,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } 
       });
     } catch (error) {
-      res.status(500).json({ message: 'Server error' });
+      console.error('Login error:', error);
+      res.status(500).json({ 
+        message: 'Login failed. Please ensure Supabase is connected.',
+        requiresSetup: true
+      });
     }
   });
 

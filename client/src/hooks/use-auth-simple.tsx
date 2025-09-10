@@ -64,11 +64,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (response.ok && data.token) {
         localStorage.setItem('token', data.token);
         setToken(data.token);
         setUser(data.user);
       } else {
+        if (data.requiresSetup) {
+          throw new Error('Please connect to Supabase using the "Connect to Supabase" button to enable login functionality.');
+        }
         throw new Error(data.message || 'Login failed');
       }
     } catch (error) {
