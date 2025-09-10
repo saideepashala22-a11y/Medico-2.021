@@ -23,7 +23,7 @@ export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
-    allowedHosts: true as const,
+    allowedHosts: ['localhost', '127.0.0.1', '.bolt.host'] as const,
   };
 
   const vite = await createViteServer({
@@ -61,6 +61,7 @@ export async function setupVite(app: Express, server: Server) {
       const page = await vite.transformIndexHtml(url, template);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
+      log(`Vite error for ${url}: ${e}`);
       vite.ssrFixStacktrace(e as Error);
       next(e);
     }
