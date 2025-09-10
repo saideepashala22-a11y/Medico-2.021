@@ -34,10 +34,6 @@ if (supabaseUrl && supabaseAnonKey) {
     }
   });
 }
-  max: 1,
-  idle_timeout: 20,
-  connect_timeout: 10,
-});
 
 // Create and export drizzle database instance
 export const db = drizzle(client, { schema });
